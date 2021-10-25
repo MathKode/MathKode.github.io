@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<script type="text/javascript">
+	function home_page() {
+		window.location.href = "main.html"
+	}
+	function article_page() {
+		window.location.href = "article.html"
+	}
+	function about_page() {
+		window.location.href = "about.html"
+	}
+	function article(name) {
+		var local = "art/" + arguments[0]
+		window.location.href = local
+	}
+</script>
+<style type="text/css">
+	header h1 {
+		padding-top: 15px;
+		padding-left: 10px;
+		padding-bottom: 8px;
+		color: White;
+		font-size: 30px;
+		font-family: "Lucida Console";
+	}
+	header h2 {
+		color: #AAACAD;
+		font-family: Arial;
+		font-size: 16px;
+		padding-top: 17px;
+	}
+	header button {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: #232323;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	header button:hover {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: White;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	#button_home {
+		position: absolute;
+		right: 160px;
+		top: 30px;
+	}
+	#button_acc {
+		position: absolute;
+		right: 87px;
+		top: 30px;
+	}
+	#button_about {
+		position: absolute;
+		right: 30px;
+		top: 30px;
+	}
+	header {
+		margin: -10px;
+		margin-top: -20px;
+		background: #343434;
+		display: flex;
+		flex: 2;
+	}
+	body {
+		background: Black;
+	}
+	@keyframes anim {
+		from {color: black;}
+		to {color: #00EEFE;}
+	}
+	#title {
+		padding-top: 20px;
+		text-align: center;
+		font-family: "Lucida Console";
+		color: #00EEFE;
+		font-size: 40px;
+		animation-name: anim;
+		animation-duration: 2s;
+	}
+	@keyframes article {
+		0%   {margin-left: -1000px;margin-right: 2000px;}
+		30%  {margin-left: -1000px;margin-right: 2000px;}
+		100% {margin-left: 20px;margin-right: 20px; }
+	}
+	.presentation {
+		background: #6F7475;
+		margin-right: 20px;
+		margin-left: 20px;
+		animation-name: article;
+		animation-duration: 3s;
+		transition: 0.1s;
+	}
+	.presentation:hover {
+		background: #828181;
+		margin-right: 20px;
+		margin-left: 20px;
+	}
+	.presentation div {
+		display: flex;
+		flex: 2;
+	}
+	.presentation img {
+		background: #3E3E3E;
+		margin: 10px;
+		padding: 3px;
+	}
+	.presentation h1 {
+		margin-top: 5px;
+		font-family: "Arial";
+		font-size: 25px;
+		color: #FFED01;
+	}
+	.presentation h2 {
+		margin-top: -30px;
+		margin-left: 68px;
+		padding-bottom: 15px;
+		font-family: "Lucida Console";
+		font-size: 15px;
+		color: #FFBA01;
+	}
+</style>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bimathax Blog</title>
+	</head>	
+
+	<!--Contenu -->
+	<body>
+		<header>
+			<h1>Bimathax</h1>
+			<h2>blog</h2>
+			<button id="button_home" onclick="home_page();">Home</button>
+			<button id="button_acc" onclick="article_page();">Article</button>
+			<button id="button_about" onclick="about_page();">About</button>
+		</header>
+		<h1 id="title">Articles</h1>
+
+			<!-- Content DIV Type
+		<div class="presentation" onclick="article('ARTICLENAME');">
+			<div>
+			<img src="PICTURELINK" width=40px height=40px>
+			<h1>NAME</h1>
+			</div>
+			<h2>DESCRIPTION</h2>
+		</div>
+		<br>
+			-->
+
+		<div class="presentation" onclick="article('tryhackme_jr_linuxprivesc.html');">
+			<div>
+			<img src="https://tryhackme-images.s3.amazonaws.com/room-icons/7303ba648ef3f3f899a55c7b19195add.png" width=40px height=40px>
+			<h1>Linux PrivEsc</h1>
+			</div>
+			<h2>Write-up de cette room (Try Hack Me)</h2>
+		</div>
+
+		<div class="presentation" onclick="article('sample.html');">
+			<div>
+			<img src="https://www.freeiconspng.com/thumbs/writing-png/writing-png-6.png" width=40px height=40px>
+			<h1>Sample Article</h1>
+			</div>
+			<h2>Une page html exemple d'un article</h2>
+		</div>
+		<br>
+	</body>
+
+</html>

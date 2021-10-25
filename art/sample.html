@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<script type="text/javascript">
+	function home_page() {
+		window.location.href = "../main.html"
+	}
+	function article_page() {
+		window.location.href = "../article.html"
+	}
+	function about_page() {
+		window.location.href = "../about.html"
+	}
+	function myFunction(id) {
+		var id = arguments[0];
+		var txt = document.getElementById(id);
+		var cmd = txt.innerHTML;
+		navigator.clipboard.writeText(cmd);
+	}
+</script>
+<style type="text/css">
+	header h1 {
+		padding-top: 15px;
+		padding-left: 10px;
+		padding-bottom: 8px;
+		color: White;
+		font-size: 30px;
+		font-family: "Lucida Console";
+	}
+	header h2 {
+		color: #AAACAD;
+		font-family: Arial;
+		font-size: 16px;
+		padding-top: 17px;
+	}
+	header button {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: #232323;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	header button:hover {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: White;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	#button_home {
+		position: absolute;
+		right: 160px;
+		top: 30px;
+	}
+	#button_acc {
+		position: absolute;
+		right: 87px;
+		top: 30px;
+	}
+	#button_about {
+		position: absolute;
+		right: 30px;
+		top: 30px;
+	}
+	header {
+		margin: -10px;
+		margin-top: -20px;
+		background: #343434;
+		display: flex;
+		flex: 2;
+	}
+	body {
+		background: Black;
+	}
+	@keyframes anim {
+		from {opacity: 0%;}
+		to {opacity: 100%;}
+	}
+	#content {
+		margin: 20px;
+		background: #616161;
+		animation-name: anim;
+		animation-duration: 2s;
+	}
+	#content h1 {
+		font-family: "Arial";
+		font-size: 35px;
+		padding-left: 10px;
+	}
+	#content h2 {
+		font-family: "Lucida Console";
+		font-size: 15px;
+		padding-left: 10px;
+		margin-top: -20px;
+	}
+	#content h3 {
+		font-family: "Arial";
+		font-size: 25px;
+		padding-left: 10px;
+		margin-top: 0px;
+	}
+	#content h4 {
+		font-family: "Lucida Console";
+		font-size: 20px;
+		padding-left: 10px;
+		margin-top: -20px;
+	}
+	#italic {
+		font-style: italic;
+	}
+	.orange {
+		color: #FEBA00;
+	}
+	.white {
+		color: white;
+	}
+	.black {
+		color: black;
+	}
+	.green {
+		color: #01FF1A;
+	}
+	.blue {
+		color: #01F6FE;
+	}
+	.red {
+		color: red;
+	}
+	#command {
+		background: #383838;
+		height: 40px;
+		margin:5px;
+		border-radius: 10px 10px 10px 10px;
+		color: #B2B2B1;
+		font-family: "Trebuchet MS";
+		display: flex;
+		flex: 2;
+		text-overflow: hidden;
+		margin-top:  -17px;
+	}
+	#command div {
+		float: left;
+		padding-left: 5px;
+		font-size: 17px;
+		width: 90%;
+		text-overflow: hidden;
+	}
+	#command div p {
+		margin-top: 10px;
+	}
+	#command button {
+		font-family: "Arial";
+		font-size: 13px;
+		margin-right: 0%;
+		margin-top: 0px;
+		border-radius: 10px;
+		border: none;
+		background-color: #DADAD8;
+	}
+	img {
+		width:80%;
+		margin-left:10%;
+	}
+</style>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bimathax Blog</title>
+	</head>	
+
+	<!--Contenu -->
+	<body>
+		<header>
+			<h1>Bimathax</h1>
+			<h2>blog</h2>
+			<button id="button_home" onclick="home_page();">Home</button>
+			<button id="button_acc" onclick="article_page();">Article</button>
+			<button id="button_about" onclick="about_page();">About</button>
+		</header>
+		<div id="content">
+			<h1 class="orange">TITLE<h2>
+			<h2 class="black" id="italic">Description</h2>
+			<h3 class="green">SUBTITLE</h3>
+			<h4 class="white">Paragraphe</h4>
+			
+			<div id="command">
+				<div>
+					<p id="one">Command</p>
+				</div>
+				<button onclick="myFunction('one')">Ctrl+C</button>
+			</div>
+
+
+		</div>
+	</body>
+</html>

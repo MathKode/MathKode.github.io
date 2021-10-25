@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<script type="text/javascript">
+	function home_page() {
+		window.location.href = "../main.html"
+	}
+	function article_page() {
+		window.location.href = "../article.html"
+	}
+	function about_page() {
+		window.location.href = "../about.html"
+	}
+	function myFunction(id) {
+		var id = arguments[0];
+		var txt = document.getElementById(id);
+		var cmd = txt.innerHTML;
+		navigator.clipboard.writeText(cmd);
+	}
+</script>
+<style type="text/css">
+	header h1 {
+		padding-top: 15px;
+		padding-left: 10px;
+		padding-bottom: 8px;
+		color: White;
+		font-size: 30px;
+		font-family: "Lucida Console";
+	}
+	header h2 {
+		color: #AAACAD;
+		font-family: Arial;
+		font-size: 16px;
+		padding-top: 17px;
+	}
+	header button {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: #232323;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	header button:hover {
+		background: #7B7E7D;
+		font-family: "Lucida Console";
+		color: White;
+		border: none;
+		font-size: 13px;
+		padding: 6px;
+	}
+	#button_home {
+		position: absolute;
+		right: 160px;
+		top: 30px;
+	}
+	#button_acc {
+		position: absolute;
+		right: 87px;
+		top: 30px;
+	}
+	#button_about {
+		position: absolute;
+		right: 30px;
+		top: 30px;
+	}
+	header {
+		margin: -10px;
+		margin-top: -20px;
+		background: #343434;
+		display: flex;
+		flex: 2;
+	}
+	body {
+		background: Black;
+	}
+	@keyframes anim {
+		from {opacity: 0%;}
+		to {opacity: 100%;}
+	}
+	#content {
+		margin: 20px;
+		background: #616161;
+		animation-name: anim;
+		animation-duration: 2s;
+	}
+	#content h1 {
+		font-family: "Arial";
+		font-size: 35px;
+		padding-left: 10px;
+	}
+	#content h2 {
+		font-family: "Lucida Console";
+		font-size: 15px;
+		padding-left: 10px;
+		margin-top: -20px;
+	}
+	#content h3 {
+		font-family: "Arial";
+		font-size: 25px;
+		padding-left: 10px;
+		margin-top: 0px;
+	}
+	#content h4 {
+		font-family: "Lucida Console";
+		font-size: 16px;
+		padding-left: 10px;
+		margin-top: -20px;
+	}
+	#content h5 {
+		font-family: "Lucida Console";
+		font-size: 13px;
+		padding-left: 10px;
+		margin-top: -20px;
+	}
+	#italic {
+		font-style: italic;
+	}
+	.orange {
+		color: #FEBA00;
+	}
+	.white {
+		color: white;
+	}
+	.black {
+		color: black;
+	}
+	.green {
+		color: #01FF1A;
+	}
+	.blue {
+		color: #01F6FE;
+	}
+	.red {
+		color: red;
+	}
+	#command {
+		background: #383838;
+		height: 40px;
+		margin:5px;
+		border-radius: 10px 10px 10px 10px;
+		color: #B2B2B1;
+		font-family: "Trebuchet MS";
+		display: flex;
+		flex: 2;
+		text-overflow: hidden;
+		margin-top:  -17px;
+	}
+	#command div {
+		float: left;
+		padding-left: 5px;
+		font-size: 17px;
+		width: 90%;
+		text-overflow: hidden;
+	}
+	#command div p {
+		margin-top: 10px;
+	}
+	#command button {
+		font-family: "Arial";
+		font-size: 13px;
+		margin-right: 0%;
+		margin-top: 0px;
+		border-radius: 10px;
+		border: none;
+		background-color: #DADAD8;
+	}
+	img {
+		width:80%;
+		margin-left:10%;
+	}
+</style>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bimathax Blog</title>
+	</head>	
+
+	<!--Contenu -->
+	<body>
+		<header>
+			<h1>Bimathax</h1>
+			<h2>blog</h2>
+			<button id="button_home" onclick="home_page();">Home</button>
+			<button id="button_acc" onclick="article_page();">Article</button>
+			<button id="button_about" onclick="about_page();">About</button>
+		</header>
+		<div id="content">
+			<h1 class="orange">Linux PrivEsc<h2>
+			<h2 class="black" id="italic">Room de tryhackme consacrée à l'élévation de privilèges sur une machine linux</h2>
+			<h3 class="green">Task 2 : C'est quoi l'élévation de privilège ?</h3>
+				<h4 class="white">Dans le hacking et la cybersécurité, l'élévation de privilège correspond à l'exploitation d'une vulnérabilité sur la machine hôte pour passer d'un utiliser standar à root (Super Admin)</h4>
+				<h4 class="white">Ceci est important car, une fois root, on peut :</h5>
+					<br>
+				<h5 class="blue">Reset les mots de passe (mp)</h5>
+				<h5 class="blue">Editer les applications (sshd)</h5>
+				<h5 class="blue">Crée et changer les privilièges utilisateur</h5>
+				<h5 class="blue">Exécuter des commandes en admin</h5>
+				<h5 class="blue">Acceder au fichier /etc/shadow/</h5>
+					<br>
+				<h4 class="white">Bref, l'étape "pivilege escalation" est une étape très impotante quand on hack quelqu'un</h4>
+			<h3 class="green">Task 3 : Enumération</h3>
+				<h2 class="black" id="italic">Cette partie explique comment trouver des failles en faisant de l'énumération (énumerer les caractéristiques du système)</h2> <br>
+				<h4 class="white">Avant de parler du cours, je vous conseille de start la machine et de vous connecter en ssh à celle-ci (pour mieux suivre)</h4>
+				
+				<div id="command">
+					<div>
+						<p id="one">ssh karen@10.10.XXX.XXX</p>
+					</div>
+					<button onclick="myFunction('one')">Ctrl+C</button>
+				</div> <br>
+
+				<h4 class="white">Et mp :</h4>
+				<div id="command">
+					<div>
+						<p id="two">Password1</p>
+					</div>
+					<button onclick="myFunction('two')">Ctrl+C</button>
+				</div> <br> <br>
+
+				<h4 class="blue">Cours :</h4>
+					<h4 class="white">La première façon d'obtenir des infos sur le système de l'hôte est de tapper la commande hostname :</h4>
+
+					<div id="command">
+						<div>
+							<p id="th">hostname</p>
+						</div>
+						<button onclick="myFunction('th')">Ctrl+C</button>
+					</div> <br> 
+
+					<h4 class="white">Elle nous donne le nom de la machine sur le réseau : soit pas grand chose ^^. Mais cela peut toujours être util pour une cartographie de ce dernier (SQL-PROD-02 deuxième serveur sql utiliser en test)</h4>
+					<img src="Img/1.PNG" >
+					<br> <br>
+					<h4 class="white">La deuxième façon de trouver les renseignements système est de tapper la commande uname -a :</h4>
+					<div id="command">
+						<div>
+							<p id="fr">uname -a</p>
+						</div>
+						<button onclick="myFunction('fr')">Ctrl+C</button>
+					</div> <br> 
+					<h4 class="white">Il va nous donner plusieurs sorties : </h4>
+					<h5 class="blue">Nom du kernel (noyau)</h5>
+					<h5 class="blue">l'Hostname (nom de la machine dur le réseau)</h5>
+					<h5 class="blue">La version du compileur du noyau</h5>
+					<h5 class="blue">La date où le noyau à été compilé</h5>
+					<h5 class="blue">Le nom de l'hardware</h5>
+					<h5 class="blue">Le type de processeur</h5>
+					<h5 class="blue">Le type d'hardaware (normalement le même que le nom)</h5>
+					<h5 class="blue">Le système opérant (qui se traduit par la distribution)</h5>
+					<img src="Img/2.PNG">
+					<br> <br>
+					<h4 class="white">L'on peut retrouver les infos de uname -a (et en avoir en complémentaire) en ouvrant le fichier /proc/version :</h4>
+					<div id="command">
+						<div>
+							<p id="five">cat /proc/version</p>
+						</div>
+						<button onclick="myFunction('five')">Ctrl+C</button>
+					</div> <br> 
+					<img src="Img/3.PNG">
+					<br> <br>
+					<h4 class="white">Enfin, l'on peut obtenir avec plus de précision la version du système d'exploitation en ouvrant le fichier /etc/issue :</h4>
+					<div id="command">
+						<div>
+							<p id="six">cat /etc/issue</p>
+						</div>
+						<button onclick="myFunction('six')">Ctrl+C</button>
+					</div> <br> 
+					<img src="Img/4.PNG">
+					<br> <br>
+					<h4 class="white">Maintenant, nous allons voire comment fonctionne la commande ps (qui permet de lister les processus en cours d'exécution). Après avoir écrit ps dans le terminal, on obtient 4 infos :</h4>
+					<h5 class="blue">PID : numéro unique d'un processus (util quand on veut l'arreter avec un kill PID</h5>
+					<h5 class="blue">TTY : Le type de terminal utilisé par l'utilisateur</h5>
+					<h5 class="blue">TIME : Le temps de CPU utilisé et non la durée</h5>
+					<h5 class="blue">CMD : le nom du programme en cours d'éxecution</h5>
+					<br>
+					<h4 class="white">Des arguments en lien avec cette commande existent... Les principaux sont :</h4>
+					<h5 class="blue">ps -A : affiche tous les processus</h5>
+					<h5 class="blue">ps aux : affiche les processus pour tout les utilisateur</h5>
+					<h5 class="blue">ps axjf : Affiche l'arborescence des processus</h5>
+					<img src="Img/5.PNG">
+					<br> <br>
+					<h4 class="white">Vient maintenant les variables d'environnement qui s'obtiennent avec un env :</h4>
+					<div id="command">
+						<div>
+							<p id="seven">env</p>
+						</div>
+						<button onclick="myFunction('seven')">Ctrl+C</button>
+					</div> <br> 
+					<h4 class="white">J'ai fait un petit screen shoot des points important de env (la variable PATH peut cacher un compilateur...)</h4>
+					<img src="Img/6.PNG"> <br> <br>
+					<h4 class="white">Pour faire une bonne énumération, il faut savoir lister les fichiers... Normalement on utilise ls mais il faut savoir que les fichier "cacher" n'apparraissent pas avec un ls simple. Pour les faire apparaitre il faut rajouter l'argument -al</h4>
+					<div id="command">
+						<div>
+							<p id="height">ls -al</p>
+						</div>
+						<button onclick="myFunction('height')">Ctrl+C</button>
+					</div> <br>
+					<img src="https://i.imgur.com/2jOtOat.png"> <br> <br>
+					<h4 class="white">Ensuite, on peut connaître la liste des utilisateurs en ouvrant le fichier /etc/passwd</h4>
+					<div id="command">
+						<div>
+							<p id="neine">cat /etc/passwd</p>
+						</div>
+						<button onclick="myFunction('neine')">Ctrl+C</button>
+					</div> <br>
+					<h4 class="white">Ou en plus propre :</h4>
+					<div id="command">
+						<div>
+							<p id="ten">cat /etc/passwd | cut -d ":" -f 1</p>
+						</div>
+						<button onclick="myFunction('ten')">Ctrl+C</button>
+					</div> <br>
+					<h4 class="white">Une fois que nous avons la liste des utilisateurs, on utilise id pour connaître leur permissions (sudouser, root, none...) :</h4>
+					<div id="command">
+						<div>
+							<p id="eleven">id NAME</p>
+						</div>
+						<button onclick="myFunction('eleven')">Ctrl+C</button>
+					</div> <br>
+					<h4 class="white">Une fois que nous avons la liste des utilisateurs, on utilise id pour connaître leur permissions (sudouser, root, none...) :</h4>
+					<img src="Img/7.PNG"> <br> <br>
+					<h4 class="white">Si l'historique des commandes est activité, ça vaut le coup d'y jetter un oeil :</h4>
+					<div id="command">
+						<div>
+							<p id="douze">history</p>
+						</div>
+						<button onclick="myFunction('douze')">Ctrl+C</button>
+					</div> <br>
+					<img src="Img/8.PNG"> <br> <br>
+					<h4 class="white">On peut aussi repérer les connexions établies ou les ports en écoute avec netstat :</h4>
+					<h5 class="blue">netstat -a : affiche tous les ports d'écoute et les connexions établies</h5>
+					<h5 class="blue">netstat -at : liste les ports/connexions TCP</h5>
+					<h5 class="blue">netstat -au : liste les ports/connexions UDP</h5>
+					<h5 class="blue">netstat -l : liste seuleument les ports en écoute (attente connection)</h5>
+					<h5 class="blue">netstat -s : liste les caractéristique pour chaque protocole réseau</h5>
+					<h5 class="blue">netstat -tp : liste les connexions TCP avec le nom du service et son PID</h5>
+					<h5 class="blue">netstat -ltp : liste les attentes de connexions TCP avec nom processus et PID</h5>
+					<h5 class="blue">netstat -i : Affiche l'interface réseau</h5>
+					<h4 class="white">Une autre commande SUPER UTILE est la commande find qui permet de chercher un fichier. Dans les exemples suivants, je vais ajouter 2>/dev/null. C'est un bout de code qui redirige les erreurs vers la corbeille...</h4>
+					<h5 class="blue">find / 2>/dev/null | grep "NOM" : trouver un nom approximatif</h5>
+					<h3 class="green">Les types d'endroits de recherches :</h3>
+					<h5 class="blue">find / : racine</h5>
+					<h5 class="blue">find . : répertoire courant</h5>
+					<h3 class="green">Les types de recherches :</h3>
+					<h5 class="blue">find / -name flag.txt : recherche un fichier du nom exacte de flag.txt</h5>
+					<h5 class="blue">find / -type d -name home : repértoire</h5>
+					<h5 class="blue">find / -user karen : utilisateur karen</h5>
+					<h5 class="blue">find / -writeable : fichier où on a le droit d'écriture</h5>
+					<h5 class="blue">find / -perm -o w -type d 2>/dev/null: dossier où l'on peut écrire (crée des docs)</h5>
+				<h4 class="blue">Questions :</h4>
+					<h4 class="red">Quel est le nom d'hôte du système cible ?</h4>
+					<h4 class="white">Pour ce faire, on se connecte à la machine en ssh et on fait un hostname (nom de la machine sur le réseau) :</h4>
+					<div id="command">
+						<div>
+							<p id="treize">hostname</p>
+						</div>
+						<button onclick="myFunction('treize')">Ctrl+C</button>
+					</div> <br>
+					<img src="Img/9.PNG"> <br> <br>
+					<h4 class="red">Quelle est la version du noyau ?</h4>
+					<h4 class="white">Pour ce faire, on utilise uname -a et on prend l'argument de la version du noyau :</h4>
+					<div id="command">
+						<div>
+							<p id="quatorze">uname -a</p>
+						</div>
+						<button onclick="myFunction('quatorze')">Ctrl+C</button>
+					</div> <br>
+					<img src="Img/10.PNG"> <br> <br>
+					<h4 class="red">Quelle est la version de Linux ?</h4>
+					<h4 class="white">Pour ce faire, on ouvre le fichier /etc/issue :</h4>
+					<div id="command">
+						<div>
+							<p id="quinze">cat /etc/issue</p>
+						</div>
+						<button onclick="myFunction('quinze')">Ctrl+C</button>
+					</div> <br>
+					<img src="Img/11.PNG"> <br> <br>
+					<h4 class="red">Quelle est la version de python ?</h4>
+					<h4 class="white">Il existe deux solutions, soit :</h4>
+					<div id="command">
+						<div>
+							<p id="seize">find / -name python*</p>
+						</div>
+						<button onclick="myFunction('seize')">Ctrl+C</button>
+					</div> <br>
+					<h4 class="white">Soit</h4>
+					<div id="command">
+						<div>
+							<p id="dsep">python</p>
+						</div>
+						<button onclick="myFunction('dsep')">Ctrl+C</button>
+					</div> <br>
+					<img src="Img/12.PNG"> <br> <br>
+					<h4 class="red">Trouver une vulnérabilité qui affecte le noyeau ?</h4>
+					<h4 class="white">On sait que la version du noyau est 3.13.0-24-generic ducoup on fait une recherche google "3.13.0-24-generic CVE" et on trouve : </h4>
+					<a href="https://www.exploit-db.com/exploits/37292">Exploit DB (site repertoriant les exploits=vulnérabilité)</a>
+					<img src="Img/13.PNG"> <br> <br>
+			<h3 class="green">Task 3 : Enumération</h3>
+				<h2 class="black" id="italic">Cette partie nous livre à nous même et nous dit d'exploiter la machine avec la CVE trouvée avant</h2> <br>
+				
+
+		</div>
+	</body>
+</html>
