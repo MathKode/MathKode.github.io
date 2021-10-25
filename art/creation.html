@@ -33,7 +33,7 @@
 				var chemin = "//html[1]/body[1]/div["+step+"]/input[5]"
 				var check_command = getElementByXpath(chemin).checked
 				if (check_command) {
-					html+="<div id='command'><div><p id='" + name[step] + "'>"+content + "</p></div><button onclick='myFunction(" + '"' + name[step] + '"' + ");'>Ctrl+c</button></div>"
+					html+="<br><div id='command'><div><p id='" + name[step] + "'>"+content + "</p></div><button onclick='myFunction(" + '"' + name[step] + '"' + ");'>Ctrl+c</button></div>"
 				} else {
 					html+="<h1 id='" + name[step] + "'>"+content+"</h1>" 
 					var chemin = "//html[1]/body[1]/div["+step+"]/input[2]"
