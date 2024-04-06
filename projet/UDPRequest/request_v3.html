@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+:root {
+    --bk-color: rgb(124, 255, 76);
+    --bk-color2: rgba(124, 255, 76, 0.5);
+    --bk-parametre : rgb(230, 230, 230);
+    --bk-input : rgb(248, 248, 248);
+    --x: 0px;
+    --y: 0px;
+}
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+body {
+    background-color: #000;
+}
+header {
+    color: var(--bk-color);
+    display: flex;
+    justify-content: center;
+    padding-top:8px;
+    padding-bottom: 5px;
+    transition: 1s;
+}
+.box {
+   
+    margin-left: 12.5%;
+    width:75%;
+    min-width: 600px;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+}
+.result {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    width: 100%;
+}
+.result textarea {
+    height:100%;
+    width: 100%;
+    background-color: #7c7c7c;
+}
+.parameter {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 3;
+    grid-column-end: 4;
+
+    display: grid;
+    width: 250px;
+    grid-template-columns: 1fr;
+
+    color: #45ff00;
+}
+.info {
+    border: solid rgb(89, 89, 89);
+    border-width: 0px 0px 0px 3px;
+    display: grid;
+    background-color: rgb(79 79 79);
+    border: solid aliceblue;
+    border-width: 1px 0px 1px 0px;
+    width: 300px;
+    grid-template-columns: repeat(auto-fill, 150px);
+}
+.info1 {
+    padding: 4px;
+
+    display: flex;
+    margin: auto;
+    text-align: center;
+}
+.info2 {
+    padding: 12px 8px;
+    
+    display: flex;
+    margin: auto;
+    text-align: center;
+}
+.info-input {
+    text-align: center;
+    font-size: 15px;
+    background-color: rgb(125 125 125);
+    border: solid #acacac;
+    border-width: 0px 0px 2px 0px;
+    width: 133px;
+    border-radius: 2px;
+}
+.info-ask {
+    font-size: 20px;
+}
+.mac {
+    min-height: 70px;
+}
+.fi {
+    border-top-width: 0px;
+}
+.li {
+    border-bottom-width: 0px;
+}
+/*
+section {
+    position: relative;
+    min-height: 100vh;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+section h2 {
+    color: #fff;
+    font-size: 15em;
+    cursor: default;
+}
+*/
+.light {
+    z-index: -2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--x) var(--y), var(--bk-color2) 0.1%, transparent 40%);
+}
+#canvas {
+    z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Creator</title>
+</head>
+<body>
+    <header>
+        <h1>UDP Request Creator</h1>
+    </header>
+    <br><br>
+    <!-- UDP -->
+    <div class="box">
+        <div class="result">
+            <textarea id="result_area"></textarea>
+        </div>
+        <div class="parameter">
+            <div class="info fi">
+                <div class="info1">
+                    <h2 class="info-ask">MAC Source</h2>
+                </div>
+                <div class="info2">
+                    <textarea id="src-mac" class="info-input mac" onchange="change_data()">d2:66:46:08:a8:83</textarea>
+                </div>
+            </div>
+            <div class="info">
+                <div class="info1">
+                    <h2 class="info-ask">MAC Destination</h2>
+                </div>
+                <div class="info2">
+                    <textarea id="dst-mac" class="info-input mac" onchange="change_data()">64:80:87:38:e3:d6</textarea>
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info1">
+                    <h2 class="info-ask">IP Source</h2>
+                </div>
+                <div class="info2">
+                    <input id="src-ip" class="info-input" type="text" onchange="change_data()" value="172.52.25.252">
+                </div>
+            </div>
+            <div class="info">
+                <div class="info1">
+                    <h2 class="info-ask">IP Destination</h2>
+                </div>
+                <div class="info2">
+                    <input id="dst-ip" class="info-input" type="text" onchange="change_data()" value="132.8.177.31">
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info1">
+                    <h2 class="info-ask">Port Source</h2>
+                </div>
+                <div class="info2">
+                    <input id="src-port" class="info-input" type="text" onchange="change_data()" value="49136">
+                </div>
+            </div>
+            <div class="info">
+                <div class="info1">
+                    <h2 class="info-ask">Port Destination</h2>
+                </div>
+                <div class="info2">
+                    <input id="dst-port" class="info-input" type="text" onchange="change_data()" value="7456">
+                </div>
+            </div>
+
+            <div class="info li">
+                <div class="info1">
+                    <h2 class="info-ask">Data</h2>
+                </div>
+                <div class="info2">
+                    <textarea id="data" class="info-input mac" onchange="change_data()">Hello World</textarea>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+
+    <!--
+    <section>
+        <h2>Light</h2>
+    </section>
+-->
+    <div class="light"></div>
+    <canvas id="canvas"></canvas>
+
+</body>
+<script>
+var pos = document.documentElement;
+pos.addEventListener('mousemove', e =>{
+    pos.style.setProperty('--x', e.clientX + "px")
+    pos.style.setProperty('--y', e.clientY + "px")
+})
+function drawCheckeredBackground(can, nRow, nCol) {
+    var ctx = can.getContext("2d");
+    var w = can.width;
+    var h = can.height;
+
+    nRow = window.innerHeight / 40;    // default number of rows
+    nCol = window.innerWidth / 40;    // default number of columns
+    
+    w /= nCol;            // width of a block
+    h /= nRow;            // height of a block
+
+    for (var i = 0; i < nRow; ++i) {
+        for (var j = 0, col = nCol; j < col; ++j) {
+            ctx.rect(j * w, i * h, w-15, h-15);
+        }
+    }
+
+    ctx.fill();
+}
+
+var canvas = document.getElementById("canvas");
+canvas.width = window.innerWidth*10;
+canvas.height = window.innerHeight*10;
+
+drawCheckeredBackground(canvas);
+
+function change_data() {
+    mac_source = String(document.getElementById('src-mac').value).split(' ').join('').split(':').join('')
+    mac_destination = String(document.getElementById('dst-mac').value).split(' ').join('').split(':').join('')
+    ip_source = document.getElementById('src-ip').value
+    ip_destination = document.getElementById('dst-ip').value
+    port_source = document.getElementById('src-port').value
+    port_destination = document.getElementById('dst-port').value
+    data = document.getElementById('data').value
+    udp(mac_source,ip_source,port_source,mac_destination,ip_destination,port_destination,data)
+}
+function decimal_to_binary(n) {
+    return String(Number(n).toString(2));
+}
+function decimal_to_bytes(n) {
+    b=decimal_to_binary(n)
+    while (b.length%8!=0) {b="0"+b}
+    return b
+}
+function text_to_binary(txt) {
+    result="";
+    for (var i=0; i<txt.length ; i++) {
+        t=txt[i].charCodeAt(0).toString(2);
+        while (t.length%8!=0) {
+            t="0"+t;
+        }
+        result+=t;
+    }
+    return result
+}
+function binary_to_hex(bin, letter_between="") {
+    r=[]
+    for (var i=0; i<bin.length/8; i++) {
+        bt = bin.substr(i*8,8);
+        ht=String(parseInt(bt, 2).toString(16))
+        if (ht.length==1) {
+            ht = "0" + ht
+        }
+        r.push(ht);
+    }
+    return r.join(letter_between)
+}
+function hex_to_binary(hex) {
+    return String((parseInt(hex, 16).toString(2)).padStart(8, '0'));
+}
+function parse_hex_to_binary(hex) {
+    // Parse by groups of 2 letter
+    if (hex.length%2!=0) {
+        hex = "0" + hex
+    }
+    result=""
+    for (let step=0; step<Number(hex.length/2); step++) {
+        group = hex.substr(step*2,2)
+        console.log(group)
+        binaire=hex_to_binary(group)
+        while (binaire.length % 8 != 0) {
+            binaire = "0" + binaire
+        }
+        result+=binaire
+    }
+    return result
+}
+function checksum(binaire) {
+    console.log(binaire)
+    while (binaire.length % 16 != 0) {
+        console.log("CHECKSUM NOMBRE NON PARFAIT")
+        binaire = binaire + "0"
+    }
+    console.log(binaire)
+    last="0000000000000000"
+    for (let step=0; step<Number(binaire.length/16); step++) {
+        bite = binaire.substr(step*16,16)
+        last = (parseInt(last, 2) + parseInt(bite, 2)).toString(2); //Converti en dec puis additionne
+        if (last.length==17) {
+            last = last.substr(1,16)
+            last = (parseInt(last, 2) + 1).toString(2);
+        }
+        if (last.length==17) {
+            last = last.substr(1,16)
+            last = (parseInt(last, 2) + 1).toString(2);
+        }
+        while (last.length % 16 != 0) {
+            last = "0" + last
+        }
+    }
+    return last.split("1").join("a").split("0").join("b").split("a").join("0").split("b").join("1")
+}
+
+//udp("A43e5142ab91","192.168.1.24","11000","489ebdd94654","1.2.3.4","10000","T")
+
+change_data()
+
+function udp(src_mac,src_ip,src_port,dst_mac,dst_ip,dst_port,data) {
+    result_tt=""
+    
+    // MAC
+    bin_mac=""
+    bin_mac+=parse_hex_to_binary(dst_mac)
+    bin_mac+=parse_hex_to_binary(src_mac)
+    
+    b=decimal_to_binary(8)
+    while (b.length%8!=0) {b="0"+b}
+    bin_mac+=b
+
+    bin_mac+="00000000"
+    result_tt+=bin_mac
+    console.log("result_tt : " + result_tt)
+
+    // IP
+    bin_ip = {
+        version:"0100",
+        header_length:"0101",
+        space:"00000000",
+        total_length:"0000000000000000", //IP Paquet + UDP
+        identification:"0000000000000001",
+        flag:"000",
+        fragment_offset:"0000000000000",
+        time_to_live:decimal_to_bytes(64),
+        protocol_udp:decimal_to_bytes(17),
+        checksum_header:"0000000000000000",
+        ip_source : "00000000000000000000000000000000",
+        ip_dest : "00000000000000000000000000000000"
+    }
+
+    //Ip Source
+    r=""
+    cut_ip = src_ip.split(".")
+    cut_ip.forEach(el => {
+        r+=decimal_to_bytes(Number(el))
+    })
+    bin_ip["ip_source"] = r
+
+    //Ip Dest
+    r=""
+    cut_ip = dst_ip.split(".")
+    cut_ip.forEach(el => {
+        r+=decimal_to_bytes(Number(el))
+    })
+    bin_ip["ip_dest"] = r
+
+
+    
+    // UDP 
+    bin_udp = {
+        port_source:"0000000000000000",
+        port_dest:"0000000000000000",
+        length:"00000000"+decimal_to_bytes(8),
+        checksum:"0000000000000000",
+        data:"",
+    }
+    
+    //Data
+    bin_udp["data"] = text_to_binary(data)
+    
+    //Port Source
+    byte = decimal_to_binary(src_port)
+    while (byte.length<16) {
+        byte = "0" + byte
+    }
+    bin_udp["port_source"] = byte
+
+    //Port Destination
+    byte = decimal_to_binary(dst_port)
+    while (byte.length<16) {
+        byte = "0" + byte
+    }
+    bin_udp["port_dest"] = byte
+    
+    //Lenght UDP
+    r=""
+    prp=["port_source","port_dest","length","checksum","data"]
+    prp.forEach(element => {
+        r+=bin_udp[element]
+    });
+    byte=decimal_to_binary(r.length/8)
+    while (byte.length<16) {
+        byte = "0" + byte
+    }
+    bin_udp["length"] = byte
+
+    //Checksum
+    r="" //pseudo header IPSRC-IPDEST-SPACE8bit-PROTOCOL-UDPLENGHT
+    prp=["ip_source","ip_dest","space","protocol_udp"]
+    prp.forEach(element => {
+        r+=bin_ip[element]
+    });
+    
+    prp=["length","port_source","port_dest","length","checksum","data"]
+    prp.forEach(element => {
+        r+=bin_udp[element]
+    });
+    
+    check = checksum(r)
+    bin_udp["checksum"] = check
+
+
+    //IP Total Length (IP + UDP)
+    r="" 
+    prp=["version","header_length","space","total_length","identification","flag","fragment_offset","time_to_live","protocol_udp","checksum_header","ip_source","ip_dest"]
+    prp.forEach(element => {
+        r+=bin_ip[element]
+    });
+    prp=["port_source","port_dest","length","checksum","data"]
+    prp.forEach(element => {
+        r+=bin_udp[element]
+    });
+    byte=decimal_to_binary(r.length/8)
+    while (byte.length<16) {
+        byte = "0" + byte
+    }
+    bin_ip["total_length"] = byte
+
+    
+    //IP checksum
+    r=""
+    prp=["version","header_length","space","total_length","identification","flag","fragment_offset","time_to_live","protocol_udp","checksum_header","ip_source","ip_dest"]
+    prp.forEach(element => {
+        r+=bin_ip[element]
+    });
+    check = checksum(r)
+    bin_ip['checksum_header'] = check
+
+
+    //Result
+    console.log("result tt : " + result_tt)
+    prp=["version","header_length","space","total_length","identification","flag","fragment_offset","time_to_live","protocol_udp","checksum_header","ip_source","ip_dest"]
+    prp.forEach(element => {
+        result_tt+=bin_ip[element]
+    });
+    prp=["port_source","port_dest","length","checksum","data"]
+    prp.forEach(element => {
+        result_tt+=bin_udp[element]
+    });
+
+    console.log(bin_ip)
+    console.log(bin_udp)
+    console.log("result tt : " + result_tt)
+
+    //Convertir le résultat
+    binary_to_hex(result_tt,"")
+    binary_to_hex(result_tt," ").toUpperCase()
+
+
+    //Python script
+    py = ["from scapy.all import *",
+            "IFACES.show() # let’s see what interfaces are available. Windows only",
+            "iface = IFACES.dev_from_index(20)",
+            "socket = conf.L2socket(iface=iface)",
+    ]
+
+    re = "socket.send(b'\\x"+binary_to_hex(result_tt,"\\x")+"')"
+    py.push(re)
+    python_script = py.join("\n")
+    console.log(python_script)
+
+    document.getElementById("result_area").value = "--- BINARY ---\n" + result_tt + "\n\n--- HEX SHORT ---\n" + binary_to_hex(result_tt,"") + "\n\n--- HEX ---\n" + binary_to_hex(result_tt," ").toUpperCase() + "\n\n--- PYTHON ---\n" + python_script
+
+}
+
+</script>
+</html>
