@@ -1,0 +1,209 @@
+<!--
+Coded by Bimathax
+https://jsfiddle.net/1pdns872/7/
+https://jsfiddle.net/1pdns872/11/
+https://jsfiddle.net/1pdns872/12/
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impossible Button</title>
+</head>
+<body>
+    <h1 id="question">On se fait un ciné ?</h1>
+    <button id="bt1" onclick="TP()">Non</button>
+    <button id="bt2" onclick="alert('Super <3')">Oui</button>
+    <button id="bt3" onclick="afficher()">Création</button>
+</body>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: bisque;
+}
+#question {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    width: 100%;
+    font-size: 26px;
+    color:black;
+    text-align: center;
+}
+
+button {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    }
+
+#bt1 {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  border: 0px;
+  border-radius: 4px;
+  color: rgb(1,1,1);
+  padding: 5px 10px;
+  font-size: 20px;
+  background-color: rgb(230,150,150);
+}
+
+#bt2 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 0px;
+  border-radius: 4px;
+  color: rgb(1,1,1);
+  padding: 5px 10px;
+  font-size: 20px;
+  background-color: rgb(150,200,160);
+  transform:translate(-50%,-50%);
+}
+
+@keyframes anim {
+  0% {
+    transform: translate(-50%,-50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%,-50%) scale(1.5);
+  }
+}
+
+#bt3 {
+    position: absolute;
+    bottom: 0px;
+    right: 50%;
+    transform: translate(50%);
+    border: 0px;
+    margin-bottom: 5px;
+}
+</style>
+<script>
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+onmousemove = function (e){
+	
+  mouse = [e.clientX, e.clientY]
+ 	//console.log("Mouse (X-Y) : " + mouse[0] + ":" + mouse[1])
+  
+  bt = document.getElementById('bt1').getBoundingClientRect()
+  /*
+  [object DOMRect] {
+    bottom: 40.5,
+    height: 32.5,
+    left: 8,
+    right: 73.578125,
+    toJSON: function toJSON() { [native code] },
+    top: 8,
+    width: 65.578125,
+    x: 8,
+    y: 8
+  }
+  */
+  center = [bt.x + bt.width/2 , bt.y+bt.height/2]
+  dx = center[0] - mouse[0]
+  dy = center[1] - mouse[1]
+  
+  //console.log("(dx-dy) : " + dx + ";" + dy)
+  
+  ds = Math.sqrt(dx*dx + dy*dy)
+  
+  //console.log("ds : "+ds)
+  seuil = (window.innerWidth + window.innerHeight)/7 + bt.width/100
+  movement = 10
+  turn = 0
+  while (ds <= seuil) {
+  	//console.log((1-(ds/seuil))
+  	if (dx < 0) {
+    	//Mouse come from the right, so we go to the left
+      //console.log((1-dx/ds))
+      document.getElementById("bt1").style.left = bt.x - (1-ds/seuil)*movement + "px"
+    }
+    if (dx > 0) {
+    	//Mouse come from the left, so we go to the right
+      document.getElementById("bt1").style.left = bt.x + (1-ds/seuil)*movement + "px"
+    }
+    if (dy > 0) {
+    	//Mouse come from the left, so we go to the right
+      document.getElementById("bt1").style.top = bt.y + (1-ds/seuil)*movement + "px"
+    }
+    if (dy < 0) {
+    	//Mouse come from the left, so we go to the right
+      document.getElementById("bt1").style.top = bt.y - (1-ds/seuil)*movement + "px"
+    }
+    if (bt.y < 0 || bt.x < 0 || (bt.y+bt.height)>window.innerHeight || (bt.x+bt.width)>window.innerWidth) {
+       //console.log('OUT')
+       new_x = getRandomArbitrary(0,window.innerWidth-bt.width)
+       new_y = getRandomArbitrary(0,window.innerHeight-bt.height)
+       document.getElementById("bt1").style.left = new_x + "px"
+       document.getElementById("bt1").style.top = new_y + "px"
+    }
+    
+    //Securité boucle while
+    if (turn>100) {
+    	break
+    }
+    turn = turn + 1
+  }
+}
+
+setTimeout("yes_visible()", 5000);
+function yes_visible(){
+	console.log('ok')
+  document.getElementById('bt2').style.animation="anim 2s linear infinite";
+}
+
+setInterval(set_parameter(),1000)
+
+function set_parameter(){
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  question = urlParams.get('question')
+  console.log(question);
+  if (question != null && question != '') {
+    document.getElementById('question').textContent=atob(question)
+  }
+  non = urlParams.get('non')
+  console.log(non);
+  if (non != null && non != '') {
+    document.getElementById('bt1').textContent=atob(non)
+  }
+  oui = urlParams.get('oui')
+  console.log(oui);
+  if (oui != null && oui != '') {
+    document.getElementById('bt2').textContent=atob(oui)
+  }
+  message = urlParams.get('message')
+  console.log(message);
+  if (message != null && message != '') {
+    document.getElementById('bt2').onclick=function() { alert(atob(message)) };
+  }
+}
+
+
+function afficher() {
+    question=btoa(prompt("Question à poser:", ""))
+    oui=btoa(prompt("Choix 'oui' (qui ne bouge pas):", ""))
+    non=btoa(prompt("Choix 'non' (qui évite le curseur):", ""))
+    message=btoa(prompt("Message (à afficher sur le oui):", ""))
+    url = window.location.href.split('?')[0] + "?question=" + question + "&oui=" + oui + "&non=" + non + "&message=" + message
+    prompt("Copy to clipboard :",url)
+}
+
+function TP() {
+    bt = document.getElementById('bt1').getBoundingClientRect()
+    new_x = getRandomArbitrary(0,window.innerWidth-bt.width)
+    new_y = getRandomArbitrary(0,window.innerHeight-bt.height)
+    document.getElementById("bt1").style.left = new_x + "px"
+    document.getElementById("bt1").style.top = new_y + "px"
+}
+
+</script>
+</html>
