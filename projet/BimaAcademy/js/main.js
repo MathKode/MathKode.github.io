@@ -50,6 +50,36 @@ function reponse_preload(index, cours) {
         responseDiv.appendChild(h2);
         container.appendChild(responseDiv);
     });
+    if (cours.length == 0) {
+        //Ajout du message de recherche + poussée
+        const container = document.getElementById('input_result');
+
+        // Vérifie que l'élément existe
+        if (!container) {
+            console.error("Élément avec l'id 'input_result' introuvable.");
+            return;
+        }
+
+        // Crée le bloc HTML
+        const bloc = document.createElement('div');
+        bloc.innerHTML = `
+            <div style="display:grid; justify-content:center; text-align:center;" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/search.html' + '?value=' + document.getElementById('input1').value">
+              
+                <div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/2703/2703414.png" width="50px">
+                </div>
+                <h1 class="hubballi-regular" style="font-size:20px;">
+                    Aucun cours dans les parages.
+                </h1>   
+                <h1 class="hubballi-regular" style="font-size:16px;">
+                    Clique sur la loupe pour une recherche approfondie !
+                </h1>
+            </div>
+        `;
+
+        // Ajoute au container
+        container.appendChild(bloc);
+    }
 }
 
 
