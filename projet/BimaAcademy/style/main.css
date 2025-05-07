@@ -202,7 +202,7 @@ a {
 
 
 /* ✅ Tablette (jusqu'à 1024px) */
-@media screen and (max-width: 1024px) {
+@media screen and (min-width: 600px) and (max-width: 1024px) {
     #section1 {
       grid-template-columns: 1fr 1fr; /* 2 colonnes au lieu de 3 */
       row-gap: 20px;
@@ -253,15 +253,17 @@ a {
   /* ✅ Mobile (jusqu'à 600px) */
   @media screen and (max-width: 600px) {
     #section1 {
-      grid-template-columns: 1fr; /* une seule colonne */
+      grid-template-columns: 1fr !important; /* une seule colonne */
       row-gap: 15px;
       margin: 5px;
     }
     #pic1 {
         grid-column: 1;
+        grid-row: 1;
     }
     #div1 {
         grid-column: 1;
+        grid-row: 2;
     }
     #citation-div {
         grid-row: 4;
