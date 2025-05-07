@@ -196,3 +196,110 @@ a {
     opacity: 1;
     pointer-events: auto; /* optionnel si tu veux bloquer l'interaction pendant le fondu */
 }
+
+
+
+
+
+/* ✅ Tablette (jusqu'à 1024px) */
+@media screen and (max-width: 1024px) {
+    #section1 {
+      grid-template-columns: 1fr 1fr; /* 2 colonnes au lieu de 3 */
+      row-gap: 20px;
+      column-gap: 10px;
+      margin: 10px;
+    }
+    
+    #pic1 {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    #div1 {
+        grid-column: 1/span 2;
+        grid-row: 1;
+    }
+    #citation-div {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    #div1 {
+      font-size: 14px;
+    }
+    
+  
+    #input1 {
+      width: 80%;
+      font-size: 14px;
+    }
+  
+    #search-button {
+      padding: 5px 8px;
+      font-size: 14px;
+    }
+  
+    #citation-div {
+      font-size: 16px;
+    }
+  
+    .response_txt {
+      font-size: 12px;
+    }
+  
+    #pic3 {
+      max-height: 300px;
+    }
+  }
+  
+  /* ✅ Mobile (jusqu'à 600px) */
+  @media screen and (max-width: 600px) {
+    #section1 {
+      grid-template-columns: 1fr; /* une seule colonne */
+      row-gap: 15px;
+      margin: 5px;
+    }
+    #pic1 {
+        grid-column: 1;
+    }
+    #div1 {
+        grid-column: 1;
+    }
+    #citation-div {
+        grid-row: 4;
+    }
+
+    #input1 {
+      width: 90%;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  
+    #search-button {
+      display: block;
+      width: 90%;
+      margin: 8px auto 0 auto;
+      font-size: 14px;
+    }
+  
+    #input_result div {
+      width: 90%;
+    }
+  
+    #citation-div {
+      font-size: 15px;
+      padding: 8px;
+    }
+  
+    .response_txt {
+      font-size: 11px;
+    }
+  
+    #pic3, #pic2 {
+      max-height: 200px;
+    }
+  
+    footer {
+      font-size: 14px;
+      padding: 8px;
+    }
+  }
+  
