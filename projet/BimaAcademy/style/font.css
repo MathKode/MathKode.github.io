@@ -1,0 +1,35 @@
+/*TITLE FONT*/
+@import url('https://fonts.googleapis.com/css2?family=Hubballi&display=swap');
+.hubballi-regular {
+    font-family: "Hubballi", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+.exo-2-200 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 200;
+    font-style: normal;
+}
+.exo-2-400 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+.exo-2-500 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+.exo-2-600 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+}

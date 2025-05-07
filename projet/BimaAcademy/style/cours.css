@@ -1,0 +1,93 @@
+textarea:focus, input:focus{
+    outline: none;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #EDE7DB;
+}
+
+.cours {
+    
+    margin-top: 30px;
+    display: grid;
+    grid-template-rows: auto;
+    justify-content: center;
+}
+
+.video {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+.divider {
+    height: 1px;
+    background-color: black;
+    width: 100%;
+    margin: 1rem 0; /* espace autour */
+}
+.title {
+    width: 100%;
+    max-width: 700px;
+    font-size: 40px;
+}
+.subtitle {
+    width: 100%;
+    max-width: 700px;
+    font-size: 23px;
+}
+.description {
+    width: 100%;
+    max-width: 700px;
+    font-size: 18px ;
+}
+.little_jump {
+    width: 100%;
+    max-width: 700px;
+    height: 10px;
+}
+.pdf {
+    width: 100%;
+    max-width: 700px;
+    height: 90vh;
+}
+.link {
+    font-size: 17px;
+}
+.article-content {
+    max-width: 700px;
+    width: 100%;
+    font-size: 17px;
+    line-height: 1.6;
+    text-align: justify;
+}
+.code-block {
+    background-color: #2f4858;
+    border-radius: 8px;
+    padding: 15px;
+    max-width: 700px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    position: relative;
+}
+  
+.code {
+    color: #f8f8f2;
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    white-space: pre;
+    user-select: all; /* Permet de tout sélectionner facilement */
+}
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: #ede7db;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+}

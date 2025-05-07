@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVANT BRAS</title>
+    <link rel="stylesheet" href="../../style/header.css">
+    <link rel="stylesheet" href="../../style/cours.css">
+    <link rel="stylesheet" href="../../style/font.css">
+    <!-- Pour le latex -->
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <link rel="shortcut icon" type="image/x-icon" href="../../picture/favicon.ico" />
+</head>
+<!--
+   _______       __
+ /   ------.   / ._`_
+|  /         ~--~    \
+| |             __    `.____________________ _^-----^
+| |  I=|=======/--\=========================| o o o |
+\ |  I=|=======\__/=========================|_o_o_o_|
+ \|                   /                       ~    ~
+   \       .---.    .
+     -----'     ~~''
+By Bimathax aka Mathis KREMER
+-->
+<body>
+    <header>
+        <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/main.html'">La Bima-Academy</h1>
+        <div>
+            <button class="hubballi-regular" onclick="window.location.href = 'https://www.youtube.com/@BiMathAx'">Youtube</button>
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/search.html'">Cours/Fiches</button>
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/contact.html'">Contact</button>
+        </div>
+    </header>
+    
+    <section class="cours">
+        
+        <h1 class="exo-2-200 title">Muscle de l'Avant Bras</h1>
+        <p class="exo-2-200 description">Une approche des différents muscles permettant la flexion/extension ainsi que la pronosupination de l'avantbras</p>
+
+        <div class="divider"></div>
+
+        <h2 class="exo-2-200 subtitle">🎥 Le cours en vidéo</h2>
+            <div class="little_jump"></div>
+            <iframe class="video" src="https://www.youtube.com/embed/idDaALZsV8k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+        <!-- Video from another site
+            <video class="video" src="https://assets.codepen.io/6093409/hubspot-video-example.mp4" controls></video>
+        -->
+
+
+
+        <div class="little_jump"></div><div class="little_jump"></div><div class="little_jump"></div>
+        <div class="divider"></div>
+
+        <h2 class="exo-2-200 subtitle">📕 La fiche récap <a href="https://pdfobject.com/pdf/sample.pdf" target="_blank" class="link">[Fichier]</a></h2>
+            <div class="little_jump"></div>
+            <div class="little_jump"></div>
+        
+        <embed class="pdf" src="https://pdfobject.com/pdf/sample.pdf" type="application/pdf">
+
+
+        <div class="little_jump"></div>
+        <div class="divider"></div>
+
+        <h2 class="exo-2-200 subtitle">📝 Article Condensé</h2>
+        <div class="little_jump"></div>
+
+        <article class="article-content exo-2-200">
+            <p>
+                L'avant-bras est une région anatomique riche en muscles, tendons et nerfs, jouant un rôle essentiel dans la motricité fine de la main. Il se compose de muscles fléchisseurs, extenseurs, pronateurs et supinateurs, qui permettent une variété de mouvements complexes.
+            </p>
+            <p>
+                Les muscles fléchisseurs, situés sur la face antérieure, sont responsables de la flexion des doigts et du poignet. Les extenseurs, quant à eux, permettent l’extension de ces mêmes structures et se trouvent sur la face postérieure.
+            </p>
+            <p>
+                Une bonne compréhension de ces groupes musculaires est essentielle pour les professionnels de santé, les étudiants en médecine et les passionnés d’anatomie. Cela permet de mieux appréhender les gestes du quotidien, mais aussi de comprendre certaines pathologies comme la tendinite ou le syndrome du canal carpien.
+            </p>
+            <p>
+                <span class="latex">\( E = mc^2 \)</span> est la célèbre équation d’Einstein
+                <span class="latex">\[ e^{i\pi} + 1 = 0 \]</span>
+            </p>
+            <div class="code-block">
+                <button class="copy-btn hubballi-regular" onclick="copyCode(this)">Copier</button>
+                <pre>
+<code class="code">console.log("Hello, world!");
+print("hello")</code></pre>
+              </div>
+        </article>        
+
+
+    </section>
+    
+
+</body>
+</html>
+
+<script>
+function copyCode(button) {
+    const code = button.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      button.textContent = "Copié !";
+      setTimeout(() => (button.textContent = "Copier"), 1500);
+    });
+  }
+</script>
+

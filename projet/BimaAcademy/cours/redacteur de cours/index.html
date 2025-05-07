@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../style/header.css">
+    <link rel="stylesheet" href="../../style/cours.css">
+    <link rel="stylesheet" href="../../style/font.css">
+    <!-- Pour le latex -->
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <link rel="shortcut icon" type="image/x-icon" href="../../picture/favicon.ico" />
+    <title>Cours Redactor</title>
+</head>
+<body>
+  <header>
+    <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/main.html'">La Bima-Academy</h1>
+    <div>
+        <button class="hubballi-regular" onclick="window.location.href = 'https://www.youtube.com/@BiMathAx'">Youtube</button>
+        <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/search.html'">Cours/Fiches</button>
+        <button class="hubballi-regular">Contact</button>
+    </div>
+</header>
+    <div class="legend-container exo-2-200">
+        <h2>🧾 Légende des Formules</h2>
+        <p>Cliquer pour copier le format correspondant :</p>
+        <div class="legend-buttons">
+          <button onclick="copyFormula('[TITLE]txt[/TITLE]')">[TITLE] — Titre</button>
+          <button onclick="copyFormula('[SUBTITLE]txt[/SUBTITLE]')">[SUBTITLE] — Sous-titre</button>
+          <button onclick="copyFormula('[DESCRIPTION]txt[/DESCRIPTION]')">[DESCRIPTION] — Description</button>
+          <button onclick="copyFormula('[YOUTUBE]link[/YOUTUBE]')">[YOUTUBE] — Vidéo YouTube</button>
+          <button onclick="copyFormula('[VIDEO]link[/VIDEO]')">[VIDEO] — Autre vidéo</button>
+          <button onclick="copyFormula('[DIVIDER]')">[DIVIDER] — Trait de séparation</button>
+          <button onclick="copyFormula('[JUMP]')">[JUMP] — Petit saut</button>
+          <button onclick="copyFormula('[LINKTEXT]link:%:txt[/LINKTEXT]')">[LINKTEXT]txt:%:link — Lien texte</button>
+          <button onclick="copyFormula('[PDF]link[/PDF]')">[PDF] — Afficher PDF</button>
+          <button onclick="copyFormula('[ARTICLE]\n[A]\n[/ARTICLE]')">[ARTICLE] — Article (multi-ligne)</button>
+          <button onclick="copyFormula('[CODE]\n\n[/CODE]')">[CODE] — Bloc de code (multi-ligne)</button>
+          <button onclick="copyFormula('[LATEX]x^2[/LATEX]')">[LATEX] — Formule latex nouvelle ligne</button>
+        </div>
+      </div>
+      
+      <style>
+        .legend-container {
+          border: 2px solid #ccc;
+          padding: 1rem;
+          margin: 2rem 0;
+          border-radius: 1rem;
+          background: #f9f9f9;
+        }
+        .legend-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+        .legend-buttons button {
+          padding: 0.5rem 1rem;
+          background-color: #e6e6e6;
+          border: none;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+        .legend-buttons button:hover {
+          background-color: #ccc;
+        }
+        </style>
+        <script>
+            function copyFormula(text) {
+                const textarea = document.getElementById("cours");
+                const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const content = textarea.value;
+
+  textarea.value = content.slice(0, start) + text + content.slice(end);
+  //textarea.focus();
+  textarea.setSelectionRange(start + text.length, start + text.length);
+              //navigator.clipboard.writeText(text)
+              
+
+            }
+        </script>
+      
+<textarea id="cours" style="width:100%;height:80vh;">
+[TITLE]Muscle de l'Avant Bras[/TITLE]
+[DESCRIPTION]Une approche des différents muscles permettant la flexion/extension ainsi que la pronosupination de l'avantbras[/DESCRIPTION]
+
+[DIVIDER]
+
+[SUBTITLE]🎥 Le cours en vidéo[/SUBTITLE]
+[JUMP]
+[YOUTUBE]https://www.youtube.com/embed/idDaALZsV8k[/YOUTUBE]
+
+[JUMP][JUMP][JUMP]
+[DIVIDER]
+
+[SUBTITLE]📕 La fiche récap [LINKTEXT]Fichier:%:https://pdfobject.com/pdf/sample.pdf[/LINKTEXT][/SUBTITLE]
+[JUMP]
+[JUMP]
+[PDF]https://pdfobject.com/pdf/sample.pdf[/PDF]
+
+[JUMP]
+[DIVIDER]
+
+[SUBTITLE]📝 Article Condensé[/SUBTITLE]
+[JUMP]
+
+[ARTICLE]
+L'avant-bras est une région anatomique riche en muscles, tendons et nerfs, jouant un rôle essentiel dans la motricité fine de la main. Il se compose de muscles fléchisseurs, extenseurs, pronateurs et supinateurs, qui permettent une variété de mouvements complexes.
+[A]
+Les muscles fléchisseurs, situés sur la face antérieure, sont responsables de la flexion des doigts et du poignet. Les extenseurs, quant à eux, permettent l’extension de ces mêmes structures et se trouvent sur la face postérieure.
+[A]
+Une bonne compréhension de ces groupes musculaires est essentielle pour les professionnels de santé, les étudiants en médecine et les passionnés d’anatomie. Cela permet de mieux appréhender les gestes du quotidien, mais aussi de comprendre certaines pathologies comme la tendinite ou le syndrome du canal carpien.
+[A]
+[LATEX]E = mc^2[/LATEX] est la célèbre équation d’Einstein
+[LATEX]e^{i\pi} + 1 = 0[/LATEX]
+[/ARTICLE]
+
+[CODE]
+console.log("Hello, world!");
+print("hello")
+[/CODE]      
+</textarea>
+<div style="display: grid;justify-content: center;margin:10px;">
+    <button class="btn-generer" id="bt" onclick="generate();window.scrollBy(0, 200);">GENERATOR</button>
+</div>
+<style>
+     .btn-generer {
+    background-color: #49686e; /* orange vif */
+    color: white;
+    font-size: 1.1rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+    font-family: 'Segoe UI', sans-serif;
+    max-width: 200px;
+  }
+
+  .btn-generer:hover {
+    background-color: #2f4858; /* plus foncé au survol */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-generer:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+</style>
+<section id="cours_section" class="cours">
+
+</section>
+
+<div style="display: grid;justify-content: center;margin:10px;">
+  <button class="btn-generer" id="bt" onclick="json_generate();">Index.JSON Generator</button>
+</div>
+</body>
+</html>
+
+<script src="../../js/generator.js"></script>

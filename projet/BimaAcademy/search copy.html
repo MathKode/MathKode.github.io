@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bima-Academy</title>
+    <link rel="stylesheet" href="style/header.css">
+    <link rel="stylesheet" href="style/search.css">
+    <link rel="stylesheet" href="style/font.css">
+    <link rel="shortcut icon" type="image/x-icon" href="picture/favicon.ico" />
+</head>
+<!--
+   _______       __
+ /   ------.   / ._`_
+|  /         ~--~    \
+| |             __    `.____________________ _^-----^
+| |  I=|=======/--\=========================| o o o |
+\ |  I=|=======\__/=========================|_o_o_o_|
+ \|                   /                       ~    ~
+   \       .---.    .
+     -----'     ~~''
+By Bimathax aka Mathis KREMER
+-->
+<body>
+    <header>
+        <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/main.html'">La Bima-Academy</h1>
+        <div>
+            <button class="hubballi-regular" onclick="window.location.href = 'https://www.youtube.com/@BiMathAx'">Youtube</button>
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/search.html'">Cours/Fiches</button>
+            <button class="hubballi-regular">Contact</button>
+        </div>
+    </header>
+    <section id="input_section">
+        <input class="hubballi-regular" placeholder="Rechercher un cours/mot clef..." id="inputbox" type="text" autofocus>
+    </section>
+    <section id="result_section">
+        <!--
+       <div class="cours">
+            <h1 class="hubballi-regular">Cours sur le Genou et les ligaments croisées dans le sens antihorraire et anti parallele de l'ADN</h1>
+       </div>
+        -->
+    </section>
+
+</body>
+<div id="white-fade"></div>
+</html>
+<script src="js/search.js"></script>
+<script>
+    window.onload = async function() {
+        params = new URLSearchParams(document.location.search);
+        txt = params.get("value");
+        if (txt == null) {
+            txt= ''
+        } else {
+            document.getElementById('inputbox').value = txt
+        }
+        await find_matches(txt)
+    };
+</script>

@@ -1,0 +1,198 @@
+/* color panel
+#ede7db
+#c2c6b8
+#96a79b
+#6c8783
+#49686e
+#2f4858
+
+#829882
+#5a806e
+#2e685e
+*/
+textarea:focus, input:focus{
+    outline: none;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #EDE7DB;
+}
+
+
+#section1 {
+    margin-top: 20px;
+    display: grid;
+    column-gap: 15px;
+    row-gap: 30px;
+    grid-template-columns: 2fr 2fr 3fr;
+    justify-content: space-around;
+}
+
+#section1 div {
+    width: 100%;
+    
+    text-align: center;
+}
+
+img {
+    border-radius: 20px;
+    max-width: 100%;
+    height: auto;
+    margin:auto
+}
+
+#pic1 {
+    border-radius: 10% 90% 5% 95% / 89% 7% 93% 11%  ;
+    grid-column: 1 / span 2;
+    max-width: 95%;
+    animation-duration: 10s;
+    animation-name: border-p1;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+@keyframes border-p1 {
+    0% {border-radius: 24% 76% 25% 75% / 79% 30% 70% 21%  ;}
+    50% {border-radius: 50% 30% / 20% 30%  ;}
+    100% {border-radius: 18% 82% 20% 80% / 64% 20% 80% 36%  ;}
+}
+
+#div1 {
+    padding: 5px;
+    font-size: 15px;
+}
+
+
+
+#search-container {
+    padding: 0px;
+    
+}
+
+#search-button {
+    border: none;
+    border-radius: 5px;
+    background-color: #F7F7F7;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 15px;
+    transition-duration: 0.4s;
+    margin-left: 1px;
+}
+#search-button:hover {
+    background-color: #dadada;
+}
+
+#input1 {
+    width: 70%;
+    padding: 10px 20px;
+    font-size: 16px;
+    height: auto;
+    border: none;
+    border-radius: 10px;
+    background-color: #F7F7F7;
+} 
+
+#input1::placeholder {
+    font-weight: bold;
+    opacity: 0.5;
+    color: rgb(0, 0, 0);
+}
+
+
+
+#input_result div {
+    text-align: center;
+    width:60%;
+    margin: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+#input_result {
+    display: grid;
+    grid-template-columns: 100%;
+    justify-content: center;
+    overflow-y: scroll;
+    max-height: 250px;
+}
+.response {
+    background-color: #dad9c6;
+    padding: 7px;
+    box-shadow: 3px 3px 2px #49686e00;
+    transition-duration: 0.4s;
+}
+.response:hover{
+    background-color: #96a79b;
+    box-shadow: 3px 3px 2px #49686e1a;
+}
+.response_txt {
+    font-size: 13px;
+    margin: 0px;
+    padding: 0px;;
+}
+
+#citation-div {
+    padding:10px;
+    height: auto;
+    align-content: center;
+    font-size: 18px;
+}
+
+#pic3 {
+    max-height: 400px;
+    animation-duration: 3s;
+    animation-name: border-p2;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+#pic2 {
+    animation-duration: 3s;
+    animation-name: border-p2;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+@keyframes border-p2 {
+    0% {border-radius: 41% 25% 34% 25% / 17% 47% 33% 49%  ;}
+    100% {border-radius: 41% 25% 10% 17% / 39% 35% 33% 28%  ;}
+}
+
+footer {
+    text-align: center;
+    background-color: #6c8783;
+    color:#dadada;
+    padding: 10px;
+}
+a {
+    
+    color: inherit;         /* hérite de la couleur du parent */
+}
+
+
+
+
+
+
+#white-fade {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+#white-fade.active {
+    opacity: 1;
+    pointer-events: auto; /* optionnel si tu veux bloquer l'interaction pendant le fondu */
+}

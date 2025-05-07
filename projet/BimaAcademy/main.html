@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bima-Academy</title>
+    <link rel="stylesheet" href="style/header.css">
+    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="style/font.css">
+    <link rel="shortcut icon" type="image/x-icon" href="picture/favicon.ico" />
+</head>
+<!--
+   _______       __
+ /   ------.   / ._`_
+|  /         ~--~    \
+| |             __    `.____________________ _^-----^
+| |  I=|=======/--\=========================| o o o |
+\ |  I=|=======\__/=========================|_o_o_o_|
+ \|                   /                       ~    ~
+   \       .---.    .
+     -----'     ~~''
+By Bimathax aka Mathis KREMER
+-->
+<body>
+    <header>
+        <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/main.html'">La Bima-Academy</h1>
+        <div>
+            <button class="hubballi-regular" onclick="window.location.href = 'https://www.youtube.com/@BiMathAx'">Youtube</button>
+            <button class="hubballi-regular" id="searchbt">Cours/Fiches</button> <!-- ONCLICK dans le JS pour le fade out -->
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/contact.html'">Contact</button>
+        </div>
+    </header>
+    <br><br>
+    <section id="section1">
+        <img id="pic1" src="picture/p1.jpg">
+        <div id="div1">
+            <h2 class="exo-2-200">Accedér à des cours et des fiches gratuitement (lycée, sup, PASS)</h2>
+            <div id="search-container">
+                <input class="hubballi-regular" type="text" id="input1" placeholder="Rechercher un cours/mot clef...">
+                <button id="search-button">🔍</button>
+            </div>
+            <br>
+            <div id="input_result">
+                <!--
+                <div class="response">
+                    <h2 class="response_txt exo-2-400">Cours sur l'avant Bras</h2>
+                </div>
+                <div class="response">
+                    <h2 class="response_txt exo-2-400">Cours pour apprendre à reiner Flo</h2>
+                </div>
+                <div class="response">
+                    <h2 class="response_txt exo-2-400">Cours sur la vie ? UE5 Turkay GOAT</h2>
+                </div>
+                -->
+            </div>
+
+        </div>
+        <div id="citation-div" class="hubballi-regular">« Le savoir est la seule ressource qui se multiplie lorsqu'on la partage. »
+            <br><br>« Tout le monde a quelque chose à enseigner et tout le monde a quelque chose à apprendre. »
+            <br><br>« La connaissance, c'est partager le savoir qui nous fait grandir »
+        </div>
+        <img id="pic2" src="picture/p2.jpg" alt="Erreur chargement image">
+        <img id="pic3" src="picture/p3.jpg" alt="Erreur chargement image">
+    </section>
+    <br><br>
+    <footer class="hubballi-regular">
+        Coded by <a href="mailto:bimathax.STUDIO@gmail.com">BiMathAx</a> (aka Mathis KREMER)
+    </footer>
+</body>
+<div id="white-fade"></div>
+</html>
+<script src="js/recup_index.js"></script>
+<script src="js/main.js"></script>
+<script>
+
+window.onload = async function() {
+    data_all = await get_index();
+    console.log(data_all)
+    reponse_preload(data_all, Object.keys(data_all))
+    console.log("ok")
+};
+</script>

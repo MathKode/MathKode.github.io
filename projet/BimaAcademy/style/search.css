@@ -1,0 +1,85 @@
+textarea:focus, input:focus{
+    outline: none;
+}
+
+/* Pour tous les éléments avec overflow (scroll possible) */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  
+  /* Pour Chrome, Edge, Safari */
+  *::-webkit-scrollbar {
+    display: none;
+}
+
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #EDE7DB;
+}
+
+#input_section {
+    background-color: #c2c6b8;
+    margin-top: 0px;
+    width:100%;
+    display: grid;
+    justify-content: center;
+    grid-template-columns: 10% 80% 10%;
+}
+#inputbox {
+    grid-column: 2;
+    width: 50%;
+    max-width: 420px;
+    margin: 25px auto ;
+    background-color: #ffffff;
+    font-size: 20px;
+    border-radius: 15px;
+    border: none;
+    padding: 12px 15px;
+}
+
+
+.cours {
+    font-size: 15px;
+    text-align: center;
+    align-content: center;
+    width: 200px;
+    height: 120px;
+    border-radius: 15px;
+    background-color: #96a79b;
+    transition-duration: 0.4s;
+    margin: 5px;
+    padding: 5px;
+}
+.cours:hover {
+    background-color: #49686e;
+}
+
+#white-fade {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(237, 237, 237);
+    z-index: 9999;
+    animation: fadeOut 0.5s ease forwards;
+    pointer-events: none;
+}
+
+/* Animation qui fait disparaître l'écran */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+
+
+

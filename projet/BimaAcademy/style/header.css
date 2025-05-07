@@ -1,0 +1,25 @@
+header {
+    margin: 0px;
+    padding: 10px 0px;
+    font-size: 40px;
+    text-align: center;
+}
+h1 {
+    margin: 0px;
+}
+header div {
+    
+    display: block;
+}
+header div button {
+    margin: 10px;
+    font-size: 22px;
+    background-color: #EDE7DB;
+    transition-duration: 0.4s;
+    border: 3px double #eabc7800;
+}
+
+header div button:hover {
+    border: 3px double #2f4858;
+    transition-duration: 0.4s;
+}
