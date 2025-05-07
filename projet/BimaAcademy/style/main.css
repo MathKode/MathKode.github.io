@@ -272,7 +272,7 @@ a {
     #input1 {
       width: 90%;
       padding: 8px 12px;
-      font-size: 14px;
+      font-size: 19px;
     }
   
     #search-button {
@@ -287,12 +287,12 @@ a {
     }
   
     #citation-div {
-      font-size: 15px;
+      font-size: 18px;
       padding: 8px;
     }
   
     .response_txt {
-      font-size: 11px;
+      font-size: 14px;
     }
   
     #pic3, #pic2 {
