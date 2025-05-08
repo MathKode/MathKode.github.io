@@ -90,11 +90,15 @@ const fadeOverlay = document.getElementById('white-fade');
 fadeBtn.addEventListener('click', () => {
     fadeOverlay.classList.add('active');
 
-    // Optionnel : retirer la classe après animation si besoin
+    
     setTimeout(() => {
-        fadeOverlay.classList.remove('active');
+        
         window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/search.html'
     }, 500); // correspond à 0.5s = durée du transition
+    setTimeout(() => {
+        // Optionnel : retirer la classe après animation si besoin (onlaisse 2seconde pour changer de page, sinon on retire l'écran blanc)
+        fadeOverlay.classList.remove('active'); 
+    }, 2000);
 });
 
 
@@ -106,9 +110,12 @@ const fadeOverlay2 = document.getElementById('white-fade');
 fadeBtn2.addEventListener('click', () => {
     fadeOverlay2.classList.add('active');
 
-    // Optionnel : retirer la classe après animation si besoin
     setTimeout(() => {
-        fadeOverlay2.classList.remove('active');
-        window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/search.html' + `?value=${document.getElementById('input1').value}`
+        
+        window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/search.html'
     }, 500); // correspond à 0.5s = durée du transition
+    setTimeout(() => {
+        // Optionnel : retirer la classe après animation si besoin (onlaisse 2seconde pour changer de page, sinon on retire l'écran blanc)
+        fadeOverlay.classList.remove('active'); 
+    }, 2000);
 });
