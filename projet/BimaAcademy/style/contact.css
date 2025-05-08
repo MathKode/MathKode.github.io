@@ -7,3 +7,90 @@ body {
     padding: 0px;
     background-color: #EDE7DB;
 }
+
+
+footer {
+    padding: 10px;
+    color: #dadada;
+    background-color: #6c8783;
+    text-align: center;
+}
+
+main.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
+
+.grid-item {
+/*    background-color: white;*/
+    padding: 10px;
+/*    border-radius: 8px;*/
+/*    box-shadow: 0 2px 8px rgba(0,0,0,0.05);*/
+}
+h2 {
+    margin: 0px 0px 15px 0px;
+    font-size: 30px;
+
+}
+p {
+    margin: 0px 0px 10px 0px;
+    font-size: 18px;
+}
+
+.ytb_insta {
+    height: 1em; /* hauteur égale à la hauteur de la police */
+    vertical-align: middle; /* aligne verticalement avec le texte */
+    margin-right: 0.5em; /* espace entre l'icône et le texte */
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(85%);
+}
+.no-bullets {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.reseau {
+    font-size: 20px;
+}
+
+.hyperlink_ok {
+    color: black;
+}
+.hyperlink_ok2 {
+    color:#dadada;
+
+}
+
+#pic1_container {
+    perspective: 800px; /* rend l'effet 3D visible */
+}
+#pic1 {
+    width: 80%;
+    border-radius: 20px;
+    max-width: 220px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
+
+/*    transition-duration: 0.4s;*/
+}
+
+/*#pic1:hover {
+    transform: rotate3d(0, 1, -1, 20deg);
+}*/
+
+.center {
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+/* Pour mobile : 1 seule colonne */
+@media (max-width: 600px) {
+    main.info-grid {
+        grid-template-columns: 1fr;
+    }
+}
