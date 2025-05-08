@@ -9,7 +9,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="picture/favicon.ico" />
         <title>Bima-Academy</title>
     </head>
-<body>
+<body id="test">
     <header>
         <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/main.html'">La Bima-Academy</h1>
         <div>
@@ -18,9 +18,53 @@
             <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-1).join('/') + '/contact.html'">Contact</button>
         </div>
     </header>
-    <img src="picture/logo.png" width="100px">
-    -- PAGE en cours de développement --
-    <br>
-    mailto: bimathax.studio@gmail.com
+    
+    <main class="info-grid hubballi-regular" >
+        <section class="grid-item center" id="pic1_container">
+            <img src="picture/logo.png" id="pic1">
+        </section>
+
+        <section class="grid-item">
+            <h2>Bienvenue sur la BIMA Academy</h2>
+            <p>
+                La BIMA Academy est une plateforme dédiée aux étudiants ainsi qu'a toutes personnes souhaitant apprendre ! 
+                Créée par <strong>Mathis KREMER</strong>, elle accompagne la chaîne YouTube "BiMathAx" en mettant à disposition les fiches/PDF/cours associés à chaque vidéo.
+            </p>
+        </section>
+
+        <section class="grid-item">
+            <h2>À propos de moi</h2>
+            <p>
+                Je m'appelle <strong>Mathis KREMER</strong>, étudiant en PASS. J’ai lancé ce site pour partager mes <em>fiches de révision</em>, mes expériences et mes conseils méthodo avec les autres étudiants.
+            </p>
+        </section>
+
+
+        <section class="grid-item">
+            <h2>Contenu disponible sur le site</h2>
+            <ul>
+                <li>Les Fiches PDF par Thème/UE...</li>
+                <li>Les vidéo YouTube</li>
+                <li>Mises à jour régulières</li>
+            </ul>
+        </section>
+
+        <section class="grid-item">
+            <h2>Me contacter</h2>
+            <p>
+                Pour toute demande ou suggestion, contactez-moi à :<br>
+                <a class="hyperlink_ok" href="mailto:bimathax.studio@gmail.com">bimathax.studio@gmail.com</a>
+            </p>
+        </section>
+    </main>
+
+    <footer class="hubballi-regular">
+        <ul class="no-bullets reseau">
+                <li><a class="hyperlink_ok2" href="https://www.youtube.com/@BiMathAx"><img class="ytb_insta" src="https://cdn-icons-png.flaticon.com/512/3669/3669688.png ">Chaîne YouTube – BIMA Academy</a></li>
+                <li><a class="hyperlink_ok2" href="https://www.instagram.com/bima__academy/"><img class="ytb_insta" src="https://cdn-icons-png.flaticon.com/512/1384/1384015.png">Instagram – @bima__academy</a></li>
+            </ul>
+        <p>&copy; 2025 BIMA Academy – Mathis Kremer</p>
+    </footer>
 </body>
 </html>
+<script src="js/contact.js"></script>
