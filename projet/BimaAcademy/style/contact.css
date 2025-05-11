@@ -6,6 +6,11 @@ body {
     margin: 0px;
     padding: 0px;
     background-color: #EDE7DB;
+
+    /*FOOTER BOTTOM*/
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -14,6 +19,10 @@ footer {
     color: #dadada;
     background-color: #6c8783;
     text-align: center;
+
+     /*FOOTER BOTTOM*/
+    width: 100%;
+    margin-top: auto;
 }
 
 main.info-grid {
