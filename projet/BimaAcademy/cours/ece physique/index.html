@@ -1,1 +1,66 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVANT BRAS</title>
+    <link rel="stylesheet" href="../../style/header.css">
+    <link rel="stylesheet" href="../../style/cours.css">
+    <link rel="stylesheet" href="../../style/font.css">
+    <!-- Pour le latex -->
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <link rel="shortcut icon" type="image/x-icon" href="../../picture/favicon.ico" />
+</head>
+<!--
+   _______       __
+ /   ------.   / ._ _
+|  /         ~--~    `
+| |             __    .____________________ _^-----^
+| |  I=|=======/--\=========================| o o o |
+\ |  I=|=======\__/=========================|_o_o_o_|
+ \|                   /                       ~    ~
+   \       .---.    .
+     -----'     ~~''
+By Bimathax aka Mathis KREMER
+-->
+<body>
+    <header>
+        <h1 class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/main.html'">La Bima-Academy</h1>
+        <div>
+            <button class="hubballi-regular" onclick="window.location.href = 'https://www.youtube.com/@BiMathAx'">Youtube</button>
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/search.html'">Cours/Fiches</button>
+            <button class="hubballi-regular" onclick="window.location.href = window.location.href.split('/').slice(0,-3).join('/') + '/contact.html'">Contact</button>
+        </div>
+    </header>
+    <section class="cours">
+<h1 class="exo-2-200 title">BAC-ECE Physique</h1>
+<p class="exo-2-200 description">Un récap de l'essentiel à maitriser pour réussir les épreuves pratiques du bac 2024/25 (spé physique-chimie)</p>
+
+
+<div class="divider"></div>
+
+<h2 class="exo-2-200 subtitle">📕 La fiche récap <a href="https://mathkode.github.io/projet/BimaAcademy/cours/ece%20physique/ECE_Nico.pdf">[Fichier]</a></h2>
+<div class="little_jump"></div>
+<div class="little_jump"></div>
+<embed class="pdf" src="https://mathkode.github.io/projet/BimaAcademy/cours/ece%20physique/ECE_Nico.pdf" type="application/pdf">
+
+<div class="little_jump"></div>
+<div class="divider"></div>
+
+    </section>
+</body>
+</html>
+
+<script>
+function copyCode(button) {
+    const code = button.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        button.textContent = "Copié !";
+        setTimeout(() => (button.textContent = "Copier"), 1500);
+    });
+}
+</script>
+
