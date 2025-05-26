@@ -45,5 +45,19 @@
                 "html",
                 "outil"
             ]
+},
+"ece physique" : {
+    "name" : "BAC - ECE Physique",
+    "description" : "Essentiel de la verrerie à maîtriser pour les ECE de physique chimie (BAC)",
+    "author": "Mathis KREMER",
+    "date":"26/5/2025",
+    "tags" : [
+                "bac",
+                "terminal",
+                "ece",
+                "verrerie",
+                "titrage",
+            "chimie"
+            ]
 }
 }
