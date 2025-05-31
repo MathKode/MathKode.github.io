@@ -1,0 +1,24 @@
+modules = ["web", "nodejs-20", "python-3.12"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Run HTML Site"
+
+[[workflows.workflow]]
+name = "Run HTML Site"
+author = 2680700
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd projet/BimaAcademy && python -m http.server 5000"
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 8000
+externalPort = 80
