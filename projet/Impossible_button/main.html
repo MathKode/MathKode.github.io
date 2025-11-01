@@ -199,8 +199,16 @@ function afficher() {
 
 function TP() {
     bt = document.getElementById('bt1').getBoundingClientRect()
-    new_x = getRandomArbitrary(0,window.innerWidth-bt.width)
-    new_y = getRandomArbitrary(0,window.innerHeight-bt.height)
+    find = false
+    while (!find) {
+      new_x = getRandomArbitrary(0,window.innerWidth-bt.width)
+      new_y = getRandomArbitrary(0,window.innerHeight-bt.height)
+      distance = Math.sqrt((bt.x- new_x)**2 + (bt.y-new_y)**2)
+      console.log(distance)
+      if (distance > 100) {
+        find = true
+      }
+    }
     document.getElementById("bt1").style.left = new_x + "px"
     document.getElementById("bt1").style.top = new_y + "px"
 }
