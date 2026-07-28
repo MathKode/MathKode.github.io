@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Comptes communs — Mathis &amp; Eline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     STRUCTURE DE LA PAGE
+     Le contenu dynamique est injecté par app.js.
+     ============================================================ -->
+
+<div class="wrap">
+
+  <!-- En-tête : titre + zone où apparaît le bouton corbeille -->
+  <header class="top">
+    <div>
+      <h1>Comptes communs</h1>
+      <p>Mathis &amp; Eline</p>
+    </div>
+    <div id="resetZone"></div>
+  </header>
+
+  <!-- Carte de solde : les deux totaux, la barre de répartition,
+       et la phrase de conclusion (qui doit combien à qui) -->
+  <section class="balance" aria-live="polite">
+    <div class="who">
+      <div class="side">
+        <div class="name m"><span class="dot"></span>Mathis</div>
+        <div class="sum" id="sumM">—</div>
+      </div>
+      <div class="side right">
+        <div class="name e">Eline<span class="dot"></span></div>
+        <div class="sum" id="sumE">—</div>
+      </div>
+    </div>
+
+    <!-- Barre de répartition : le trait central marque l'équilibre parfait -->
+    <div class="track" role="img" aria-label="Répartition des dépenses">
+      <div class="seg m" id="segM" style="width:50%"></div>
+      <div class="seg e" id="segE" style="width:50%"></div>
+      <div class="mid"></div>
+    </div>
+
+    <div class="verdict" id="verdict">Chargement…</div>
+  </section>
+
+  <!-- Liste des dépenses -->
+  <div class="listhead"><span id="count">Dépenses</span></div>
+  <ul class="list" id="list"></ul>
+
+  <!-- État de la synchronisation avec le classeur -->
+  <footer class="foot"><span id="syncState">Chargement…</span></footer>
+
+</div>
+
+<!-- Bouton d'ajout flottant -->
+<button class="fab" id="add"><span class="plus">+</span> Ajouter une dépense</button>
+
+<!-- Feuille de saisie d'une nouvelle dépense (masquée par défaut) -->
+<div class="veil" id="veil">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">Nouvelle dépense</h2>
+
+    <div class="field">
+      <label>Qui a payé</label>
+      <div class="pick">
+        <button type="button" data-p="mathis" aria-pressed="true"><span class="dot"></span>Mathis</button>
+        <button type="button" data-p="eline" aria-pressed="false"><span class="dot"></span>Eline</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="amount">Montant</label>
+      <input class="money" id="amount" type="text" inputmode="decimal" placeholder="0,00 €" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="label">Motif</label>
+      <input id="label" type="text" placeholder="Courses, essence, resto…" autocomplete="off" maxlength="60">
+    </div>
+
+    <div class="actions">
+      <button type="button" id="cancel">Annuler</button>
+      <button type="button" class="go" id="confirmAdd" disabled>Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message temporaire (confirmation, erreur réseau…) -->
+<div class="toast" id="toast"></div>
+
+<!-- Ordre imposé : la configuration, puis l'accès au classeur, puis l'interface -->
+<script src="config.js"></script>
+<script src="sheet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

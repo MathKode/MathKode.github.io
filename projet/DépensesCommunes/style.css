@@ -1,0 +1,279 @@
+/* ============================================================
+   COMPTES COMMUNS — feuille de style
+   Sommaire :
+     1. Variables et base
+     2. En-tête
+     3. Carte de solde (totaux + barre de répartition)
+     4. Liste des dépenses
+     5. Boutons (ajout, corbeille)
+     6. Feuille de saisie
+     7. Message temporaire, accessibilité, animations
+     8. Pied de page et état d'attente
+   ============================================================ */
+
+
+/* ---------- 1. Variables et base ---------- */
+
+:root{
+  /* Couleurs neutres */
+  --bg:#ECEFEE;
+  --surface:#FFFFFF;
+  --ink:#101816;
+  --muted:#6C7A77;
+  --line:#DDE3E1;
+
+  /* Couleurs d'identité : chaque personne a sa teinte pleine
+     (points, barre, liseré) et sa teinte pâle (fond des lignes) */
+  --mathis:#136A63;
+  --mathis-soft:#E0EFEC;
+  --eline:#6A4DA0;
+  --eline-soft:#EBE6F7;
+
+  /* Typographie : une pile système pour le texte,
+     une pile monospace pour tous les chiffres (colonnes alignées) */
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-num:"SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+
+  --r:14px;
+  --shadow:0 1px 2px rgba(16,24,22,.05), 0 8px 24px -12px rgba(16,24,22,.18);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  /* marge basse généreuse : le bouton flottant ne doit jamais
+     recouvrir la dernière dépense de la liste */
+  padding:24px 16px 120px;
+}
+
+.wrap{max-width:520px;margin:0 auto}
+
+
+/* ---------- 2. En-tête ---------- */
+
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
+.top h1{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:0}
+.top p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+
+
+/* ---------- 3. Carte de solde ---------- */
+
+.balance{
+  background:var(--surface);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  padding:20px 20px 18px;
+}
+
+.who{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.who .side{min-width:0}
+.who .side.right{text-align:right}
+
+/* Nom en petites capitales espacées + pastille de couleur */
+.name{
+  font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  display:flex;align-items:center;gap:6px;
+}
+.who .side.right .name{justify-content:flex-end}
+.name .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.name.m{color:var(--mathis)} .name.m .dot{background:var(--mathis)}
+.name.e{color:var(--eline)}  .name.e .dot{background:var(--eline)}
+
+/* tabular-nums : les chiffres gardent la même largeur,
+   les montants ne « sautent » pas quand ils changent */
+.sum{
+  font-family:var(--font-num);font-variant-numeric:tabular-nums;
+  font-size:27px;font-weight:500;letter-spacing:-.02em;margin-top:4px;
+}
+
+/* Barre de répartition : deux segments côte à côte dont la largeur
+   est proportionnelle à ce que chacun a dépensé */
+.track{
+  position:relative;height:10px;border-radius:99px;background:var(--line);
+  margin:18px 0 14px;overflow:hidden;display:flex;
+}
+.track .seg{height:100%;transition:width .45s cubic-bezier(.22,.8,.3,1)}
+.track .seg.m{background:var(--mathis)}
+.track .seg.e{background:var(--eline)}
+/* Trait central = point d'équilibre parfait (50 / 50) */
+.track .mid{
+  position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;
+  background:var(--surface);transform:translateX(-1px);
+}
+
+/* Phrase de conclusion : « X doit tant à Y » */
+.verdict{display:flex;align-items:center;gap:8px;font-size:14px}
+.verdict strong{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-weight:600}
+.verdict.balanced{color:var(--muted)}
+.arrow{font-size:12px;color:var(--muted)}
+
+
+/* ---------- 4. Liste des dépenses ---------- */
+
+.listhead{display:flex;align-items:center;justify-content:space-between;margin:26px 4px 10px}
+.listhead span{
+  font-size:11px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+
+/* Une ligne = une dépense. Le fond et le liseré gauche indiquent
+   qui a payé, sans avoir besoin de lire le nom */
+li.row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 12px 12px 14px;
+  border-radius:11px;
+  border-left:3px solid transparent;
+  animation:in .3s cubic-bezier(.22,.8,.3,1) both;
+}
+li.row.m{background:var(--mathis-soft);border-left-color:var(--mathis)}
+li.row.e{background:var(--eline-soft);border-left-color:var(--eline)}
+
+.row .meta{flex:1;min-width:0}
+.row .label{font-weight:550;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .sub{font-size:12px;color:var(--muted);margin-top:1px}
+.row .amt{
+  font-family:var(--font-num);font-variant-numeric:tabular-nums;
+  font-size:15px;font-weight:600;letter-spacing:-.01em;
+}
+
+/* Croix de suppression : discrète au repos, franche au survol */
+.row .kill{
+  flex:none;width:26px;height:26px;border-radius:50%;border:0;background:transparent;
+  color:var(--muted);cursor:pointer;font-size:18px;line-height:1;opacity:.45;
+  transition:opacity .15s, background .15s;
+}
+.row .kill:hover,.row .kill:focus-visible{opacity:1;background:rgba(16,24,22,.07)}
+
+/* État vide : une invitation à agir, pas un constat */
+.empty{
+  background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);
+  padding:28px 20px;text-align:center;color:var(--muted);font-size:14px;
+}
+.empty b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+
+
+/* ---------- 5. Boutons ---------- */
+
+/* Bouton d'ajout, fixé en bas et centré : atteignable au pouce */
+.fab{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
+  height:54px;padding:0 26px 0 20px;border:0;border-radius:99px;
+  background:var(--ink);color:#fff;font-family:inherit;font-size:15px;font-weight:600;
+  display:flex;align-items:center;gap:9px;cursor:pointer;
+  box-shadow:0 6px 20px -6px rgba(16,24,22,.45);
+  transition:transform .15s;
+}
+.fab:hover{transform:translateX(-50%) translateY(-2px)}
+.fab .plus{font-size:22px;font-weight:400;line-height:1;margin-top:-2px}
+
+/* Bouton corbeille et sa confirmation : rouge seulement au moment
+   où l'action devient réellement destructrice */
+.ghost{
+  border:1px solid var(--line);background:transparent;color:var(--muted);
+  height:32px;padding:0 10px;border-radius:8px;font-family:inherit;font-size:13px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s;
+}
+.ghost:hover{color:#A1362F;border-color:#E4BDB9;background:#FCF1F0}
+.ghost.danger{color:#fff;background:#A1362F;border-color:#A1362F}
+.ghost.danger:hover{background:#8C2D27}
+.confirm{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+
+
+/* ---------- 6. Feuille de saisie ---------- */
+
+.veil{
+  position:fixed;inset:0;background:rgba(16,24,22,.32);
+  display:none;align-items:flex-end;justify-content:center;padding:16px;z-index:20;
+}
+.veil.open{display:flex}
+
+.sheet{
+  background:var(--surface);border-radius:20px;width:100%;max-width:480px;
+  padding:22px 20px 20px;box-shadow:0 20px 50px -20px rgba(16,24,22,.5);
+  animation:up .28s cubic-bezier(.22,.8,.3,1);
+}
+.sheet h2{margin:0 0 16px;font-size:16px;font-weight:600}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:7px;
+}
+/* 16px minimum sur mobile : en dessous, iOS zoome automatiquement */
+.field input{
+  width:100%;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:10px;
+  font-family:inherit;font-size:16px;background:#FAFBFB;color:var(--ink);
+}
+.field input.money{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600}
+.field input:focus{outline:none;border-color:var(--ink);background:var(--surface)}
+
+/* Choix du payeur : le bouton sélectionné prend la couleur de la personne,
+   ce qui annonce déjà la couleur qu'aura la ligne dans la liste */
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick button{
+  height:48px;border-radius:10px;border:1.5px solid var(--line);background:#FAFBFB;
+  font-family:inherit;font-size:14.5px;font-weight:600;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;
+}
+.pick button .dot{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.5}
+.pick button[aria-pressed="true"]{color:#fff}
+.pick button[data-p="mathis"][aria-pressed="true"]{background:var(--mathis);border-color:var(--mathis)}
+.pick button[data-p="eline"][aria-pressed="true"]{background:var(--eline);border-color:var(--eline)}
+.pick button[aria-pressed="true"] .dot{background:#fff;opacity:1}
+
+.sheet .actions{display:flex;gap:8px;margin-top:20px}
+.sheet .actions button{
+  flex:1;height:48px;border-radius:11px;font-family:inherit;font-size:15px;font-weight:600;
+  cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--muted);
+}
+.sheet .actions button.go{background:var(--ink);color:#fff;border-color:var(--ink);flex:1.6}
+.sheet .actions button.go:disabled{opacity:.35;cursor:not-allowed}
+
+
+/* ---------- 7. Message temporaire, accessibilité, animations ---------- */
+
+.toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-size:13.5px;padding:10px 16px;border-radius:99px;
+  z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.toast.show{opacity:1}
+
+/* Contour visible à la navigation au clavier */
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* Respect du réglage système « réduire les animations » */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+
+/* Sur grand écran, la feuille se centre au lieu de coller en bas */
+@media (min-width:560px){
+  .veil{align-items:center}
+}
+
+
+/* ---------- 8. Pied de page et état d'attente ---------- */
+
+/* Ligne discrète qui indique si l'écran est à jour avec le classeur */
+.foot{
+  display:flex;align-items:center;justify-content:flex-end;
+  margin:20px 4px 0;font-size:12px;color:var(--muted);
+}
+
+/* Dépense affichée avant confirmation du classeur : visible mais
+   pas encore modifiable, puisqu'elle n'a pas encore de ligne */
+li.row.pending{opacity:.55}
+li.row.pending .kill{opacity:.2;cursor:default}
