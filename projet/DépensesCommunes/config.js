@@ -13,4 +13,4 @@
    C'est le compromis assumé pour ne pas avoir de mot de passe.
    ============================================================ */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGAH9zc9btHB8h-bsLXYb4CIP0gaNE61AOQI8SKTUkua9YZ_owgEvKJxZfUC7l_9Bn/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyY-TTWh7Mnhz3OCY_piERpvCA4sk_b4-hiLGxZRWnE7B96EBgk3Jgx_doZQDiwKWsq/exec';
