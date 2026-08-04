@@ -1,63 +1,1555 @@
-{"muscle avant bras" : {
-    "name" : "Les Muscles de l'avant bras (PASS)",
-    "description" : "Une approche des différents muscles permettant la flexion/extension ainsi que la pronosupination de l'avantbras",
-    "author": "Mathis KREMER",
-    "date":"07/05/2025",
-    "tags" : [  "muscle",
-                "bras",
-                "avant",
-                "avant-bras",
-                "PASS"
-            ]
-},
-"repere cartesien" : {
-    "name" : "Le repère cartésien en physique",
-    "description" : "Revoir les bases de se repère pour l'étude du mouvement",
-    "author": "Mathis KREMER",
-    "date":"07/05/2025",
-    "tags" : [  "terminal",
-                "repère",
-                "cartésien",
-                "repere",
-                "cartesien",
-                "physique"
-            ]
-},
-"cinologie" : {
-    "name" : "La cinologie de l'avant bras",
-    "description" : "Les mouvements possibles ainsi que les muscles impliqués",
-    "author": "Mathis KREMER",
-    "date":"07/05/2025",
-    "tags" : [  "PASS",
-                "repère",
-                "avant bras",
-                "repere",
-                "cartesien",
-                "physique"
-            ]
-},
-"redacteur de cours" : {
-    "name" : "[OUTIL] Rédaction des cours",
-    "description" : "Outil permettant de rédiger mes cours au format HTML afin de s'implifier la création de nouveau fichier",
-    "author": "Mathis KREMER",
-    "date":"07/05/2025",
-    "tags" : [  "code",
-                "html",
-                "outil"
-            ]
-},
-"ece physique" : {
-    "name" : "BAC - ECE Physique",
-    "description" : "Essentiel de la verrerie à maîtriser pour les ECE de physique chimie (BAC)",
-    "author": "Mathis KREMER",
-    "date":"26/5/2025",
-    "tags" : [
-                "bac",
-                "terminal",
-                "ece",
-                "verrerie",
-                "titrage",
+{
+    "muscle avant bras": {
+        "name": "Les Muscles de l'avant bras (PASS)",
+        "description": "Une approche des différents muscles permettant la flexion/extension ainsi que la pronosupination de l'avantbras",
+        "author": "Mathis KREMER",
+        "date": "07/05/2025",
+        "tags": [
+            "muscle",
+            "bras",
+            "avant",
+            "avant-bras",
+            "PASS"
+        ]
+    },
+    "repere cartesien": {
+        "name": "Le repère cartésien en physique",
+        "description": "Revoir les bases de se repère pour l'étude du mouvement",
+        "author": "Mathis KREMER",
+        "date": "07/05/2025",
+        "tags": [
+            "terminal",
+            "repère",
+            "cartésien",
+            "repere",
+            "cartesien",
+            "physique"
+        ]
+    },
+    "cinologie": {
+        "name": "La cinologie de l'avant bras",
+        "description": "Les mouvements possibles ainsi que les muscles impliqués",
+        "author": "Mathis KREMER",
+        "date": "07/05/2025",
+        "tags": [
+            "PASS",
+            "repère",
+            "avant bras",
+            "repere",
+            "cartesien",
+            "physique"
+        ]
+    },
+    "redacteur de cours": {
+        "name": "[OUTIL] Rédaction des cours",
+        "description": "Outil permettant de rédiger mes cours au format HTML afin de s'implifier la création de nouveau fichier",
+        "author": "Mathis KREMER",
+        "date": "07/05/2025",
+        "tags": [
+            "code",
+            "html",
+            "outil"
+        ]
+    },
+    "ece physique": {
+        "name": "BAC - ECE Physique",
+        "description": "Essentiel de la verrerie à maîtriser pour les ECE de physique chimie (BAC)",
+        "author": "Mathis KREMER",
+        "date": "26/5/2025",
+        "tags": [
+            "bac",
+            "terminal",
+            "ece",
+            "verrerie",
+            "titrage",
             "chimie"
-            ]
-}
+        ]
+    },
+    "immunologie-recepteurs-antigene": {
+        "name": "Immunologie - Reconnaissance de l'antigène (PRR, TCR-CD3, différenciation LT)",
+        "description": "Signaux du danger (PAMPs, DAMPs) et récepteurs de l'immunité innée, structure du complexe TCR-CD3, rôle des corécepteurs CD4/CD8 et différenciation des lymphocytes T CD4 en Th1/Th2.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "immunologie",
+            "PRR",
+            "PAMP",
+            "DAMP",
+            "TCR",
+            "CD3",
+            "lymphocyte T",
+            "Th1",
+            "Th2",
+            "Aarnink",
+            "medecine"
+        ],
+        "file": "cours/immunologie-recepteurs-antigene/fiche.pdf",
+        "pages": 3,
+        "source": "Aarnink_recap_v04.pdf"
+    },
+    "immunologie-ontogenese-lymphocytaire": {
+        "name": "Immunologie - Ontogénèse lymphocytaire, CMH et cellules NK",
+        "description": "Maturation des lymphocytes T dans le thymus et des lymphocytes B dans la moelle, réarrangements VDJ et sélection, complexe majeur d'histocompatibilité (CMH I et II) et récepteurs KIR des cellules NK.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "immunologie",
+            "ontogenese",
+            "lymphocyte B",
+            "lymphocyte T",
+            "thymus",
+            "VDJ",
+            "CMH",
+            "HLA",
+            "NK",
+            "KIR",
+            "Aarnink"
+        ],
+        "file": "cours/immunologie-ontogenese-lymphocytaire/fiche.pdf",
+        "pages": 4,
+        "source": "Aarnink_recap_v04.pdf"
+    },
+    "immunite-innee-cellules": {
+        "name": "Immunologie - Cellules de l'immunité innée (hématopoïèse, phagocytes, NK)",
+        "description": "Arbre de l'hématopoïèse, monocytes et macrophages, cellules NK et polynucléaires neutrophiles, éosinophiles et basophiles avec leurs granulations caractéristiques.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "immunologie",
+            "hematopoiese",
+            "macrophage",
+            "monocyte",
+            "NK",
+            "polynucleaire",
+            "neutrophile",
+            "eosinophile",
+            "basophile",
+            "Pagliuca"
+        ],
+        "file": "cours/immunite-innee-cellules/fiche.pdf",
+        "pages": 4,
+        "source": "Pagliuca_recap_v01.pdf"
+    },
+    "complement-immunoglobulines-malt": {
+        "name": "Immunologie - Complément, immunoglobulines et MALT",
+        "description": "Les trois voies d'activation du complément, structure et fonctions des immunoglobulines (fragments Fab et Fc, idiotype), et organisation du système immunitaire associé aux muqueuses (MALT, NALT, GALT, BALT).",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "immunologie",
+            "complement",
+            "immunoglobuline",
+            "anticorps",
+            "Ig",
+            "MALT",
+            "GALT",
+            "BALT",
+            "muqueuse",
+            "Pagliuca"
+        ],
+        "file": "cours/complement-immunoglobulines-malt/fiche.pdf",
+        "pages": 3,
+        "source": "Pagliuca_recap_v01.pdf"
+    },
+    "physiologie-respiratoire-bases": {
+        "name": "Physiologie respiratoire - Bases, muscles respiratoires et volumes pulmonaires",
+        "description": "Loi de Dalton et pressions partielles, muscles de l'inspiration et de l'expiration, volumes et capacités pulmonaires, notion de compliance pulmonaire.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "physiologie",
+            "respiratoire",
+            "poumon",
+            "Dalton",
+            "volumes pulmonaires",
+            "compliance",
+            "spirometrie",
+            "Poussel"
+        ],
+        "file": "cours/physiologie-respiratoire-bases/fiche.pdf",
+        "pages": 3,
+        "source": "Poussel_recap_v01.pdf"
+    },
+    "physiologie-respiratoire-echanges-gazeux": {
+        "name": "Physiologie respiratoire - Échanges gazeux, transport de l'O2 et du CO2",
+        "description": "Explorations fonctionnelles respiratoires, courbe de dissociation de l'hémoglobine (Barcroft), transport du CO2, diagramme de Davenport, ventilation alvéolaire et contrôle de la ventilation par les chémorécepteurs.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "physiologie",
+            "respiratoire",
+            "Barcroft",
+            "hemoglobine",
+            "CO2",
+            "Davenport",
+            "ventilation",
+            "chemorecepteur",
+            "EFR",
+            "Chenuel"
+        ],
+        "file": "cours/physiologie-respiratoire-echanges-gazeux/fiche.pdf",
+        "pages": 6,
+        "source": "Chenuel_recap_v01.pdf"
+    },
+    "ue4-voies-aeriennes-asthme-bpco": {
+        "name": "UE4 - Réflexe tussif, asthme, BPCO et histologie des voies aériennes",
+        "description": "Récepteurs et arc du réflexe tussif, comparaison physiopathologique de l'asthme et de la BPCO, histologie des voies aériennes de la cavité nasale aux bronchioles terminales.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE4",
+            "respiratoire",
+            "toux",
+            "asthme",
+            "BPCO",
+            "histologie",
+            "bronche",
+            "medecine"
+        ],
+        "file": "cours/ue4-voies-aeriennes-asthme-bpco/fiche.pdf",
+        "pages": 3,
+        "source": "recap_respiUE4_v01.pdf"
+    },
+    "ue4-imagerie-thoracique": {
+        "name": "UE4 - Imagerie thoracique et syndromes radiologiques",
+        "description": "Bases de lecture d'une radiographie thoracique, anomalies médiastinales, épanchements pleuraux liquidien et gazeux, tumeurs intraparenchymateuses, infections, atélectasie et œdème aigu du poumon.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE4",
+            "radiographie",
+            "imagerie",
+            "thorax",
+            "pneumothorax",
+            "epanchement",
+            "atelectasie",
+            "OAP",
+            "respiratoire"
+        ],
+        "file": "cours/ue4-imagerie-thoracique/fiche.pdf",
+        "pages": 5,
+        "source": "recap_respiUE4_v01.pdf"
+    },
+    "ue4-semiologie-respiratoire": {
+        "name": "UE4 - Sémiologie respiratoire (dyspnée, douleur thoracique, toux, hémoptysie)",
+        "description": "Analyse de la dyspnée aiguë et chronique, douleurs thoraciques et urgences, signes généraux, distension thoracique, cyanose, toux, hémoptysie, pleurésie avec distinction transsudat/exsudat, syndrome cave supérieur et syndrome de Pancoast-Tobias.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE4",
+            "semiologie",
+            "dyspnee",
+            "douleur thoracique",
+            "toux",
+            "hemoptysie",
+            "cyanose",
+            "pleuresie",
+            "respiratoire"
+        ],
+        "file": "cours/ue4-semiologie-respiratoire/fiche.pdf",
+        "pages": 8,
+        "source": "recap_respiUE4_v01.pdf"
+    },
+    "ecg-bases-et-lecture": {
+        "name": "Cardiologie - ECG : signal électrique, dérivations et méthode de lecture",
+        "description": "Genèse du signal électrique cardiaque, montages bipolaires et unipolaires, positionnement des électrodes précordiales, calibration du tracé et méthode de lecture systématique de l'ECG.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "ECG",
+            "cardiologie",
+            "electrocardiogramme",
+            "derivation",
+            "precordiale",
+            "UE5",
+            "medecine"
+        ],
+        "file": "cours/ecg-bases-et-lecture/fiche.pdf",
+        "pages": 3,
+        "source": "ue5_recap_v01.pdf"
+    },
+    "ecg-anomalies": {
+        "name": "Cardiologie - ECG pathologique : blocs de branche, hypertrophies et troubles du rythme",
+        "description": "Troubles de conduction et blocs de branche droit et gauche, signes d'hypertrophie auriculaire et ventriculaire, troubles du rythme supraventriculaires et ventriculaires.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "ECG",
+            "cardiologie",
+            "bloc de branche",
+            "hypertrophie",
+            "trouble du rythme",
+            "arythmie",
+            "UE5"
+        ],
+        "file": "cours/ecg-anomalies/fiche.pdf",
+        "pages": 3,
+        "source": "ue5_recap_v01.pdf"
+    },
+    "anatomie-auscultation-cardiaque": {
+        "name": "Cardiologie - Anatomie du cœur et bases de l'auscultation cardiaque",
+        "description": "Repères anatomiques des cavités cardiaques, foyers d'auscultation et conditions de réalisation d'une auscultation cardiaque correcte.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "cardiologie",
+            "anatomie",
+            "coeur",
+            "auscultation",
+            "foyer",
+            "semiologie",
+            "UE5"
+        ],
+        "file": "cours/anatomie-auscultation-cardiaque/fiche.pdf",
+        "pages": 3,
+        "source": "ue5_recap_v01.pdf"
+    },
+    "atherosclerose-et-imagerie-cardiaque": {
+        "name": "Cardiologie - Athérosclérose et angioscintigraphie cardiaque",
+        "description": "Physiopathologie de l'athérome et de l'athérosclérose avec la dysfonction endothéliale, puis principes, indications et contre-indications de l'angioscintigraphie cardiaque et de la fraction d'éjection.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "atherosclerose",
+            "atherome",
+            "endothelium",
+            "scintigraphie",
+            "fraction ejection",
+            "cardiologie",
+            "UE5"
+        ],
+        "file": "cours/atherosclerose-et-imagerie-cardiaque/fiche.pdf",
+        "pages": 2,
+        "source": "ue5_recap_v01.pdf"
+    },
+    "pharmacologie-ligand-recepteur": {
+        "name": "Pharmacologie - Interaction ligand-récepteur et quantification",
+        "description": "Loi d'action de masse et constante de dissociation, théorie de Clark et activité intrinsèque, agonistes entiers, partiels et antagonistes, représentation de Scatchard, méthodes de saturation et de compétition, sélectivité, courbe de saturation et droite de Hill.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "recepteur",
+            "ligand",
+            "KD",
+            "CE50",
+            "Clark",
+            "Scatchard",
+            "Hill",
+            "agoniste",
+            "antagoniste",
+            "Peyronnel"
+        ],
+        "file": "cours/pharmacologie-ligand-recepteur/fiche.pdf",
+        "pages": 8,
+        "source": "Peyronnel_recap_v03.pdf"
+    },
+    "familles-de-recepteurs": {
+        "name": "Pharmacologie - Les grandes familles de récepteurs et de transporteurs",
+        "description": "Récepteurs couplés aux protéines G, récepteurs à activité tyrosine kinase et guanylate cyclase, voie de la PKA, pompes ATPasiques, récepteurs canaux ioniques et récepteurs nucléaires.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "RCPG",
+            "RTK",
+            "PKA",
+            "pompe",
+            "ATPase",
+            "canal ionique",
+            "recepteur nucleaire",
+            "Peyronnel"
+        ],
+        "file": "cours/familles-de-recepteurs/fiche.pdf",
+        "pages": 4,
+        "source": "Peyronnel_recap_v03.pdf"
+    },
+    "dopamine-serotonine-parkinson": {
+        "name": "Pharmacologie - Dopamine, sérotonine, maladie de Parkinson et neuroleptiques",
+        "description": "Synthèse et catabolisme de la dopamine et de la sérotonine, cibles pharmacologiques (L-DOPA, IMAO, ICOMT), traitement de la maladie de Parkinson et effets indésirables des neuroleptiques.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "dopamine",
+            "serotonine",
+            "Parkinson",
+            "L-DOPA",
+            "neuroleptique",
+            "MAO",
+            "COMT",
+            "Peyronnel"
+        ],
+        "file": "cours/dopamine-serotonine-parkinson/fiche.pdf",
+        "pages": 2,
+        "source": "Peyronnel_recap_v03.pdf"
+    },
+    "systeme-adrenergique": {
+        "name": "Pharmacologie - Système adrénergique et médicaments sympathomimétiques",
+        "description": "Synthèse des catécholamines, médicaments adrénergiques (adrénaline, noradrénaline), antihypertenseurs d'action centrale et antagonistes du système adrénergique dont les bêta-bloquants.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "adrenergique",
+            "catecholamine",
+            "adrenaline",
+            "noradrenaline",
+            "beta-bloquant",
+            "antihypertenseur",
+            "Scala",
+            "Bertolat"
+        ],
+        "file": "cours/systeme-adrenergique/fiche.pdf",
+        "pages": 4,
+        "source": "Scala_Bertolat_recap_v03.pdf"
+    },
+    "systeme-histaminergique": {
+        "name": "Pharmacologie - Système histaminergique et antihistaminiques H1",
+        "description": "Synthèse et libération de l'histamine, récepteurs histaminergiques, antagonistes H1 de première et de deuxième génération avec leurs effets anticholinergiques et sédatifs.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "histamine",
+            "antihistaminique",
+            "H1",
+            "allergie",
+            "sedation",
+            "Scala",
+            "Bertolat"
+        ],
+        "file": "cours/systeme-histaminergique/fiche.pdf",
+        "pages": 2,
+        "source": "Scala_Bertolat_recap_v03.pdf"
+    },
+    "sraa-hta-hypolipemiants": {
+        "name": "Pharmacologie - Système rénine-angiotensine, prise en charge de l'HTA et hypolipémiants",
+        "description": "Système rénine-angiotensine-aldostérone et peptides natriurétiques, stratégie thérapeutique de l'hypertension artérielle (IEC, ARA2, inhibiteurs calciques, diurétiques), et traitements du cholestérol dont les statines et les anti-PCSK9.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "SRAA",
+            "renine",
+            "angiotensine",
+            "HTA",
+            "IEC",
+            "ARA2",
+            "statine",
+            "PCSK9",
+            "cholesterol",
+            "Scala",
+            "Bertolat"
+        ],
+        "file": "cours/sraa-hta-hypolipemiants/fiche.pdf",
+        "pages": 3,
+        "source": "Scala_Bertolat_recap_v03.pdf"
+    },
+    "systeme-cholinergique": {
+        "name": "Pharmacologie - Système cholinergique et antagonistes muscariniques",
+        "description": "Synthèse et dégradation de l'acétylcholine, voies motrice, sympathique et parasympathique, effets des antagonistes muscariniques comme l'atropine et la scopolamine.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "cholinergique",
+            "acetylcholine",
+            "muscarinique",
+            "atropine",
+            "scopolamine",
+            "parasympathique",
+            "Pape"
+        ],
+        "file": "cours/systeme-cholinergique/fiche.pdf",
+        "pages": 2,
+        "source": "Pape_recap_v02.pdf"
+    },
+    "medicaments-du-diabete": {
+        "name": "Pharmacologie - Les médicaments du diabète",
+        "description": "Critères diagnostiques du diabète et principales classes thérapeutiques avec leurs cibles, dont les inhibiteurs de SGLT2 et l'action sur la néoglucogenèse.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "diabete",
+            "glycemie",
+            "SGLT2",
+            "antidiabetique",
+            "insuline",
+            "Pape"
+        ],
+        "file": "cours/medicaments-du-diabete/fiche.pdf",
+        "pages": 1,
+        "source": "Pape_recap_v02.pdf"
+    },
+    "systeme-dopaminergique-iatrogenie": {
+        "name": "Pharmacologie - Système dopaminergique, récepteurs D1/D2 et iatrogénie",
+        "description": "Voies dopaminergiques cérébrales (nigrostriée, mésolimbique, mésocorticale), récepteurs D1-like et D2-like et leurs effets, polymédication et réflexe iatrogénique.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "dopamine",
+            "dopaminergique",
+            "D1",
+            "D2",
+            "iatrogenie",
+            "polymedication",
+            "Pape"
+        ],
+        "file": "cours/systeme-dopaminergique-iatrogenie/fiche.pdf",
+        "pages": 3,
+        "source": "Pape_recap_v02.pdf"
+    },
+    "serotonine-hallucinogenes": {
+        "name": "Pharmacologie - Domaine sérotoninergique et hallucinogènes",
+        "description": "Synthèse et métabolisme de la sérotonine, familles de récepteurs 5-HT, mécanisme d'action du LSD et reconnaissance des psilocybes.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "serotonine",
+            "5-HT",
+            "LSD",
+            "psilocybe",
+            "hallucinogene",
+            "melatonine",
+            "Gambier"
+        ],
+        "file": "cours/serotonine-hallucinogenes/fiche.pdf",
+        "pages": 2,
+        "source": "Gambier_recap_v01.pdf"
+    },
+    "douleur-et-antalgiques": {
+        "name": "Pharmacologie - Douleur et antalgiques (paliers, opioïdes)",
+        "description": "Les quatre étapes de la douleur, types de douleur et traitements correspondants, paliers antalgiques de l'OMS, effets indésirables des opioïdes forts et place de la nalbuphine.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "douleur",
+            "antalgique",
+            "opioide",
+            "morphine",
+            "palier",
+            "nociception",
+            "Gambier"
+        ],
+        "file": "cours/douleur-et-antalgiques/fiche.pdf",
+        "pages": 2,
+        "source": "Gambier_recap_v01.pdf"
+    },
+    "anti-inflammatoires-ais-ains": {
+        "name": "Pharmacologie - Glucocorticoïdes, anti-inflammatoires stéroïdiens et AINS",
+        "description": "Axe corticotrope et sécrétion du cortisol, anti-inflammatoires stéroïdiens et leurs effets indésirables, cascade de l'acide arachidonique et mécanisme d'action des AINS via les cyclo-oxygénases.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "glucocorticoide",
+            "cortisol",
+            "AIS",
+            "AINS",
+            "COX",
+            "inflammation",
+            "Jouzeau"
+        ],
+        "file": "cours/anti-inflammatoires-ais-ains/fiche.pdf",
+        "pages": 3,
+        "source": "Jouzeau_recap_v02.pdf"
+    },
+    "systeme-gabaergique": {
+        "name": "Pharmacologie - Système GABAergique et benzodiazépines",
+        "description": "Récepteurs GABA-A ionotropiques et GABA-B métabotropiques, sites de modulation et mécanisme d'action des benzodiazépines.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "GABA",
+            "benzodiazepine",
+            "recepteur",
+            "anxiolytique",
+            "Jouzeau"
+        ],
+        "file": "cours/systeme-gabaergique/fiche.pdf",
+        "pages": 1,
+        "source": "Jouzeau_recap_v02.pdf"
+    },
+    "metabolisme-des-medicaments": {
+        "name": "Pharmacologie - Métabolisme des médicaments et xénobiotiques (CYP450)",
+        "description": "Phases 0, 1 et 2 du métabolisme, clairance hépatique, cytochrome CYP2E1 et toxicité du paracétamol, de l'éthanol et du méthanol, mécanismes d'induction enzymatique via AhR et CAR-RXR.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "metabolisme",
+            "CYP450",
+            "CYP2E1",
+            "paracetamol",
+            "ethanol",
+            "induction",
+            "xenobiotique",
+            "Meausoone"
+        ],
+        "file": "cours/metabolisme-des-medicaments/fiche.pdf",
+        "pages": 3,
+        "source": "Méausoone_recap_v02.pdf"
+    },
+    "developpement-du-medicament": {
+        "name": "Pharmacologie - Développement du médicament et pharmacovigilance",
+        "description": "Du criblage de molécules à la mise sur le marché : études précliniques et essais cliniques de phase 1 à 3, puis pharmacovigilance en phase 4 avec la classification des effets indésirables et exemples historiques.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "pharmacologie",
+            "medicament",
+            "essai clinique",
+            "preclinique",
+            "pharmacovigilance",
+            "effet indesirable",
+            "AMM",
+            "Fresse",
+            "Antoine"
+        ],
+        "file": "cours/developpement-du-medicament/fiche.pdf",
+        "pages": 2,
+        "source": "Fresse_et_Antoine_recap_v01.pdf"
+    },
+    "ue9-foie-icteres-ascite": {
+        "name": "UE9 - Foie : ictères, cholestase et ascite",
+        "description": "Pathologies de la glycosylation, segmentation hépatique de Couinaud, métabolisme de la bilirubine et classification des ictères à bilirubine libre, conjuguée ou mixte, et les quatre grandes familles d'ascite avec le gradient GASA.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "foie",
+            "ictere",
+            "bilirubine",
+            "cholestase",
+            "ascite",
+            "GASA",
+            "Couinaud"
+        ],
+        "file": "cours/ue9-foie-icteres-ascite/fiche.pdf",
+        "pages": 4,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "ue9-endocrinologie-biologique": {
+        "name": "UE9 - Endocrinologie biologique : axes hypophysaires, surrénales, thyroïde et calcium",
+        "description": "Axe hypothalamo-hypophysaire et ses différents axes, hyper et hypocorticisme, minéralocorticoïdes et SRAA, hyperplasie congénitale des surrénales, axe thyréotrope et hyperthyroïdie, dyscalcémies et rôles du calcium.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "hypophyse",
+            "surrenale",
+            "cortisol",
+            "aldosterone",
+            "thyroide",
+            "calcium",
+            "hypercorticisme",
+            "endocrinologie"
+        ],
+        "file": "cours/ue9-endocrinologie-biologique/fiche.pdf",
+        "pages": 6,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "ue9-inflammation-alzheimer-fer": {
+        "name": "UE9 - Inflammation, Alzheimer, polyarthrite rhumatoïde et métabolisme du fer",
+        "description": "Bases moléculaires de la maladie d'Alzheimer (peptide amyloïde et protéine Tau), cytokines et médiateurs de l'inflammation, physiopathologie de la polyarthrite rhumatoïde, ferritine et régulation du métabolisme martial.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "inflammation",
+            "cytokine",
+            "Alzheimer",
+            "amyloide",
+            "Tau",
+            "polyarthrite",
+            "ferritine",
+            "fer"
+        ],
+        "file": "cours/ue9-inflammation-alzheimer-fer/fiche.pdf",
+        "pages": 4,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "ue9-amylose-dysnatremies": {
+        "name": "UE9 - Équilibre hydrique, dysnatrémies et amyloses systémiques",
+        "description": "Répartition de l'eau dans l'organisme, hyponatrémies et hypernatrémies avec leurs mécanismes d'hyperhydratation ou de déshydratation intracellulaire, et amyloses systémiques par mauvais repliement protéique.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "natremie",
+            "hyponatremie",
+            "hypernatremie",
+            "eau",
+            "amylose",
+            "deshydratation"
+        ],
+        "file": "cours/ue9-amylose-dysnatremies/fiche.pdf",
+        "pages": 3,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "ue9-exploration-renale": {
+        "name": "UE9 - Exploration rénale, protéinurie et gammapathies monoclonales",
+        "description": "Fonction rénale et DFG, insuffisance rénale chronique, urée comme marqueur de la consommation protéique, albuminurie et protéinurie, gammapathies monoclonales et myélome multiple.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "rein",
+            "DFG",
+            "insuffisance renale",
+            "proteinurie",
+            "albuminurie",
+            "uree",
+            "myelome",
+            "gammapathie"
+        ],
+        "file": "cours/ue9-exploration-renale/fiche.pdf",
+        "pages": 3,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "ue9-equilibre-acido-basique": {
+        "name": "UE9 - Équilibre acido-basique et gaz du sang",
+        "description": "Diagramme de Davenport et interprétation des troubles acido-basiques (acidose et alcalose, respiratoire et métabolique), lecture d'un examen des gaz du sang.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE9",
+            "biochimie",
+            "acido-basique",
+            "Davenport",
+            "acidose",
+            "alcalose",
+            "gaz du sang",
+            "pH",
+            "bicarbonate"
+        ],
+        "file": "cours/ue9-equilibre-acido-basique/fiche.pdf",
+        "pages": 2,
+        "source": "UE9_recap_v1.pdf"
+    },
+    "glycoregulation-diagnostic-diabete": {
+        "name": "UE11 - Glycorégulation et diagnostic du diabète",
+        "description": "Régulation de la glycémie au cours de la journée, critères diagnostiques du diabète, hyperglycémie provoquée par voie orale, dosage de l'HbA1c et dépistage du diabète gestationnel.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE11",
+            "glycemie",
+            "diabete",
+            "HbA1c",
+            "HGPO",
+            "diabete gestationnel",
+            "glycoregulation"
+        ],
+        "file": "cours/glycoregulation-diagnostic-diabete/fiche.pdf",
+        "pages": 2,
+        "source": "UE11_recap_v1.pdf"
+    },
+    "glycolyse-neoglucogenese": {
+        "name": "UE11 - Régulation de la glycolyse et néoglucogenèse",
+        "description": "Transporteurs du glucose et hexokinase/glucokinase, régulation de la glycolyse en état de réplétion et de jeûne, cycle de Cori et étapes clés de la néoglucogenèse.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE11",
+            "glycolyse",
+            "neoglucogenese",
+            "GLUT",
+            "hexokinase",
+            "glucokinase",
+            "Cori",
+            "insuline",
+            "glucagon",
+            "biochimie"
+        ],
+        "file": "cours/glycolyse-neoglucogenese/fiche.pdf",
+        "pages": 2,
+        "source": "UE11_recap_v1.pdf"
+    },
+    "hypophyse-parathyroides": {
+        "name": "UE11 - Hypophyse et parathyroïdes : physiologie et sémiologie",
+        "description": "Anatomie et axes de l'hypophyse (thyréotrope, somatotrope, corticotrope, gonadotrope, lactotrope), déficits antéhypophysaires, SIADH, et sémiologie des parathyroïdes avec hyper et hypocalcémies.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE11",
+            "hypophyse",
+            "hypophysaire",
+            "SIADH",
+            "ADH",
+            "parathyroide",
+            "PTH",
+            "calcemie",
+            "endocrinologie"
+        ],
+        "file": "cours/hypophyse-parathyroides/fiche.pdf",
+        "pages": 2,
+        "source": "UE11_recap_v1.pdf"
+    },
+    "diabetes-et-complications": {
+        "name": "UE11 - Types de diabète et complications",
+        "description": "Diabète insipide central et néphrogénique, diabète sucré de type 1 et 2, hypoglycémie, complications microvasculaires et macrovasculaires dont le pied diabétique de Charcot.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE11",
+            "diabete",
+            "diabete insipide",
+            "hypoglycemie",
+            "complication",
+            "microvasculaire",
+            "pied diabetique",
+            "ADH"
+        ],
+        "file": "cours/diabetes-et-complications/fiche.pdf",
+        "pages": 2,
+        "source": "UE11_recap_v1.pdf"
+    },
+    "semiologie-gynecologique-contraception": {
+        "name": "UE11 - Sémiologie gynécologique et contraception",
+        "description": "Ménarche, nomenclature GXPX, durée et anomalies du cycle menstruel, sémiologie mammaire, et méthodes de contraception (COP, progestatifs seuls, DIU, méthode MAMA).",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE11",
+            "gynecologie",
+            "semiologie",
+            "cycle",
+            "menstruel",
+            "contraception",
+            "pilule",
+            "DIU",
+            "COP"
+        ],
+        "file": "cours/semiologie-gynecologique-contraception/fiche.pdf",
+        "pages": 2,
+        "source": "UE11_recap_v1.pdf"
+    },
+    "nutrition-obesite-tca": {
+        "name": "UE14 - Obésité, comportement alimentaire et troubles du comportement alimentaire",
+        "description": "Physiopathologie de l'obésité et courbe de corpulence, hormones de la régulation de l'appétit (leptine, ghréline, adiponectine), phases du comportement alimentaire et critères diagnostiques des principaux TCA.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE14",
+            "nutrition",
+            "obesite",
+            "IOTF",
+            "leptine",
+            "ghreline",
+            "TCA",
+            "anorexie",
+            "boulimie",
+            "comportement alimentaire"
+        ],
+        "file": "cours/nutrition-obesite-tca/fiche.pdf",
+        "pages": 5,
+        "source": "RECAP_UE14_Nutrition_V2.pdf"
+    },
+    "nutrition-lipides-dyslipidemies": {
+        "name": "UE14 - Besoins nutritionnels, transport des lipides et dyslipidémies",
+        "description": "Besoins nutritionnels moyens et références nutritionnelles, sarcopénie et besoins protéiques du sujet âgé, absorption intestinale et transport des lipides par les lipoprotéines, bilan et prise en charge des dyslipidémies.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE14",
+            "nutrition",
+            "lipide",
+            "lipoproteine",
+            "dyslipidemie",
+            "cholesterol",
+            "statine",
+            "sarcopenie",
+            "omega-3",
+            "BNM"
+        ],
+        "file": "cours/nutrition-lipides-dyslipidemies/fiche.pdf",
+        "pages": 5,
+        "source": "RECAP_UE14_Nutrition_V2.pdf"
+    },
+    "nutrition-micronutriments": {
+        "name": "UE14 - Micronutriments : fer, cuivre et iode",
+        "description": "Métabolisme du fer et sa régulation, rôle et pathologies du cuivre, métabolisme de l'iode et lien avec la fonction thyroïdienne.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE14",
+            "nutrition",
+            "micronutriment",
+            "fer",
+            "cuivre",
+            "iode",
+            "oligoelement",
+            "thyroide"
+        ],
+        "file": "cours/nutrition-micronutriments/fiche.pdf",
+        "pages": 4,
+        "source": "RECAP_UE14_Nutrition_V2.pdf"
+    },
+    "nutrition-denutrition-energie": {
+        "name": "UE14 - Oxydation des acides gras, dénutrition et balance énergétique",
+        "description": "Bêta-oxydation des acides gras et production d'énergie, diagnostic de la dénutrition, balance énergétique et dépense énergétique de repos.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE14",
+            "nutrition",
+            "acide gras",
+            "beta-oxydation",
+            "denutrition",
+            "energie",
+            "metabolisme",
+            "balance energetique"
+        ],
+        "file": "cours/nutrition-denutrition-energie/fiche.pdf",
+        "pages": 7,
+        "source": "RECAP_UE14_Nutrition_V2.pdf"
+    },
+    "genetique-modes-heredite": {
+        "name": "UE15 - Modes d'hérédité, maladies liées à l'X et pathologies mitochondriales",
+        "description": "Sommaire général du récap, modes de transmission héréditaire, maladies liées à l'X (hémophilie, myopathie de Duchenne, X fragile, dyschondrostéose de Leri-Weill), outils moléculaires des maladies monogéniques et pathologies mitochondriales avec l'hétéroplasmie.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE15",
+            "genetique",
+            "heredite",
+            "chromosome X",
+            "hemophilie",
+            "Duchenne",
+            "X fragile",
+            "mitochondrie",
+            "heteroplasmie",
+            "ADNmt"
+        ],
+        "file": "cours/genetique-modes-heredite/fiche.pdf",
+        "pages": 7,
+        "source": "UE15_Récap_Génétique_Médicale_v1.pdf"
+    },
+    "genetique-cancer-ethique": {
+        "name": "UE15 - Prédispositions génétiques au cancer, éthique et conseil génétique",
+        "description": "Syndromes de prédisposition au cancer dont le syndrome de Lynch, principes éthiques et cadre légal des tests génétiques (DPI, DPN, génétique postnatale), approches thérapeutiques, calcul de risque et empreinte génomique parentale.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE15",
+            "genetique",
+            "cancer",
+            "predisposition",
+            "Lynch",
+            "BRCA",
+            "ethique",
+            "DPI",
+            "DPN",
+            "conseil genetique",
+            "empreinte"
+        ],
+        "file": "cours/genetique-cancer-ethique/fiche.pdf",
+        "pages": 4,
+        "source": "UE15_Récap_Génétique_Médicale_v1.pdf"
+    },
+    "genetique-outils-moleculaires": {
+        "name": "UE15 - Outils moléculaires et cytogénétiques du diagnostic (Sanger, NGS, ACPA, FISH)",
+        "description": "PCR et électrophorèse capillaire, séquençage Sanger et séquençage haut débit NGS avec leurs limites respectives, analyse chromosomique sur puce à ADN et hybridation in situ en fluorescence.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE15",
+            "genetique",
+            "PCR",
+            "Sanger",
+            "NGS",
+            "sequencage",
+            "ACPA",
+            "FISH",
+            "diagnostic moleculaire"
+        ],
+        "file": "cours/genetique-outils-moleculaires/fiche.pdf",
+        "pages": 3,
+        "source": "UE15_Récap_Génétique_Médicale_v1.pdf"
+    },
+    "genetique-anomalies-chromosomiques": {
+        "name": "UE15 - Anomalies chromosomiques, maladies complexes et diagnostic prénatal",
+        "description": "Mécanismes des anomalies chromosomiques de nombre et de structure, leur diagnostic biologique, maladies multifactorielles complexes, outils moléculaires du diagnostic prénatal et distinction DPN/DPI.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE15",
+            "genetique",
+            "anomalie chromosomique",
+            "trisomie",
+            "translocation",
+            "caryotype",
+            "DPN",
+            "DPI",
+            "maladie complexe"
+        ],
+        "file": "cours/genetique-anomalies-chromosomiques/fiche.pdf",
+        "pages": 4,
+        "source": "UE15_Récap_Génétique_Médicale_v1.pdf"
+    },
+    "genetique-pathologies-et-populations": {
+        "name": "UE15 - Pathologies autosomiques, génétique des populations et dépistage néonatal",
+        "description": "Pathologies autosomiques récessives et dominantes (neurofibromatose, syndrome de Marfan), génétique des populations et calcul de risque avec Hardy-Weinberg, dysgonosomies, dépistage néonatal et tableau récapitulatif des pièges d'annales.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "UE15",
+            "genetique",
+            "autosomique",
+            "recessif",
+            "dominant",
+            "Marfan",
+            "neurofibromatose",
+            "Hardy-Weinberg",
+            "dysgonosomie",
+            "depistage neonatal"
+        ],
+        "file": "cours/genetique-pathologies-et-populations/fiche.pdf",
+        "pages": 8,
+        "source": "UE15_Récap_Génétique_Médicale_v1.pdf"
+    },
+    "anapath-bases-cancerologie": {
+        "name": "Anatomie pathologique - Bases de la cancérologie et cascade métastatique",
+        "description": "Définition d'une tumeur et diagnostics différentiels, critères distinguant tumeur bénigne et maligne, nomenclature des tumeurs, et étapes de la cascade métastatique de l'invasion locale à l'extravasation.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "anatomie pathologique",
+            "tumeur",
+            "cancer",
+            "benin",
+            "malin",
+            "metastase",
+            "nomenclature",
+            "Sartelet"
+        ],
+        "file": "cours/anapath-bases-cancerologie/fiche.pdf",
+        "pages": 3,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "hemopathies-lymphoides": {
+        "name": "Anatomie pathologique - Hémopathies lymphoïdes",
+        "description": "Prolifération des lymphocytes B et T, architecture du ganglion lymphatique, macroglobulinémie de Waldenström, lymphome folliculaire et myélome multiple.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "hemopathie",
+            "lymphome",
+            "lymphocyte",
+            "Waldenstrom",
+            "myelome",
+            "ganglion",
+            "Sartelet"
+        ],
+        "file": "cours/hemopathies-lymphoides/fiche.pdf",
+        "pages": 1,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "tumeurs-non-epitheliales": {
+        "name": "Anatomie pathologique - Tumeurs mélanocytaires, conjonctives, osseuses, nerveuses et germinales",
+        "description": "Naevus et mélanomes, tumeurs conjonctives fibreuses et musculaires, tumeurs du squelette, tumeurs mésothéliales, tumeurs du système nerveux (schwannome, neurofibrome) et tumeurs des cellules germinales.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "tumeur",
+            "melanome",
+            "naevus",
+            "sarcome",
+            "leiomyome",
+            "mesotheliome",
+            "schwannome",
+            "germinale",
+            "Sartelet"
+        ],
+        "file": "cours/tumeurs-non-epitheliales/fiche.pdf",
+        "pages": 7,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "therapies-ciblees-immunotherapie": {
+        "name": "Anatomie pathologique - Biomarqueurs, thérapies ciblées et immunothérapie",
+        "description": "Translocation ALK-EML4 et mutations RAS comme biomarqueurs théranostiques, mécanismes de l'immunothérapie et rôle des lymphocytes T régulateurs dans l'échappement tumoral.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "therapie ciblee",
+            "immunotherapie",
+            "ALK",
+            "RAS",
+            "EGFR",
+            "biomarqueur",
+            "theranostique",
+            "Sartelet"
+        ],
+        "file": "cours/therapies-ciblees-immunotherapie/fiche.pdf",
+        "pages": 1,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "vascularites": {
+        "name": "Anatomie pathologique - Les vascularites",
+        "description": "Classification des vascularites selon le calibre des vaisseaux atteints : maladie de Horton, périartérite noueuse, granulomatose de Wegener et anticorps anti-cytoplasme des polynucléaires.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "vascularite",
+            "Horton",
+            "PAN",
+            "Wegener",
+            "ANCA",
+            "vaisseau",
+            "inflammation",
+            "Sartelet"
+        ],
+        "file": "cours/vascularites/fiche.pdf",
+        "pages": 1,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "tumeurs-epitheliales": {
+        "name": "Anatomie pathologique - Tumeurs épithéliales : malpighiennes, glandulaires, urothéliales et endocrines",
+        "description": "Papillomes et carcinomes épidermoïdes, adénomes et adénocarcinomes des organes creux, tumeurs urothéliales et leur classement, et tumeurs à différenciation endocrine.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "anapath",
+            "tumeur",
+            "epithelial",
+            "malpighien",
+            "papillome",
+            "adenome",
+            "adenocarcinome",
+            "urothelial",
+            "endocrine",
+            "Sartelet"
+        ],
+        "file": "cours/tumeurs-epitheliales/fiche.pdf",
+        "pages": 4,
+        "source": "Sartelet_Recap_v01.pdf"
+    },
+    "krebs-cycle-uree": {
+        "name": "Biochimie - Cycle de Krebs, métabolisme des acides aminés et cycle de l'urée",
+        "description": "Cycle de l'acide citrique et ses enzymes clés, transamination et désamination des acides aminés, cycle de l'urée et hyperammoniémies primaires par déficit du cycle.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "Krebs",
+            "cycle citrique",
+            "acide amine",
+            "transamination",
+            "uree",
+            "hyperammoniemie",
+            "OCT",
+            "metabolisme"
+        ],
+        "file": "cours/krebs-cycle-uree/fiche.pdf",
+        "pages": 4,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "stress-oxydant": {
+        "name": "Biochimie - Stress oxydant et défenses anti-oxydantes",
+        "description": "Formation des espèces réactives de l'oxygène, peroxydation lipidique et oxydation des protéines, systèmes de défense enzymatiques et non enzymatiques dont le glutathion.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "stress oxydant",
+            "ERO",
+            "radical libre",
+            "peroxydation",
+            "glutathion",
+            "SOD",
+            "catalase",
+            "antioxydant"
+        ],
+        "file": "cours/stress-oxydant/fiche.pdf",
+        "pages": 3,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "inflammation-eicosanoides": {
+        "name": "Biochimie - Bases moléculaires de l'inflammation, phagocytose et eicosanoïdes",
+        "description": "Étapes de l'inflammation et familles de chimiokines, polynucléaire neutrophile et mécanismes de la phagocytose, voies des cyclo-oxygénases et des lipoxygénases à partir de l'acide arachidonique.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "inflammation",
+            "chimiokine",
+            "neutrophile",
+            "phagocytose",
+            "eicosanoide",
+            "COX",
+            "LOX",
+            "prostaglandine"
+        ],
+        "file": "cours/inflammation-eicosanoides/fiche.pdf",
+        "pages": 3,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "oncogenes-cycle-cellulaire": {
+        "name": "Biochimie - Oncogènes, anti-oncogènes et cycle cellulaire",
+        "description": "Mécanismes qualitatifs et quantitatifs d'activation des oncogènes dont l'amplification de HER2, anti-oncogènes Rb et p53, et déroulement du cycle cellulaire avec les couples CDK-cyclines.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "oncogene",
+            "anti-oncogene",
+            "p53",
+            "Rb",
+            "HER2",
+            "cycle cellulaire",
+            "CDK",
+            "cycline",
+            "cancer"
+        ],
+        "file": "cours/oncogenes-cycle-cellulaire/fiche.pdf",
+        "pages": 2,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "pentoses-phosphates-atherosclerose": {
+        "name": "Biochimie - Voie des pentoses phosphates et athérosclérose",
+        "description": "Voie des pentoses phosphates et production de NADPH,H+ pour la défense anti-oxydante, puis physiopathologie de l'athérosclérose de la dysfonction endothéliale à la plaque stable.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "pentose phosphate",
+            "VPP",
+            "NADPH",
+            "G6PD",
+            "atherosclerose",
+            "endothelium",
+            "plaque",
+            "LDL"
+        ],
+        "file": "cours/pentoses-phosphates-atherosclerose/fiche.pdf",
+        "pages": 2,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "mucoviscidose-mici-autophagie": {
+        "name": "Biochimie - Mucoviscidose, MICI, autophagie et microbiote",
+        "description": "Gène CFTR, dépistage néonatal et cercle vicieux de la mucoviscidose, maladies inflammatoires chroniques de l'intestin (RCH et maladie de Crohn), autophagie et rôle du microbiote via NOD2 et ATG16L1.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "mucoviscidose",
+            "CFTR",
+            "MICI",
+            "Crohn",
+            "RCH",
+            "autophagie",
+            "microbiote",
+            "NOD2",
+            "ATG16L1"
+        ],
+        "file": "cours/mucoviscidose-mici-autophagie/fiche.pdf",
+        "pages": 3,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "outils-moleculaires-a1at": {
+        "name": "Biochimie - PCR, NGS, méthylation de l'ADN et déficit en alpha-1-antitrypsine",
+        "description": "Principes de la PCR et du séquençage haut débit, déficit en alpha-1-antitrypsine avec ses atteintes pulmonaires et hépatiques, et détection des cytosines méthylées par traitement au bisulfite.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "biochimie",
+            "PCR",
+            "NGS",
+            "sequencage",
+            "alpha-1-antitrypsine",
+            "SERPINA",
+            "emphyseme",
+            "methylation",
+            "bisulfite",
+            "epigenetique"
+        ],
+        "file": "cours/outils-moleculaires-a1at/fiche.pdf",
+        "pages": 3,
+        "source": "UEP_Biochimie_Intégrative_et_Translationnelle_v3.pdf"
+    },
+    "imagerie-bases-lecture": {
+        "name": "Imagerie EDN - Bases de lecture : radiographie, TDM et IRM",
+        "description": "Critères de qualité d'une radiographie thoracique et signe de la silhouette, plans de coupe et fenêtres en tomodensitométrie, phases d'injection, pondérations en IRM et saturation du signal de la graisse.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "radiographie",
+            "TDM",
+            "scanner",
+            "IRM",
+            "ponderation",
+            "fenetre",
+            "injection",
+            "medecine"
+        ],
+        "file": "cours/imagerie-bases-lecture/fiche.pdf",
+        "pages": 5,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-pediatrie-maltraitance": {
+        "name": "Imagerie EDN - Pédiatrie et maltraitance (bébé secoué, syndrome de Silverman)",
+        "description": "Radiographie du rachis dans la scoliose malformative, sémiologie tomodensitométrique du syndrome du bébé secoué avec hématomes sous-duraux et extra-duraux, et lésions du syndrome de Silverman.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "pediatrie",
+            "maltraitance",
+            "bebe secoue",
+            "Silverman",
+            "scoliose",
+            "hematome"
+        ],
+        "file": "cours/imagerie-pediatrie-maltraitance/fiche.pdf",
+        "pages": 4,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-neuro-rachis": {
+        "name": "Imagerie EDN - Neuro-imagerie et pathologies du rachis",
+        "description": "Compression médullaire et syndrome de la queue de cheval, hernie discale, sclérose en plaques et critères de dissémination, hématome sous-dural chronique et hydrocéphalie chronique de l'adulte.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "neurologie",
+            "rachis",
+            "compression medullaire",
+            "hernie discale",
+            "SEP",
+            "hematome sous-dural",
+            "hydrocephalie",
+            "IRM"
+        ],
+        "file": "cours/imagerie-neuro-rachis/fiche.pdf",
+        "pages": 6,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-osteoporose-arthrose": {
+        "name": "Imagerie EDN - Ostéoporose et arthrose",
+        "description": "Fractures ostéoporotiques en radiographie et en IRM, sémiologie radiographique de l'arthrose avec la coxarthrose, la gonarthrose et l'arthrose digitale, et diagnostic des arthroses secondaires.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "rhumatologie",
+            "osteoporose",
+            "fracture",
+            "arthrose",
+            "coxarthrose",
+            "gonarthrose",
+            "radiographie"
+        ],
+        "file": "cours/imagerie-osteoporose-arthrose/fiche.pdf",
+        "pages": 6,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-infectiologie": {
+        "name": "Imagerie EDN - Infectiologie thoracique et cérébrale",
+        "description": "Pneumopathie franche lobaire aiguë et pleuropneumopathie de l'enfant, tuberculose pulmonaire en radiographie et en TDM, toxoplasmose cérébrale et pneumocystose au cours de l'infection à VIH, distension thoracique de l'asthme.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "infectiologie",
+            "pneumopathie",
+            "PFLA",
+            "tuberculose",
+            "VIH",
+            "toxoplasmose",
+            "pneumocystose"
+        ],
+        "file": "cours/imagerie-infectiologie/fiche.pdf",
+        "pages": 7,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-rhumatismes-inflammatoires": {
+        "name": "Imagerie EDN - Rhumatismes inflammatoires et microcristallins",
+        "description": "Érosions et pincements articulaires de la polyarthrite rhumatoïde, syndesmophytes et coxite de la spondylarthrite ankylosante, et calcifications des arthropathies microcristallines.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "rhumatologie",
+            "polyarthrite",
+            "spondylarthrite",
+            "syndesmophyte",
+            "coxite",
+            "chondrocalcinose",
+            "microcristalline"
+        ],
+        "file": "cours/imagerie-rhumatismes-inflammatoires/fiche.pdf",
+        "pages": 7,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-thoracique-pneumologie": {
+        "name": "Imagerie EDN - Imagerie thoracique et pneumologie",
+        "description": "Corps étranger bronchique, dilatation des bronches, hémoptysie, épanchements pleuraux liquidien et gazeux, syndromes alvéolaire et interstitiel, anomalies médiastinales, atélectasies, BPCO, fibrose pulmonaire et sarcoïdose.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "pneumologie",
+            "thorax",
+            "epanchement",
+            "pneumothorax",
+            "syndrome alveolaire",
+            "syndrome interstitiel",
+            "atelectasie",
+            "BPCO",
+            "sarcoidose",
+            "fibrose"
+        ],
+        "file": "cours/imagerie-thoracique-pneumologie/fiche.pdf",
+        "pages": 21,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-urgences-cardiovasculaires": {
+        "name": "Imagerie EDN - Urgences cardio-vasculaires et œdème aigu du poumon",
+        "description": "Place et anomalies de la radiographie thoracique dans les quatre urgences cardio-vasculaires de la douleur thoracique, et sémiologie radiographique de l'œdème aigu du poumon hémodynamique.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "cardiologie",
+            "urgence",
+            "douleur thoracique",
+            "OAP",
+            "oedeme pulmonaire",
+            "radiographie"
+        ],
+        "file": "cours/imagerie-urgences-cardiovasculaires/fiche.pdf",
+        "pages": 2,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-abdominale": {
+        "name": "Imagerie EDN - Imagerie abdominale, hépato-biliaire et urologique",
+        "description": "Causes d'hématurie, splénomégalie, corps étranger pharyngo-œsophagien, carcinome hépatocellulaire, métastases et kystes hépatiques, lithiase biliaire et cholécystite aiguë, diverticulose colique et diverticulite.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "abdomen",
+            "hematurie",
+            "splenomegalie",
+            "CHC",
+            "foie",
+            "lithiase",
+            "cholecystite",
+            "diverticulite",
+            "echographie"
+        ],
+        "file": "cours/imagerie-abdominale/fiche.pdf",
+        "pages": 10,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-oncologie": {
+        "name": "Imagerie EDN - Imagerie des tumeurs (poumon, rein, myélome)",
+        "description": "Adénocarcinome pulmonaire en radiographie et en TDM, kyste rénal en échographie et tumeurs du rein, et lésions lytiques du myélome multiple.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "oncologie",
+            "tumeur",
+            "cancer",
+            "poumon",
+            "rein",
+            "kyste",
+            "myelome",
+            "lesion lytique"
+        ],
+        "file": "cours/imagerie-oncologie/fiche.pdf",
+        "pages": 4,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-traumatologie-neuro-urgences": {
+        "name": "Imagerie EDN - Traumatologie grave et urgences neurologiques",
+        "description": "Hémothorax et pneumothorax, fractures diaphysaires, hématomes extra-dural et sous-dural et contusions cérébrales, fractures de la mandibule et du plancher de l'orbite, hémorragies intracrâniennes, engagement cérébral, AVC ischémique et hémorragique, hémorragie méningée.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "traumatologie",
+            "urgence",
+            "hematome extra-dural",
+            "AVC",
+            "hemorragie meningee",
+            "engagement",
+            "fracture",
+            "TDM"
+        ],
+        "file": "cours/imagerie-traumatologie-neuro-urgences/fiche.pdf",
+        "pages": 10,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-urgences-abdominales": {
+        "name": "Imagerie EDN - Urgences abdominales (occlusion, péritonite, pancréatite)",
+        "description": "Signes tomodensitométriques d'une occlusion selon son siège, radiographie d'abdomen sans préparation, trois signes scanographiques principaux de la péritonite et pancréatite aiguë nécrosante.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "urgence",
+            "abdomen",
+            "occlusion",
+            "ASP",
+            "peritonite",
+            "pancreatite",
+            "scanner"
+        ],
+        "file": "cours/imagerie-urgences-abdominales/fiche.pdf",
+        "pages": 4,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    },
+    "imagerie-traumatologie-osteo-articulaire": {
+        "name": "Imagerie EDN - Traumatologie ostéo-articulaire",
+        "description": "Entorse grave de cheville, luxation antéro-inférieure de l'épaule, fractures de l'extrémité supérieure du fémur, fracture de Pouteau-Colles et fractures typiques de l'enfant.",
+        "author": "Mathis KREMER",
+        "date": "04/08/2026",
+        "tags": [
+            "imagerie",
+            "EDN",
+            "traumatologie",
+            "entorse",
+            "luxation",
+            "epaule",
+            "fracture",
+            "col du femur",
+            "Pouteau-Colles",
+            "enfant"
+        ],
+        "file": "cours/imagerie-traumatologie-osteo-articulaire/fiche.pdf",
+        "pages": 6,
+        "source": "Images_à_connaître_pour_EDN_2.pdf"
+    }
 }
