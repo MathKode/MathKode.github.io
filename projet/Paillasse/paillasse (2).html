@@ -1,0 +1,2938 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paillasse — éditeur de structures chimiques</title>
+<style>
+/* ============================================================
+   Design tokens
+   ============================================================ */
+:root{
+  --ink:#12171B;
+  --slate:#1C242B;
+  --slate-2:#232E37;
+  --slate-3:#2C3A45;
+  --line:#35454F;
+  --paper:#F2F6F7;
+  --paper-2:#E4ECEE;
+  --chalk:#93A6B1;
+  --chalk-2:#6B7D88;
+  --cyan:#12A0B5;
+  --cyan-hi:#4FD3E4;
+  --magenta:#D8256F;
+  --amber:#E0A32E;
+  --green:#3FA75B;
+
+  --ui: ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --rail:60px;
+  --insp:296px;
+  --top:50px;
+  --r:7px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--ink); color:var(--paper);
+  font-family:var(--ui); font-size:13px; overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan-hi); outline-offset:2px; border-radius:4px}
+
+/* ============================================================
+   Ossature
+   ============================================================ */
+#shell{display:grid;grid-template-rows:var(--top) 1fr;height:100dvh}
+
+#topbar{
+  display:flex;align-items:center;gap:14px;padding:0 12px;
+  background:var(--slate);border-bottom:1px solid var(--line);
+  overflow-x:auto; scrollbar-width:none;
+}
+#topbar::-webkit-scrollbar{display:none}
+
+.brand{display:flex;align-items:baseline;gap:8px;flex:none;padding-right:4px}
+.brand b{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--paper);
+}
+.brand span{font-family:var(--mono);font-size:10px;color:var(--chalk-2);letter-spacing:.1em}
+
+.sep{width:1px;height:22px;background:var(--line);flex:none}
+
+.grp{display:flex;align-items:center;gap:3px;flex:none}
+.grp-lbl{
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--chalk-2);margin-right:5px;flex:none;
+}
+
+.tb{
+  height:30px;padding:0 10px;border-radius:var(--r);color:var(--chalk);
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+  transition:background .12s,color .12s;
+}
+.tb:hover{background:var(--slate-3);color:var(--paper)}
+.tb.on{background:var(--cyan);color:#04222A;font-weight:600}
+.tb.ghost{border:1px solid var(--line)}
+.tb small{font-family:var(--mono);font-size:9px;opacity:.6}
+
+#main{display:grid;grid-template-columns:var(--rail) 1fr var(--insp);min-height:0}
+
+/* ---- rail gauche ---- */
+#rail{
+  background:var(--slate);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;
+  overflow-y:auto;scrollbar-width:none;
+}
+#rail::-webkit-scrollbar{display:none}
+.tool{
+  width:44px;height:40px;border-radius:var(--r);color:var(--chalk);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  position:relative;transition:background .12s,color .12s;flex:none;
+}
+.tool svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.tool em{font-family:var(--mono);font-size:8px;font-style:normal;opacity:.55}
+.tool:hover{background:var(--slate-3);color:var(--paper)}
+.tool.on{background:var(--cyan);color:#04222A}
+.tool.on em{opacity:.75}
+.rail-rule{width:26px;height:1px;background:var(--line);margin:5px 0;flex:none}
+
+/* ---- scène ---- */
+#stage{position:relative;background:var(--paper);min-width:0;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* plaque formule brute — élément signature */
+#plate{
+  position:absolute;left:14px;bottom:14px;z-index:3;
+  background:rgba(28,36,43,.94);color:var(--paper);
+  border:1px solid var(--line);border-radius:9px;
+  padding:9px 13px;min-width:170px;max-width:min(340px,calc(100% - 28px));
+  box-shadow:0 6px 22px rgba(10,20,26,.22);
+  backdrop-filter:blur(6px);
+}
+#plate .k{
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--chalk-2);display:block;margin-bottom:3px;
+}
+#plate .formula{font-family:var(--ui);font-size:19px;letter-spacing:.01em;line-height:1.15}
+#plate .formula sub{font-size:.62em;vertical-align:-.22em}
+#plate .formula sup{font-size:.62em;vertical-align:.42em}
+#plate .mass{font-family:var(--mono);font-size:11px;color:var(--cyan-hi);margin-top:3px}
+#plate .warn{
+  font-family:var(--mono);font-size:10px;color:var(--magenta);margin-top:6px;
+  padding-top:6px;border-top:1px solid var(--line);line-height:1.5;
+}
+#plate .warn.hide{display:none}
+
+#hint{
+  position:absolute;right:14px;bottom:14px;z-index:3;
+  font-family:var(--mono);font-size:10px;color:var(--chalk-2);
+  background:rgba(242,246,247,.82);padding:5px 9px;border-radius:6px;
+  border:1px solid var(--paper-2);pointer-events:none;
+}
+
+#zoombar{position:absolute;right:14px;top:14px;z-index:3;display:flex;gap:4px}
+#zoombar button{
+  width:28px;height:28px;border-radius:6px;background:rgba(28,36,43,.9);
+  color:var(--paper);display:grid;place-items:center;font-size:14px;line-height:1;
+  border:1px solid var(--line);
+}
+#zoombar button:hover{background:var(--cyan);color:#04222A}
+
+/* ---- inspecteur ---- */
+#insp{
+  background:var(--slate);border-left:1px solid var(--line);
+  overflow-y:auto;overscroll-behavior:contain;
+}
+#insp::-webkit-scrollbar{width:9px}
+#insp::-webkit-scrollbar-thumb{background:var(--slate-3);border-radius:9px;border:3px solid var(--slate)}
+
+.sect{border-bottom:1px solid var(--line);padding:11px 12px}
+.sect > h3{
+  margin:0 0 9px;font-family:var(--mono);font-size:9px;font-weight:500;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--chalk-2);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.sect > h3 b{color:var(--cyan-hi);font-weight:500}
+
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{
+  min-width:32px;height:29px;padding:0 8px;border-radius:6px;
+  background:var(--slate-2);border:1px solid transparent;color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;transition:background .12s,border-color .12s;
+}
+.chip:hover{background:var(--slate-3)}
+.chip.on{background:var(--cyan);color:#04222A;font-weight:600}
+.chip sub{font-size:.66em;vertical-align:-.2em}
+.chip sup{font-size:.66em;vertical-align:.38em}
+.chip.wide{flex:1 1 auto}
+
+.bondgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.bnd{
+  height:38px;border-radius:6px;background:var(--slate-2);
+  display:grid;place-items:center;transition:background .12s;
+  border:1px solid transparent;
+}
+.bnd:hover{background:var(--slate-3)}
+.bnd.on{background:var(--cyan)}
+.bnd svg{width:34px;height:26px}
+.bnd svg *{stroke:var(--paper);fill:var(--paper)}
+.bnd.on svg *{stroke:#04222A;fill:#04222A}
+
+.row{display:flex;align-items:center;gap:8px;margin:7px 0}
+.row label{
+  flex:1;font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+  color:var(--chalk);text-transform:uppercase;
+}
+.row input[type=text],.row input[type=number],.row select{
+  background:var(--slate-2);border:1px solid var(--line);border-radius:5px;
+  padding:5px 7px;width:96px;font-family:var(--mono);font-size:12px;
+}
+.row input[type=text]{width:120px}
+.row input[type=checkbox]{accent-color:var(--cyan);width:15px;height:15px;flex:none}
+.row select{width:116px}
+.chip[draggable],.bnd[draggable]{cursor:grab}
+.chip[draggable]:active,.bnd[draggable]:active{cursor:grabbing}
+#stage{touch-action:none}
+
+.stepper{display:flex;align-items:center;gap:0;background:var(--slate-2);
+  border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.stepper button{width:26px;height:26px;color:var(--chalk);font-size:14px;line-height:1}
+.stepper button:hover{background:var(--slate-3);color:var(--paper)}
+.stepper span{min-width:34px;text-align:center;font-family:var(--mono);font-size:12px}
+
+.empty{color:var(--chalk-2);font-size:11.5px;line-height:1.6}
+.empty kbd{
+  font-family:var(--mono);font-size:10px;background:var(--slate-2);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 4px;
+}
+
+.btn{
+  width:100%;height:32px;border-radius:6px;background:var(--slate-2);
+  border:1px solid var(--line);color:var(--paper);margin-top:6px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:background .12s,border-color .12s;
+}
+.btn:hover{background:var(--slate-3);border-color:var(--chalk-2)}
+.btn.accent{background:var(--cyan);color:#04222A;border-color:transparent;font-weight:600}
+.btn.accent:hover{background:var(--cyan-hi)}
+.btn.danger:hover{background:var(--magenta);border-color:transparent}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.btn2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn2 .btn{margin-top:0}
+
+.tmpl{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tmpl button{
+  aspect-ratio:1;border-radius:6px;background:var(--slate-2);
+  display:grid;place-items:center;transition:background .12s;
+}
+.tmpl button:hover{background:var(--cyan)}
+.tmpl svg{width:80%;height:80%;stroke:var(--paper);fill:none;stroke-width:1.5}
+.tmpl button:hover svg{stroke:#04222A}
+
+/* ---- modale aide ---- */
+#help{
+  position:fixed;inset:0;z-index:40;display:none;
+  background:rgba(10,16,20,.72);backdrop-filter:blur(3px);
+  place-items:center;padding:20px;
+}
+#help.open{display:grid}
+#help .card{
+  background:var(--slate);border:1px solid var(--line);border-radius:12px;
+  max-width:600px;width:100%;max-height:82dvh;overflow:auto;padding:22px 24px;
+}
+#help h2{
+  margin:0 0 4px;font-family:var(--mono);font-size:13px;letter-spacing:.18em;
+  text-transform:uppercase;font-weight:600;
+}
+#help p.lead{color:var(--chalk-2);margin:0 0 18px;font-size:12px}
+#help h4{
+  margin:18px 0 7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--cyan-hi);font-weight:500;
+}
+#help dl{display:grid;grid-template-columns:112px 1fr;gap:5px 12px;margin:0;font-size:12px}
+#help dt{font-family:var(--mono);font-size:10.5px;color:var(--chalk)}
+#help dd{margin:0;color:var(--paper-2)}
+
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+  background:var(--slate);border:1px solid var(--cyan);color:var(--paper);
+  padding:8px 15px;border-radius:8px;font-family:var(--mono);font-size:11.5px;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:60;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============================================================
+   Adaptatif
+   ============================================================ */
+@media (max-width:1080px){ :root{--insp:250px} }
+@media (max-width:860px){
+  :root{--rail:52px;--insp:0px}
+  #main{grid-template-columns:var(--rail) 1fr}
+  #insp{
+    position:fixed;right:0;top:var(--top);bottom:0;width:280px;z-index:20;
+    transform:translateX(100%);transition:transform .2s;
+    box-shadow:-8px 0 26px rgba(8,14,18,.34);
+  }
+  #insp.open{transform:none}
+  #inspToggle{display:flex !important}
+  .tool{width:40px;height:38px}
+}
+@media (min-width:861px){ #inspToggle{display:none !important} }
+@media (max-width:560px){
+  #plate{left:8px;bottom:8px;padding:7px 10px;min-width:0}
+  #plate .formula{font-size:16px}
+  #hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <!-- ══════════ barre supérieure ══════════ -->
+  <header id="topbar">
+    <div class="brand"><b>Paillasse</b><span>v1.0</span></div>
+    <div class="sep"></div>
+
+    <div class="grp" id="views">
+      <span class="grp-lbl">Vue</span>
+      <button class="tb on" data-view="topo">Topologique <small>F1</small></button>
+      <button class="tb" data-view="semi">Semi-développée <small>F2</small></button>
+      <button class="tb" data-view="dev">Développée <small>F3</small></button>
+      <button class="tb" data-view="cram">Cram <small>F4</small></button>
+      <button class="tb" data-view="fischer">Fischer <small>F5</small></button>
+      <button class="tb" data-view="lewis">Lewis <small>F6</small></button>
+    </div>
+
+    <div class="sep"></div>
+    <div class="grp">
+      <button class="tb ghost" id="btnTidy" title="Recalculer une géométrie propre">Réorganiser <small>R</small></button>
+      <button class="tb ghost" id="btnPng" title="Exporter l'image">PNG</button>
+      <button class="tb ghost" id="btnSave" title="Enregistrer le fichier .paillasse.json">Enregistrer</button>
+      <button class="tb ghost" id="btnOpen" title="Ouvrir un fichier">Ouvrir</button>
+      <button class="tb ghost" id="btnHelp">?</button>
+      <button class="tb ghost" id="inspToggle" style="display:none">Réglages</button>
+    </div>
+    <input type="file" id="fileIn" accept=".json,application/json" hidden>
+  </header>
+
+  <div id="main">
+    <!-- ══════════ rail d'outils ══════════ -->
+    <nav id="rail" aria-label="Outils"></nav>
+
+    <!-- ══════════ scène ══════════ -->
+    <div id="stage">
+      <canvas id="cv"></canvas>
+      <div id="zoombar">
+        <button id="zIn" title="Zoom avant">+</button>
+        <button id="zOut" title="Zoom arrière">−</button>
+        <button id="zFit" title="Tout afficher">⤢</button>
+      </div>
+      <div id="plate">
+        <span class="k">Formule brute</span>
+        <div class="formula" id="fFormula">—</div>
+        <div class="mass" id="fMass"></div>
+        <div class="warn hide" id="fWarn"></div>
+      </div>
+      <div id="hint">glisser depuis un atome pour lier</div>
+    </div>
+
+    <!-- ══════════ inspecteur ══════════ -->
+    <aside id="insp"></aside>
+  </div>
+</div>
+
+<div id="help" role="dialog" aria-modal="true" aria-label="Aide">
+  <div class="card">
+    <h2>Mode d'emploi</h2>
+    <p class="lead">Les sommets de la grille en nid d'abeille sont espacés d'une longueur de liaison : tout y tombe naturellement à 60° et 120°.</p>
+
+    <h4>Dessiner</h4>
+    <dl>
+      <dt>Clic sur un atome</dt><dd>Prolonge la chaîne en zigzag avec la liaison courante.</dd>
+      <dt>Glisser d'un atome</dt><dd>Trace une liaison dans la direction voulue.</dd>
+      <dt>Glisser sur le vide</dt><dd>Crée une liaison isolée.</dd>
+      <dt>Lâcher sur un atome</dt><dd>Referme un cycle entre les deux atomes.</dd>
+      <dt>Glisser une pastille</dt><dd>Dépose un élément, un groupe ou un type de liaison depuis les palettes : sur un atome pour le remplacer, sur une liaison pour la changer, sur le vide pour créer.</dd>
+      <dt>Double-clic</dt><dd>Ouvre l'atome dans l'inspecteur.</dd>
+    </dl>
+
+    <h4>Se déplacer</h4>
+    <dl>
+      <dt>Glisser le fond</dt><dd>Déplace la feuille, avec l'outil Sélection comme avec la Gomme ou les charges.</dd>
+      <dt>Clic droit</dt><dd>Déplace la feuille depuis n'importe quel outil.</dd>
+      <dt>Maj + glisser</dt><dd>Trace un cadre de sélection.</dd>
+      <dt>Molette · pincer</dt><dd>Zoom.</dd>
+    </dl>
+
+    <h4>Développée et Lewis</h4>
+    <dl>
+      <dt>Hydrogène implicite</dt><dd>Le tirer le transforme en atome réel, déplaçable ; la formule brute ne change pas.</dd>
+      <dt>Doublet non liant</dt><dd>Se fait tourner autour de son atome à la souris.</dd>
+      <dt>Gomme</dt><dd>Sur un H ou un doublet tracé, en retire un.</dd>
+    </dl>
+
+    <h4>Atomes à cinq ou six liaisons</h4>
+    <dl>
+      <dt>Réorganiser les voisins</dt><dd>Bouton de l'inspecteur, ou <kbd>T</kbd> : place les voisins selon la répulsion des doublets. Cinq liaisons donnent une bipyramide (deux axiales, trois équatoriales dont un coin plein et un coin hachuré), six donnent un octaèdre. Cette figure ignore volontairement la grille.</dd>
+    </dl>
+
+    <h4>Raccourcis</h4>
+    <dl>
+      <dt>V B A G E</dt><dd>Sélection · Liaison · Atome · Groupe · Gomme</dd>
+      <dt>C N O S P F H</dt><dd>Change l'élément courant ou la sélection</dd>
+      <dt>1 2 3</dt><dd>Liaison simple, double, triple</dd>
+      <dt>4 5</dt><dd>Coin plein (avant), coin hachuré (arrière)</dd>
+      <dt>X</dt><dd>Inverse le sens d'un coin</dd>
+      <dt>T</dt><dd>Réorganise les voisins de l'atome choisi</dd>
+      <dt>+ −</dt><dd>Ajoute ou retire une charge</dd>
+      <dt>F1 … F6</dt><dd>Change de vue</dd>
+      <dt>R</dt><dd>Réorganise le schéma</dd>
+      <dt>Suppr</dt><dd>Supprime la sélection</dd>
+      <dt>Ctrl+Z / Ctrl+Y</dt><dd>Annuler / Rétablir</dd>
+      <dt>Ctrl+A / Échap</dt><dd>Tout sélectionner / Désélectionner</dd>
+      <dt>Molette</dt><dd>Zoom · clic milieu ou Espace pour se déplacer</dd>
+    </dl>
+
+    <h4>Grille et échelle</h4>
+    <dl>
+      <dt>Aimanter</dt><dd>Les atomes se posent sur les sommets du nid d'abeille. Un groupe d'atomes déplacé garde sa forme : il se translate d'une maille entière.</dd>
+      <dt>Longueur de liaison</dt><dd>Règle le pas de la grille. Le schéma existant suit le changement et reste aligné.</dd>
+      <dt>Pavage du fond</dt><dd>Nid d'abeille par défaut, rectangulaire automatiquement en projection de Fischer. Réglable dans Affichage.</dd>
+      <dt>Écart des liaisons multiples</dt><dd>Distance entre les barres d'une double ou d'une triple liaison.</dd>
+      <dt>Poser sur la grille</dt><dd>Recale un schéma importé ou dessiné à main levée, sans le déformer.</dd>
+      <dt>Réorganiser</dt><dd>Reconstruit la géométrie sur la grille : cycles à six sommets sur les hexagones, chaînes en zigzag à 120°.</dd>
+    </dl>
+
+    <h4>À propos des vues</h4>
+    <dl>
+      <dt>Topologique</dt><dd>Carbones et H implicites, squelette seul.</dd>
+      <dt>Semi-développée</dt><dd>Chaque atome écrit avec ses H groupés.</dd>
+      <dt>Développée</dt><dd>Toutes les liaisons tracées, H compris.</dd>
+      <dt>Cram</dt><dd>Squelette + coins ; les H des centres stéréogènes sont tracés.</dd>
+      <dt>Fischer</dt><dd>Réorganise la chaîne à la verticale, substituants à l'horizontale.</dd>
+      <dt>Lewis</dt><dd>Doublets non liants, charges formelles, tous les H.</dd>
+    </dl>
+    <button class="btn" id="helpClose" style="margin-top:22px">Fermer</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   PAILLASSE — éditeur de structures chimiques
+   ============================================================================ */
+
+/* ---------------------------------------------------------------- éléments */
+/* ve = électrons de valence (atome neutre) · m = masse molaire g/mol         */
+const EL = {
+  H :{m:1.008 ,ve:1,c:'#12171B'}, He:{m:4.0026,ve:2,c:'#7D5BA6'},
+  Li:{m:6.94  ,ve:1,c:'#A0522D'}, Be:{m:9.0122,ve:2,c:'#8A6A2C'},
+  B :{m:10.81 ,ve:3,c:'#A0682C'}, C :{m:12.011,ve:4,c:'#12171B'},
+  N :{m:14.007,ve:5,c:'#1A5FB4'}, O :{m:15.999,ve:6,c:'#C01C28'},
+  F :{m:18.998,ve:7,c:'#2A9D3A'}, Ne:{m:20.180,ve:8,c:'#7D5BA6'},
+  Na:{m:22.990,ve:1,c:'#8B5CF6'}, Mg:{m:24.305,ve:2,c:'#5F8B2C'},
+  Al:{m:26.982,ve:3,c:'#8A8F98'}, Si:{m:28.085,ve:4,c:'#7A6F5D'},
+  P :{m:30.974,ve:5,c:'#E07A1F'}, S :{m:32.06 ,ve:6,c:'#B8930B'},
+  Cl:{m:35.45 ,ve:7,c:'#2A9D3A'}, Ar:{m:39.948,ve:8,c:'#7D5BA6'},
+  K :{m:39.098,ve:1,c:'#8B5CF6'}, Ca:{m:40.078,ve:2,c:'#5F8B2C'},
+  Sc:{m:44.956,ve:3,c:'#6C7A89'}, Ti:{m:47.867,ve:4,c:'#6C7A89'},
+  V :{m:50.942,ve:5,c:'#6C7A89'}, Cr:{m:51.996,ve:6,c:'#6C7A89'},
+  Mn:{m:54.938,ve:7,c:'#6C7A89'}, Fe:{m:55.845,ve:8,c:'#B5651D'},
+  Co:{m:58.933,ve:9,c:'#6C7A89'}, Ni:{m:58.693,ve:10,c:'#6C7A89'},
+  Cu:{m:63.546,ve:11,c:'#B5651D'},Zn:{m:65.38 ,ve:12,c:'#6C7A89'},
+  Ga:{m:69.723,ve:3,c:'#8A8F98'}, Ge:{m:72.630,ve:4,c:'#7A6F5D'},
+  As:{m:74.922,ve:5,c:'#B565A7'}, Se:{m:78.971,ve:6,c:'#B8930B'},
+  Br:{m:79.904,ve:7,c:'#8C3A1E'}, Kr:{m:83.798,ve:8,c:'#7D5BA6'},
+  Rb:{m:85.468,ve:1,c:'#8B5CF6'}, Sr:{m:87.62 ,ve:2,c:'#5F8B2C'},
+  Ag:{m:107.87,ve:11,c:'#6C7A89'},Cd:{m:112.41,ve:12,c:'#6C7A89'},
+  Sn:{m:118.71,ve:4,c:'#7A6F5D'}, Sb:{m:121.76,ve:5,c:'#B565A7'},
+  Te:{m:127.60,ve:6,c:'#B8930B'}, I :{m:126.90,ve:7,c:'#6A2C9E'},
+  Xe:{m:131.29,ve:8,c:'#7D5BA6'}, Ba:{m:137.33,ve:2,c:'#5F8B2C'},
+  Pt:{m:195.08,ve:10,c:'#6C7A89'},Au:{m:196.97,ve:11,c:'#B08D2E'},
+  Hg:{m:200.59,ve:12,c:'#6C7A89'},Pb:{m:207.2 ,ve:4,c:'#6C7A89'},
+  Bi:{m:208.98,ve:5,c:'#B565A7'}, R :{m:0     ,ve:1,c:'#12171B'}
+};
+const EL_COMMON = ['C','H','O','N','S','P','F','Cl','Br','I','B','Si','Na','K','Mg','Ca','Fe','Cu','Zn','Al','Se','R'];
+const EL_ALL = Object.keys(EL);
+
+/* valences usuelles — la première sert au calcul des H implicites,
+   la liste complète sert au contrôle de valence                             */
+const VAL = {
+  H:[1], B:[3], C:[4], N:[3], O:[2], F:[1], Si:[4], P:[3,5], S:[2,4,6],
+  Cl:[1,3,5,7], Br:[1,3,5,7], I:[1,3,5,7], Se:[2,4,6], Te:[2,4,6],
+  As:[3,5], Sb:[3,5], Bi:[3,5], Ge:[4], Sn:[2,4], Pb:[2,4], Al:[3], Ga:[3],
+  Be:[2], Mg:[2], Ca:[2], Sr:[2], Ba:[2], Li:[1], Na:[1], K:[1], Rb:[1],
+  R:[1]
+};
+/* éléments pour lesquels on complète automatiquement par des H */
+const AUTO_H = new Set(['H','B','C','N','O','F','Si','P','S','Cl','Br','I','Se','Te','As','Ge','Sn','Sb']);
+
+/* ------------------------------------------------------- groupes & fragments */
+/* val : nombre de points d'attache · frag : développement (x,y en longueurs
+   de liaison, l'attache est à l'origine et la liaison entrante suit −x)      */
+const GROUPS = [
+  {k:'OH'   ,lbl:'OH'    ,val:1,f:{O:1,H:1}          ,frag:{a:[['O',0,0]],b:[]}},
+  {k:'CH3'  ,lbl:'CH3'   ,val:1,f:{C:1,H:3}          ,frag:{a:[['C',0,0]],b:[]}},
+  {k:'C2H5' ,lbl:'C2H5'  ,val:1,f:{C:2,H:5}          ,frag:{a:[['C',0,0],['C',.87,.5]],b:[[0,1,1]]}},
+  {k:'NH2'  ,lbl:'NH2'   ,val:1,f:{N:1,H:2}          ,frag:{a:[['N',0,0]],b:[]}},
+  {k:'CHO'  ,lbl:'CHO'   ,val:1,f:{C:1,H:1,O:1}      ,frag:{a:[['C',0,0],['O',.87,-.5]],b:[[0,1,2]]}},
+  {k:'COOH' ,lbl:'COOH'  ,val:1,f:{C:1,O:2,H:1}      ,frag:{a:[['C',0,0],['O',.87,-.5],['O',.87,.5]],b:[[0,1,2],[0,2,1]]}},
+  {k:'NO2'  ,lbl:'NO2'   ,val:1,f:{N:1,O:2}          ,frag:{a:[['N',0,0,1],['O',.87,-.5],['O',.87,.5,-1]],b:[[0,1,2],[0,2,1]]}},
+  {k:'CN'   ,lbl:'CN'    ,val:1,f:{C:1,N:1}          ,frag:{a:[['C',0,0],['N',1,0]],b:[[0,1,3]]}},
+  {k:'OCH3' ,lbl:'OCH3'  ,val:1,f:{C:1,H:3,O:1}      ,frag:{a:[['O',0,0],['C',.87,.5]],b:[[0,1,1]]}},
+  {k:'SO3H' ,lbl:'SO3H'  ,val:1,f:{S:1,O:3,H:1}      ,frag:{a:[['S',0,0],['O',0,-1],['O',.87,.5],['O',-.2,1]],b:[[0,1,2],[0,2,2],[0,3,1]]}},
+  {k:'COCH3',lbl:'COCH3' ,val:1,f:{C:2,H:3,O:1}      ,frag:{a:[['C',0,0],['O',.87,-.5],['C',.87,.5]],b:[[0,1,2],[0,2,1]]}},
+  {k:'Ph'   ,lbl:'Ph'    ,val:1,f:{C:6,H:5}          ,frag:{a:[['C',0,0],['C',.87,-.5],['C',1.73,0],['C',1.73,1],['C',.87,1.5],['C',0,1]],
+                                                             b:[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]]}},
+  {k:'tBu'  ,lbl:'C(CH3)3',val:1,f:{C:4,H:9}         ,frag:{a:[['C',0,0],['C',.87,-.5],['C',.87,.5],['C',0,1]],b:[[0,1,1],[0,2,1],[0,3,1]]}},
+  {k:'H2O'  ,lbl:'H2O'   ,val:0,f:{H:2,O:1}},
+  {k:'NH3'  ,lbl:'NH3'   ,val:0,f:{N:1,H:3}},
+  {k:'CO2'  ,lbl:'CO2'   ,val:0,f:{C:1,O:2}},
+  {k:'HCl'  ,lbl:'HCl'   ,val:0,f:{H:1,Cl:1}},
+  {k:'NaCl' ,lbl:'NaCl'  ,val:0,f:{Na:1,Cl:1}},
+  {k:'H2SO4',lbl:'H2SO4' ,val:0,f:{H:2,S:1,O:4}}
+];
+const GMAP = Object.fromEntries(GROUPS.map(g => [g.k, g]));
+
+/* ------------------------------------------------------------- liaisons */
+const BONDS = [
+  {k:'s'   ,order:1,lbl:'Simple'},
+  {k:'d'   ,order:2,lbl:'Double'},
+  {k:'t'   ,order:3,lbl:'Triple'},
+  {k:'q'   ,order:4,lbl:'Quadruple'},
+  {k:'arom',order:1,lbl:'Aromatique (délocalisée)'},
+  {k:'wedge',order:1,lbl:'Coin plein — vers l’avant'},
+  {k:'hash' ,order:1,lbl:'Coin hachuré — vers l’arrière'},
+  {k:'wavy' ,order:1,lbl:'Ondulée — configuration indéterminée'},
+  {k:'dative',order:1,lbl:'Liaison de coordination'},
+  {k:'dot'  ,order:0,lbl:'Interaction (pointillés)'},
+  {k:'part' ,order:1,lbl:'Liaison partielle'},
+  {k:'dd'   ,order:2,lbl:'Double centrée (cumulée)'}
+];
+const BMAP = Object.fromEntries(BONDS.map(b => [b.k, b]));
+
+/* ------------------------------------------------------------------ vues */
+const VIEWS = {
+  topo   :{lbl:'Topologique'     ,labelAll:false, hydro:'none'    , lp:false},
+  semi   :{lbl:'Semi-développée' ,labelAll:true , hydro:'grouped' , lp:false},
+  dev    :{lbl:'Développée'      ,labelAll:true , hydro:'explicit', lp:false},
+  cram   :{lbl:'Cram'            ,labelAll:false, hydro:'stereo'  , lp:false},
+  fischer:{lbl:'Fischer'         ,labelAll:true , hydro:'grouped' , lp:false, fischer:true},
+  lewis  :{lbl:'Lewis'           ,labelAll:true , hydro:'explicit', lp:true}
+};
+
+/* =========================================================== état global */
+let L = 46;                         // longueur de liaison, unités monde (réglable)
+let doc = {atoms:[], bonds:[], nid:1};
+let view = {x:0, y:0, k:1};
+let ui = {
+  tool:'bond', el:'C', bond:'s', group:'OH', mode:'topo',
+  snap:true, grid:true, gridShape:'auto', lewisDots:false, showC:false, symDouble:false,
+  fs:17, gap:5.1,
+  heteroColor:true, carbonColor:false, bg:'white', scale:3
+};
+let sel = {a:new Set(), b:new Set()};
+let hist = [], future = [];
+
+const byId = new Map();
+function reindex(){ byId.clear(); for(const a of doc.atoms) byId.set(a.id, a); }
+
+/* ------------------------------------------------------------- historique */
+function snapshot(){
+  hist.push(JSON.stringify(doc));
+  if(hist.length > 120) hist.shift();
+  future.length = 0;
+}
+function undo(){
+  if(!hist.length) return;
+  future.push(JSON.stringify(doc));
+  doc = JSON.parse(hist.pop());
+  clearSel(); reindex(); refresh();
+}
+function redo(){
+  if(!future.length) return;
+  hist.push(JSON.stringify(doc));
+  doc = JSON.parse(future.pop());
+  clearSel(); reindex(); refresh();
+}
+
+/* ------------------------------------------------------------- primitives */
+function addAtom(x, y, el, extra){
+  const a = Object.assign({
+    id:doc.nid++, x, y, el:el||'C', q:0, rad:0, hSet:null, lpSet:null,
+    type:'atom', gk:null, txt:null
+  }, extra||{});
+  doc.atoms.push(a); byId.set(a.id, a);
+  return a;
+}
+function addGroup(x, y, gk){
+  const g = GMAP[gk];
+  return addAtom(x, y, null, {type:'group', gk, txt:g.lbl});
+}
+function addBond(a, b, kind){
+  if(a === b) return null;
+  const ex = doc.bonds.find(z => (z.a===a && z.b===b) || (z.a===b && z.b===a));
+  if(ex){ ex.k = kind || ui.bond; return ex; }
+  const bd = {id:doc.nid++, a, b, k:kind||ui.bond};
+  doc.bonds.push(bd);
+  return bd;
+}
+function delAtoms(ids){
+  const s = new Set(ids);
+  doc.atoms = doc.atoms.filter(a => !s.has(a.id));
+  doc.bonds = doc.bonds.filter(b => !s.has(b.a) && !s.has(b.b));
+  reindex();
+}
+function delBonds(ids){
+  const s = new Set(ids);
+  doc.bonds = doc.bonds.filter(b => !s.has(b.id));
+}
+function clearSel(){ sel.a.clear(); sel.b.clear(); }
+
+/* ---------------------------------------------------------- voisinage */
+let ADJ = new Map();
+function buildAdj(){
+  ADJ = new Map();
+  for(const a of doc.atoms) ADJ.set(a.id, []);
+  for(const b of doc.bonds){
+    if(ADJ.has(b.a)) ADJ.get(b.a).push({n:b.b, b});
+    if(ADJ.has(b.b)) ADJ.get(b.b).push({n:b.a, b});
+  }
+}
+const nbrs = id => ADJ.get(id) || [];
+const bondOrder = b => BMAP[b.k] ? BMAP[b.k].order : 1;
+
+/* =============================================== chimie : valence, H, doublets */
+function wantedBonds(a){
+  if(a.type === 'group') return GMAP[a.gk] ? GMAP[a.gk].val : 0;
+  const e = EL[a.el]; if(!e) return 0;
+  const v = VAL[a.el] ? VAL[a.el][0] : null;
+  if(v === null) return 0;
+  const q = a.q || 0;
+  if(e.ve <= 4)  return a.el === 'B' || a.el === 'Al' || a.el === 'Ga'
+                   ? v - q            // B⁻ accepte 4 liaisons
+                   : v - Math.abs(q); // C⁺ et C⁻ : 3 liaisons
+  return v + q;                       // N⁺ → 4 · O⁻ → 1
+}
+function sumOrders(id){
+  let s = 0;
+  for(const {b} of nbrs(id)){
+    const o = bondOrder(b);
+    s += (b.k === 'arom' || b.k === 'part') ? 1.5 : o;
+  }
+  return s;
+}
+/** nombre d'hydrogènes implicites portés par l'atome */
+function hCount(a){
+  if(a.hSet !== null && a.hSet !== undefined) return a.hSet;
+  if(a.type === 'group') return 0;
+  if(!AUTO_H.has(a.el)) return 0;
+  const n = wantedBonds(a) - Math.ceil(sumOrders(a.id)) - (a.rad || 0);
+  return Math.max(0, n);
+}
+/** doublets non liants */
+function lonePairs(a){
+  if(a.lpSet !== null && a.lpSet !== undefined) return a.lpSet;
+  if(a.type === 'group') return 0;
+  const e = EL[a.el]; if(!e) return 0;
+  const used = Math.ceil(sumOrders(a.id)) + hCount(a) + (a.rad || 0);
+  return Math.max(0, Math.floor((e.ve - (a.q || 0) - used) / 2));
+}
+/** contrôle de valence — renvoie null ou un message */
+function valenceIssue(a){
+  if(a.type === 'group'){
+    const g = GMAP[a.gk];
+    const d = nbrs(a.id).reduce((s,x) => s + bondOrder(x.b), 0);
+    return d > (g ? g.val : 0) ? `${a.txt} : ${d} liaison(s) pour ${g?g.val:0} attache(s)` : null;
+  }
+  if(!VAL[a.el]) return null;
+  const tot = Math.ceil(sumOrders(a.id)) + hCount(a) + (a.rad || 0);
+  const q = a.q || 0;
+  const ok = VAL[a.el].some(v => {
+    const e = EL[a.el];
+    const t = e.ve <= 4
+      ? (a.el === 'B' || a.el === 'Al' || a.el === 'Ga' ? v - q : v - Math.abs(q))
+      : v + q;
+    return tot <= t;
+  });
+  return ok ? null : `${a.el} : ${tot} liaisons — valence inhabituelle`;
+}
+
+/* ------------------------------------------------------- formule brute */
+function formulaCounts(){
+  const c = {};
+  const add = (s, n) => { c[s] = (c[s] || 0) + n; };
+  for(const a of doc.atoms){
+    if(a.type === 'group'){
+      const g = GMAP[a.gk];
+      if(g) for(const k in g.f) add(k, g.f[k]);
+    }else{
+      add(a.el, 1);
+      const h = hCount(a); if(h) add('H', h);
+    }
+  }
+  delete c.R;
+  return c;
+}
+function hillFormula(c){
+  const keys = Object.keys(c).filter(k => c[k] > 0);
+  if(!keys.length) return null;
+  const out = [];
+  const push = k => out.push(k + (c[k] > 1 ? `<sub>${c[k]}</sub>` : ''));
+  if(c.C){ push('C'); if(c.H) push('H'); }
+  else if(c.H) push('H');
+  keys.filter(k => k !== 'C' && k !== 'H').sort().forEach(push);
+  return out.join('');
+}
+function molarMass(c){
+  let m = 0;
+  for(const k in c) m += (EL[k] ? EL[k].m : 0) * c[k];
+  return m;
+}
+function totalCharge(){ return doc.atoms.reduce((s,a) => s + (a.q || 0), 0); }
+
+/* ============================================== géométrie du réseau hexagonal */
+/* Réseau triangulaire de pas L : P(i,j) = ((i + j/2)L , j·L·√3/2).
+   Les points de classe (i−j) mod 3 ≠ 0 forment le nid d'abeille ;
+   la classe 0 en occupe les centres.                                         */
+const SQ3 = Math.sqrt(3);
+function latticePoint(i, j){ return {x:i * L * SQ3 / 2, y:(j + i / 2) * L}; }
+function latticeIndex(x, y){
+  const i = x / (L * SQ3 / 2);
+  const j = y / L - i / 2;
+  return {i, j};
+}
+/** Pavage courant : nid d'abeille, ou rectangulaire pour la projection de Fischer. */
+function gridShape(){
+  return ui.gridShape === 'auto' ? (ui.mode === 'fischer' ? 'square' : 'hex') : ui.gridShape;
+}
+function snapLattice(x, y){
+  if(gridShape() === 'square'){
+    const i = Math.round(x / L), j = Math.round(y / L);
+    return {x:i * L, y:j * L, i, j, sq:true};
+  }
+  const {i, j} = latticeIndex(x, y);
+  let best = null, bd = Infinity;
+  for(let di = -1; di <= 1; di++) for(let dj = -1; dj <= 1; dj++){
+    const ii = Math.round(i) + di, jj = Math.round(j) + dj;
+    const p = latticePoint(ii, jj);
+    const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+    if(d < bd){ bd = d; best = {x:p.x, y:p.y, i:ii, j:jj}; }
+  }
+  return best;
+}
+/* 0 = centre d'hexagone · 1 et 2 = sommets du nid d'abeille dessiné */
+const subLattice = p => p.sq ? 1 : (((p.i - p.j) % 3) + 3) % 3;
+function snapAngle(x0, y0, x, y){
+  const dx = x - x0, dy = y - y0;
+  if(gridShape() === 'square'){
+    let p = snapLattice(x, y);
+    if(Math.hypot(p.x - x0, p.y - y0) < L * 0.5){
+      const a = Math.round(Math.atan2(dy, dx) / (Math.PI / 2)) * (Math.PI / 2);
+      p = {x:x0 + Math.cos(a) * L, y:y0 + Math.sin(a) * L};
+    }
+    return p;
+  }
+  const st = Math.PI / 3, off = Math.PI / 6;          // 30°, 90°, 150°…
+  const a = Math.round((Math.atan2(dy, dx) - off) / st) * st + off;
+  const n = Math.max(1, Math.min(3, Math.round(Math.hypot(dx, dy) / L)));
+  return {x:x0 + Math.cos(a) * L * n, y:y0 + Math.sin(a) * L * n};
+}
+function snapPoint(x, y, from){
+  if(!ui.snap) return {x, y};
+  if(from) return snapAngle(from.x, from.y, x, y);
+  return snapLattice(x, y);
+}
+
+/* -------------------------------------------------------------- cycles */
+let RINGS = [];
+function findRings(){
+  RINGS = [];
+  const seen = new Set();
+  for(const bd of doc.bonds){
+    const path = shortestPathWithout(bd.a, bd.b, bd.id);
+    if(!path || path.length > 9) continue;
+    const key = path.slice().sort((p,q) => p - q).join(',');
+    if(seen.has(key)) continue;
+    seen.add(key);
+    RINGS.push(path);
+  }
+  RINGS.sort((a,b) => a.length - b.length);
+  return RINGS;
+}
+function shortestPathWithout(s, t, skipBond){
+  const prev = new Map([[s, null]]);
+  const q = [s];
+  while(q.length){
+    const u = q.shift();
+    if(u === t) break;
+    for(const {n, b} of nbrs(u)){
+      if(b.id === skipBond || prev.has(n)) continue;
+      prev.set(n, u); q.push(n);
+    }
+  }
+  if(!prev.has(t)) return null;
+  const out = []; let u = t;
+  while(u !== null && u !== undefined){ out.push(u); u = prev.get(u); }
+  return out;
+}
+function ringOf(bond){
+  for(const r of RINGS){
+    const i = r.indexOf(bond.a), j = r.indexOf(bond.b);
+    if(i >= 0 && j >= 0 && (Math.abs(i - j) === 1 || Math.abs(i - j) === r.length - 1)) return r;
+  }
+  return null;
+}
+function ringCentroid(r){
+  let x = 0, y = 0, n = 0;
+  for(const id of r){ const a = byId.get(id); if(a){ x += a.x; y += a.y; n++; } }
+  return n ? {x:x / n, y:y / n} : null;
+}
+
+/* ============================================================================
+   COMPOSITION DES ÉTIQUETTES
+   ============================================================================ */
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
+/** L'atome porte-t-il ses H sous forme d'atomes tracés ? */
+let FCHAIN = new Set(), FTXT = new Map(), FHIDE = new Set();
+function computeFischerContext(){
+  FCHAIN = new Set(longestChain());
+  FTXT = new Map(); FHIDE = new Set();
+  for(const id of FCHAIN){
+    const a = byId.get(id);
+    if(!a || a.type !== 'atom') continue;
+    const inChain = nbrs(id).filter(x => FCHAIN.has(x.n));
+    if(inChain.length > 1) continue;                    // carbone interne
+    const outs = nbrs(id).filter(x => !FCHAIN.has(x.n));
+    if(!outs.length) continue;
+    const ok = outs.every(x => {
+      const o = byId.get(x.n);
+      return o && o.type === 'atom' && nbrs(x.n).length === 1;
+    });
+    if(!ok) continue;
+    FTXT.set(id, condensedLabel(a, outs.slice()));
+    outs.forEach(x => FHIDE.add(x.n));
+  }
+}
+
+function usesExplicitH(a, V){
+  if(a.type === 'group') return false;
+  /* Fischer : seuls les carbones de la chaîne montrent leur H, à l'horizontale */
+  if(V.fischer) return FCHAIN.has(a.id) && !FTXT.has(a.id);
+  if(V.hydro === 'explicit') return true;
+  if(V.hydro === 'stereo')   /* seul le centre stéréogène, pointe fine du coin */
+    return nbrs(a.id).some(x => (x.b.k === 'wedge' || x.b.k === 'hash') && x.b.a === a.id);
+  return false;
+}
+/** L'atome doit-il être écrit ? */
+function isLabelled(a, V){
+  if(V.fischer) return FTXT.has(a.id) || !FCHAIN.has(a.id);
+  if(a.type === 'group' || a.txt) return true;
+  if(V.labelAll) return true;
+  if(ui.showC) return true;
+  if(a.el !== 'C') return true;
+  if(a.q || a.rad) return true;
+  if(nbrs(a.id).length === 0) return true;
+  return false;
+}
+
+/** Découpe un texte libre : les chiffres deviennent des indices. */
+function parseText(t){
+  const parts = [];
+  for(const m of String(t).matchAll(/(\d+)|([^\d]+)/g)){
+    if(m[1]) parts.push({t:m[1], k:'sub'});
+    else parts.push({t:m[2], k:''});
+  }
+  return parts;
+}
+function chargeText(q){
+  if(!q) return null;
+  const n = Math.abs(q);
+  return (n > 1 ? n : '') + (q > 0 ? '+' : '\u2212');
+}
+
+/**
+ * Construit les fragments de texte d'un atome.
+ * `hSide` = 'l' si les H doivent précéder le symbole.
+ */
+function atomParts(a, V){
+  const parts = [];
+  const q = chargeText(a.q);
+
+  const forced = V.fischer ? FTXT.get(a.id) : null;
+  if(forced || a.type === 'group' || a.txt){
+    const base = parseText(forced || a.txt || (GMAP[a.gk] ? GMAP[a.gk].lbl : '?'));
+    base[0].core = true;
+    parts.push(...base);
+    if(q) parts.push({t:q, k:'sup'});
+    return parts;
+  }
+
+  const h = usesExplicitH(a, V) ? 0 : hCount(a);
+  const sym = {t:a.el, k:'', core:true};
+
+  if(h > 0 && hSideLeft(a)){
+    parts.push({t:'H', k:''});
+    if(h > 1) parts.push({t:String(h), k:'sub'});
+    parts.push(sym);
+  }else{
+    parts.push(sym);
+    if(h > 0){
+      parts.push({t:'H', k:''});
+      if(h > 1) parts.push({t:String(h), k:'sub'});
+    }
+  }
+  if(a.rad) parts.push({t:'\u00b7'.repeat(Math.min(a.rad,2)), k:'sup'});
+  if(q) parts.push({t:q, k:'sup'});
+  return parts;
+}
+/** Les H se placent du côté opposé aux liaisons. */
+function hSideLeft(a){
+  const ns = nbrs(a.id);
+  if(!ns.length) return false;
+  let sx = 0;
+  for(const {n} of ns){ const o = byId.get(n); if(o) sx += o.x - a.x; }
+  return sx > L * 0.25;
+}
+
+/* ------------------------------------------------------------- métriques */
+function richMetrics(ctx, parts, fs){
+  let w = 0, top = fs * 0.52, bot = fs * 0.36, anchor = null;
+  const out = [];
+  for(const p of parts){
+    const size = p.k ? fs * 0.70 : fs;
+    ctx.font = `400 ${size}px ${FONT}`;
+    const tw = ctx.measureText(p.t).width;
+    const dy = p.k === 'sub' ? fs * 0.22 : p.k === 'sup' ? -fs * 0.40 : 0;
+    if(p.k === 'sup') top = Math.max(top, fs * 0.52 + fs * 0.40);
+    if(p.k === 'sub') bot = Math.max(bot, fs * 0.36 + fs * 0.22);
+    out.push({t:p.t, k:p.k, size, dy, x:w, w:tw});
+    if(p.core) anchor = w + tw / 2;
+    w += tw;
+  }
+  if(anchor === null) anchor = w / 2;
+  return {w, top, bot, anchor, parts:out};
+}
+function drawRich(ctx, m, cx, cy, color){
+  const x0 = cx - m.anchor;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for(const p of m.parts){
+    ctx.font = `400 ${p.size}px ${FONT}`;
+    ctx.fillText(p.t, x0 + p.x, cy + p.dy);
+  }
+}
+/** Sortie d'un rayon partant d'un point intérieur à une boîte. */
+function rayBoxExit(px, py, dx, dy, bx){
+  let t = Infinity;
+  if(dx > 1e-9) t = Math.min(t, (bx.x2 - px) / dx);
+  else if(dx < -1e-9) t = Math.min(t, (bx.x1 - px) / dx);
+  if(dy > 1e-9) t = Math.min(t, (bx.y2 - py) / dy);
+  else if(dy < -1e-9) t = Math.min(t, (bx.y1 - py) / dy);
+  return isFinite(t) ? Math.max(0, t) : 0;
+}
+
+/* ============================================================================
+   CONSTRUCTION DE LA SCÈNE
+   ============================================================================ */
+/** Directions libres autour d'un atome (radians), pour H et doublets. */
+function freeDirections(a, n, extra){
+  const used = [];
+  for(const {n:id} of nbrs(a.id)){
+    const o = byId.get(id);
+    if(o) used.push(Math.atan2(o.y - a.y, o.x - a.x));
+  }
+  if(extra) used.push(...extra);
+  const out = [];
+  if(!used.length){
+    let preset;
+    if(n <= 1) preset = [0];
+    else if(n === 2) preset = lonePairs(a) > 0 ? [-Math.PI/6, -Math.PI*5/6] : [0, Math.PI];
+    else if(n === 3) preset = [-Math.PI/2, Math.PI/6, Math.PI*5/6];
+    else preset = [0, -Math.PI/2, Math.PI, Math.PI/2];
+    for(let i = 0; i < n; i++) out.push(preset[i % preset.length] + (i >= preset.length ? .35 : 0));
+    return out;
+  }
+  const pool = used.slice();
+  for(let i = 0; i < n; i++){
+    pool.sort((p, q) => p - q);
+    let best = 0, bestGap = -1;
+    for(let j = 0; j < pool.length; j++){
+      const a1 = pool[j];
+      const a2 = (j === pool.length - 1) ? pool[0] + Math.PI * 2 : pool[j + 1];
+      const gap = a2 - a1;
+      if(gap > bestGap){ bestGap = gap; best = a1 + gap / 2; }
+    }
+    out.push(best); pool.push(best);
+  }
+  return out;
+}
+
+/**
+ * Transforme le document en éléments à tracer pour la vue demandée.
+ * Les hydrogènes explicites deviennent des nœuds virtuels (id négatif).
+ */
+function buildScene(mode, ctx, fs){
+  const V = VIEWS[mode];
+  const nodes = new Map();
+  const edges = [];
+  const dots = [];      // doublets non liants
+  let vid = -1;
+  if(V.fischer) computeFischerContext(); else { FCHAIN = new Set(); FTXT = new Map(); FHIDE = new Set(); }
+
+  for(const a of doc.atoms){
+    if(FHIDE.has(a.id)) continue;
+    const show = isLabelled(a, V);
+    const parts = show ? atomParts(a, V) : null;
+    let m = null, box = null;
+    if(parts){
+      m = richMetrics(ctx, parts, fs);
+      const x0 = a.x - m.anchor, pad = fs * 0.16;
+      box = {x1:x0 - pad, x2:x0 + m.w + pad, y1:a.y - m.top - pad, y2:a.y + m.bot + pad};
+    }
+    nodes.set(a.id, {
+      id:a.id, x:a.x, y:a.y, m, box, atom:a,
+      color: (a.type === 'group' || !ui.heteroColor || (a.el === 'C' && !ui.carbonColor))
+        ? '#12171B'
+        : (EL[a.el] ? EL[a.el].c : '#12171B'),
+      bad: !!valenceIssue(a)
+    });
+  }
+
+  for(const b of doc.bonds){
+    if(FHIDE.has(b.a) || FHIDE.has(b.b)) continue;
+    edges.push({k:b.k, n1:b.a, n2:b.b, bond:b});
+  }
+
+  /* hydrogènes explicites */
+  for(const a of doc.atoms){
+    if(FHIDE.has(a.id) || FTXT.has(a.id)) continue;
+    if(!usesExplicitH(a, V)) continue;
+    const n = hCount(a);
+    if(!n) continue;
+    const dirs = freeDirections(a, n);
+    for(const ang of dirs){
+      const d = L * 0.68;
+      const hx = a.x + Math.cos(ang) * d, hy = a.y + Math.sin(ang) * d;
+      const m = richMetrics(ctx, [{t:'H', k:'', core:true}], fs);
+      const x0 = hx - m.anchor, pad = fs * 0.16;
+      const id = vid--;
+      nodes.set(id, {
+        id, parent:a.id, x:hx, y:hy, m, atom:{el:'H', virtual:true}, color:'#12171B', bad:false,
+        box:{x1:x0 - pad, x2:x0 + m.w + pad, y1:hy - m.top - pad, y2:hy + m.bot + pad}
+      });
+      edges.push({k:'s', n1:a.id, n2:id, virtual:true});
+    }
+  }
+
+  /* doublets non liants */
+  if(V.lp){
+    for(const a of doc.atoms){
+      if(FHIDE.has(a.id)) continue;
+      const lp = lonePairs(a);
+      if(!lp) continue;
+      const extra = [];
+      for(const [, nd] of nodes)
+        if(nd.id < 0 && Math.hypot(nd.x - a.x, nd.y - a.y) < L)
+          extra.push(Math.atan2(nd.y - a.y, nd.x - a.x));
+      const nd = nodes.get(a.id);
+      const dirs = freeDirections(a, lp, extra);
+      const rr = nd && nd.box
+        ? Math.max(nd.box.x2 - nd.box.x1, nd.box.y2 - nd.box.y1) / 2 + fs * 0.34
+        : fs * 0.62;
+      for(let i = 0; i < dirs.length; i++){
+        const ang = (a.lpAng && a.lpAng[i] !== undefined && a.lpAng[i] !== null) ? a.lpAng[i] : dirs[i];
+        dots.push({x:a.x, y:a.y, ang, r:rr, fs, id:a.id, idx:i});
+      }
+    }
+  }
+  return {nodes, edges, dots, V};
+}
+
+/* ============================================================================
+   TRACÉ
+   ============================================================================ */
+function lineWidthFor(fs){ return Math.max(1.4, fs * 0.115); }
+
+function drawScene(ctx, o){
+  const {ox, oy, k, mode, grid, uiLayer, w, h, bg} = o;
+  ctx.save();
+  if(bg){ ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h); }
+  ctx.translate(ox, oy);
+  ctx.scale(k, k);
+
+  const fs = o.fs || ui.fs;
+  const lw = lineWidthFor(fs);
+  buildAdj(); findRings();
+  const sc = buildScene(mode, ctx, fs);
+
+  if(grid) drawGrid(ctx, o);
+
+  /* --- surlignage de sélection --- */
+  if(uiLayer){
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(18,160,181,.30)';
+    ctx.lineWidth = lw * 5;
+    for(const e of sc.edges){
+      if(!e.bond || !sel.b.has(e.bond.id)) continue;
+      const A = sc.nodes.get(e.n1), B = sc.nodes.get(e.n2);
+      if(!A || !B) continue;
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(18,160,181,.28)';
+    for(const id of sel.a){
+      const n = sc.nodes.get(id); if(!n) continue;
+      ctx.beginPath(); ctx.arc(n.x, n.y, fs * 0.82, 0, 7); ctx.fill();
+    }
+  }
+
+  /* --- liaisons --- */
+  ctx.lineCap = 'butt';
+  ctx.lineJoin = 'round';
+  for(const e of sc.edges) drawBond(ctx, sc, e, lw, fs, mode);
+
+  /* --- doublets --- */
+  for(const d of sc.dots) drawLonePair(ctx, d);
+
+  /* --- étiquettes --- */
+  for(const [, n] of sc.nodes){
+    if(!n.m) continue;
+    if(uiLayer && n.bad){
+      ctx.fillStyle = 'rgba(216,37,111,.13)';
+      ctx.beginPath(); ctx.arc(n.x, n.y, fs * 0.88, 0, 7); ctx.fill();
+    }
+    /* masque : la liaison est effacée sous le texte */
+    const b = n.box;
+    if(o.maskColor){
+      ctx.fillStyle = o.maskColor;
+      ctx.fillRect(b.x1, b.y1, b.x2 - b.x1, b.y2 - b.y1);
+    }else{
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = '#000';
+      ctx.fillRect(b.x1, b.y1, b.x2 - b.x1, b.y2 - b.y1);
+      ctx.restore();
+    }
+    drawRich(ctx, n.m, n.x, n.y, n.color);
+  }
+
+  /* --- points d'accroche des atomes non écrits (aide visuelle) --- */
+  if(uiLayer){
+    ctx.fillStyle = 'rgba(18,23,27,.28)';
+    for(const [, n] of sc.nodes){
+      if(n.m || n.id < 0) continue;
+      if(nbrs(n.id).length) continue;
+      ctx.beginPath(); ctx.arc(n.x, n.y, 2.6, 0, 7); ctx.fill();
+    }
+  }
+  ctx.restore();
+  return sc;
+}
+
+/* ------------------------------------------------------------- une liaison */
+function drawBond(ctx, sc, e, lw, fs, mode){
+  const A = sc.nodes.get(e.n1), B = sc.nodes.get(e.n2);
+  if(!A || !B) return;
+  let dx = B.x - A.x, dy = B.y - A.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  const px = -uy, py = ux;                       // perpendiculaire
+
+  const gap = fs * 0.12;
+  const t1 = A.box ? rayBoxExit(A.x, A.y, ux, uy, A.box) + gap : 0;
+  const t2 = B.box ? rayBoxExit(B.x, B.y, -ux, -uy, B.box) + gap : 0;
+  if(t1 + t2 >= len - 1) return;
+
+  const x1 = A.x + ux * t1, y1 = A.y + uy * t1;
+  const x2 = B.x - ux * t2, y2 = B.y - uy * t2;
+
+  const kind = e.k;
+  const sel1 = e.bond && sel.b.has(e.bond.id);
+  ctx.strokeStyle = sel1 ? '#0B7F91' : '#12171B';
+  ctx.fillStyle = ctx.strokeStyle;
+  ctx.lineWidth = lw;
+
+  const seg = (ax, ay, bx, by) => { ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); };
+  const off = ui.gap;
+
+  if(mode === 'lewis' && ui.lewisDots && !e.virtual){
+    return drawBondDots(ctx, x1, y1, x2, y2, ux, uy, px, py, BMAP[kind] ? BMAP[kind].order : 1, fs);
+  }
+
+  switch(kind){
+    case 's': case 'wavyless': default: {
+      if(kind === 's' || !BMAP[kind]){ seg(x1, y1, x2, y2); break; }
+      seg(x1, y1, x2, y2); break;
+    }
+    case 'd': case 'arom': case 'part': {
+      const ring = e.bond ? ringOf(e.bond) : null;
+      const dashed = (kind === 'arom' || kind === 'part');
+      if(ring && !ui.symDouble){
+        const c = ringCentroid(ring);
+        let s = ((c.x - x1) * px + (c.y - y1) * py) > 0 ? 1 : -1;
+        seg(x1, y1, x2, y2);
+        const vlen = Math.hypot(x2 - x1, y2 - y1);
+        const sh = Math.min(0.15, fs * 0.9 / Math.max(vlen, 1));
+        const ax = x1 + ux * vlen * sh, ay = y1 + uy * vlen * sh;
+        const bx = x2 - ux * vlen * sh, by = y2 - uy * vlen * sh;
+        if(dashed) ctx.setLineDash([fs * 0.28, fs * 0.24]);
+        seg(ax + px * off * s, ay + py * off * s, bx + px * off * s, by + py * off * s);
+        ctx.setLineDash([]);
+      }else{
+        const s = off / 2;
+        seg(x1 + px * s, y1 + py * s, x2 + px * s, y2 + py * s);
+        if(dashed) ctx.setLineDash([fs * 0.28, fs * 0.24]);
+        seg(x1 - px * s, y1 - py * s, x2 - px * s, y2 - py * s);
+        ctx.setLineDash([]);
+      }
+      break;
+    }
+    case 'dd': {
+      const s = off / 2;
+      seg(x1 + px * s, y1 + py * s, x2 + px * s, y2 + py * s);
+      seg(x1 - px * s, y1 - py * s, x2 - px * s, y2 - py * s);
+      break;
+    }
+    case 't': {
+      seg(x1, y1, x2, y2);
+      seg(x1 + px * off, y1 + py * off, x2 + px * off, y2 + py * off);
+      seg(x1 - px * off, y1 - py * off, x2 - px * off, y2 - py * off);
+      break;
+    }
+    case 'q': {
+      const s = off * 0.62;
+      for(const f of [-3, -1, 1, 3])
+        seg(x1 + px * s * f / 2, y1 + py * s * f / 2, x2 + px * s * f / 2, y2 + py * s * f / 2);
+      break;
+    }
+    case 'wedge': {
+      const w = fs * 0.42;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2 + px * w, y2 + py * w);
+      ctx.lineTo(x2 - px * w, y2 - py * w);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'hash': {
+      const w = fs * 0.42, dLen = Math.hypot(x2 - x1, y2 - y1);
+      const n = Math.max(4, Math.round(dLen / (fs * 0.30)));
+      ctx.lineWidth = lw * 0.92;
+      for(let i = 1; i <= n; i++){
+        const f = i / n, hw = w * f;
+        const cx = x1 + (x2 - x1) * f, cy = y1 + (y2 - y1) * f;
+        seg(cx + px * hw, cy + py * hw, cx - px * hw, cy - py * hw);
+      }
+      break;
+    }
+    case 'wavy': {
+      const dLen = Math.hypot(x2 - x1, y2 - y1);
+      const n = Math.max(3, Math.round(dLen / (fs * 0.38)));
+      const amp = fs * 0.24;
+      ctx.beginPath(); ctx.moveTo(x1, y1);
+      for(let i = 0; i < n; i++){
+        const f0 = i / n, f1 = (i + 0.5) / n, f2 = (i + 1) / n;
+        const s = i % 2 ? -1 : 1;
+        ctx.quadraticCurveTo(
+          x1 + (x2 - x1) * f1 + px * amp * s, y1 + (y2 - y1) * f1 + py * amp * s,
+          x1 + (x2 - x1) * f2, y1 + (y2 - y1) * f2);
+        void f0;
+      }
+      ctx.stroke();
+      break;
+    }
+    case 'dative': {
+      const head = fs * 0.34;
+      seg(x1, y1, x2 - ux * head * 0.9, y2 - uy * head * 0.9);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - ux * head + px * head * 0.52, y2 - uy * head + py * head * 0.52);
+      ctx.lineTo(x2 - ux * head - px * head * 0.52, y2 - uy * head - py * head * 0.52);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'dot': {
+      ctx.setLineDash([fs * 0.16, fs * 0.26]);
+      seg(x1, y1, x2, y2);
+      ctx.setLineDash([]);
+      break;
+    }
+  }
+}
+
+function drawBondDots(ctx, x1, y1, x2, y2, ux, uy, px, py, order, fs){
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  const r = fs * 0.10, sp = fs * 0.30;
+  for(let i = 0; i < Math.max(1, order); i++){
+    const s = (i - (order - 1) / 2) * fs * 0.34;
+    for(const d of [-1, 1]){
+      ctx.beginPath();
+      ctx.arc(mx + px * s + ux * sp * d, my + py * s + uy * sp * d, r, 0, 7);
+      ctx.fill();
+    }
+  }
+}
+function drawLonePair(ctx, d){
+  const {x, y, ang, r, fs} = d;
+  const cx = x + Math.cos(ang) * r, cy = y + Math.sin(ang) * r;
+  const px = -Math.sin(ang), py = Math.cos(ang);
+  const s = fs * 0.17, rr = fs * 0.105;
+  ctx.fillStyle = '#12171B';
+  for(const k of [-1, 1]){
+    ctx.beginPath(); ctx.arc(cx + px * s * k, cy + py * s * k, rr, 0, 7); ctx.fill();
+  }
+}
+
+/* ---------------------------------------------------------------- la grille */
+function drawGrid(ctx, o){
+  const {ox, oy, k, w, h} = o;
+  if(k < 0.28) return;
+  const x0 = -ox / k, y0 = -oy / k, x1 = (w - ox) / k, y1 = (h - oy) / k;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(120,160,175,.30)';
+  ctx.lineWidth = 1 / k;
+
+  if(gridShape() === 'square'){
+    ctx.beginPath();
+    for(let x = Math.floor(x0 / L) * L; x <= x1; x += L){ ctx.moveTo(x, y0); ctx.lineTo(x, y1); }
+    for(let y = Math.floor(y0 / L) * L; y <= y1; y += L){ ctx.moveTo(x0, y); ctx.lineTo(x1, y); }
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  /* Les indices (i,j) du réseau ne varient pas le long des axes de l'écran :
+     il faut donc borner à partir des QUATRE coins, sinon la grille se coupe
+     en diagonale. */
+  const cs = [latticeIndex(x0, y0), latticeIndex(x1, y0), latticeIndex(x0, y1), latticeIndex(x1, y1)];
+  const iMin = Math.floor(Math.min(...cs.map(c => c.i))) - 2;
+  const iMax = Math.ceil (Math.max(...cs.map(c => c.i))) + 2;
+  const jMin = Math.floor(Math.min(...cs.map(c => c.j))) - 2;
+  const jMax = Math.ceil (Math.max(...cs.map(c => c.j))) + 2;
+  if((jMax - jMin) * (iMax - iMin) > 90000){ ctx.restore(); return; }
+
+  ctx.beginPath();
+  for(let j = jMin; j <= jMax; j++){
+    for(let i = iMin; i <= iMax; i++){
+      if((((i - j) % 3) + 3) % 3 !== 1) continue;
+      const p = latticePoint(i, j);
+      for(const [di, dj] of [[1, 0], [-1, 1], [0, -1]]){
+        const q = latticePoint(i + di, j + dj);
+        ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+      }
+    }
+  }
+  ctx.stroke();
+  if(k > 0.62){
+    ctx.fillStyle = 'rgba(120,160,175,.36)';
+    for(let j = jMin; j <= jMax; j++){
+      for(let i = iMin; i <= iMax; i++){
+        if((((i - j) % 3) + 3) % 3 !== 0) continue;
+        const p = latticePoint(i, j);
+        if(p.x < x0 - L || p.x > x1 + L || p.y < y0 - L || p.y > y1 + L) continue;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.15 / k, 0, 7); ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+/* ============================================================================
+   MISE EN PAGE AUTOMATIQUE
+   ============================================================================ */
+const TAU = Math.PI * 2;
+const angDiff = (a, b) => { let d = Math.abs(a - b) % TAU; return d > Math.PI ? TAU - d : d; };
+
+function components(){
+  const seen = new Set(), out = [];
+  for(const a of doc.atoms){
+    if(seen.has(a.id)) continue;
+    const comp = [], q = [a.id]; seen.add(a.id);
+    while(q.length){
+      const u = q.shift(); comp.push(u);
+      for(const {n} of nbrs(u)) if(!seen.has(n)){ seen.add(n); q.push(n); }
+    }
+    out.push(comp);
+  }
+  return out;
+}
+
+function placeRingPolygon(r, pos, center){
+  const n = r.length, R = L / (2 * Math.sin(Math.PI / n));
+  const c = center || {x:0, y:0};
+  const a0 = -Math.PI / 2;
+  r.forEach((id, m) => {
+    if(pos.has(id)) return;
+    pos.set(id, {x:c.x + R * Math.cos(a0 + m * TAU / n), y:c.y + R * Math.sin(a0 + m * TAU / n)});
+  });
+}
+/** Accole un cycle à une arête (ou un sommet) déjà placée. */
+function placeRingFused(r, pos){
+  const n = r.length, R = L / (2 * Math.sin(Math.PI / n));
+  let k = -1;
+  for(let i = 0; i < n; i++){
+    if(pos.has(r[i]) && pos.has(r[(i + 1) % n])){ k = i; break; }
+  }
+  if(k >= 0){
+    const ring = r.slice(k).concat(r.slice(0, k));      // ring[0], ring[1] placés
+    const P = pos.get(ring[0]), Q = pos.get(ring[1]);
+    const mx = (P.x + Q.x) / 2, my = (P.y + Q.y) / 2;
+    const dx = Q.x - P.x, dy = Q.y - P.y, dl = Math.hypot(dx, dy) || 1;
+    const px = -dy / dl, py = dx / dl;
+    const hgt = Math.sqrt(Math.max(0.01, R * R - (dl / 2) ** 2));
+    let cx = 0, cy = 0, cn = 0;
+    for(const [, p] of pos){ cx += p.x; cy += p.y; cn++; }
+    cx /= cn || 1; cy /= cn || 1;
+    const s = ((mx - cx) * px + (my - cy) * py) >= 0 ? 1 : -1;
+    const C = {x:mx + px * hgt * s, y:my + py * hgt * s};
+    const a0 = Math.atan2(P.y - C.y, P.x - C.x);
+    const a1 = Math.atan2(Q.y - C.y, Q.x - C.x);
+    let step = a1 - a0;
+    while(step > Math.PI) step -= TAU;
+    while(step < -Math.PI) step += TAU;
+    ring.forEach((id, m) => {
+      if(pos.has(id)) return;
+      pos.set(id, {x:C.x + R * Math.cos(a0 + m * step), y:C.y + R * Math.sin(a0 + m * step)});
+    });
+    return true;
+  }
+  const i = r.findIndex(id => pos.has(id));                 // spiro
+  if(i < 0) return false;
+  const ring = r.slice(i).concat(r.slice(0, i));
+  const P = pos.get(ring[0]);
+  const used = [];
+  for(const {n:id} of nbrs(ring[0])){
+    const p = pos.get(id);
+    if(p) used.push(Math.atan2(p.y - P.y, p.x - P.x));
+  }
+  let dir = 0, bd = -1;
+  for(let d = 0; d < TAU; d += Math.PI / 12){
+    let m = TAU; for(const u of used) m = Math.min(m, angDiff(d, u));
+    if(m > bd){ bd = m; dir = d; }
+  }
+  const C = {x:P.x + Math.cos(dir) * R, y:P.y + Math.sin(dir) * R};
+  placeRingPolygon(ring, pos, C);
+  const a0 = Math.atan2(P.y - C.y, P.x - C.x);
+  ring.forEach((id, m) => {
+    if(m === 0) return;
+    pos.set(id, {x:C.x + R * Math.cos(a0 + m * TAU / ring.length),
+                 y:C.y + R * Math.sin(a0 + m * TAU / ring.length)});
+  });
+  return true;
+}
+
+/* Les six directions du réseau : 30°, 90°, 150°, 210°, 270°, 330°. */
+const LATTICE_DIRS = [30, 90, 150, 210, 270, 330].map(d => d * Math.PI / 180);
+function chooseAngle(pu, pos, used, depth){
+  let best = null, bs = -Infinity;
+  for(const c of LATTICE_DIRS){
+    let ad = TAU;
+    for(const a of used) ad = Math.min(ad, angDiff(c, a));
+    if(used.length && ad < 0.85) continue;
+    const x = pu.x + Math.cos(c) * L, y = pu.y + Math.sin(c) * L;
+    let md = Infinity;
+    for(const [, p] of pos) md = Math.min(md, Math.hypot(p.x - x, p.y - y));
+    let s = Math.min(ad, 2.1) * 2 + Math.min(md, L * 1.7) / L * 1.5;
+    if(used.length === 1){
+      const ideal = used[0] + (depth % 2 ? 1 : -1) * TAU / 3;
+      s += 1.7 * Math.max(0, 1 - angDiff(c, ideal) / 0.45);
+    }else if(!used.length){
+      s += 1.2 * Math.max(0, 1 - angDiff(c, -Math.PI / 6) / 0.45);
+    }
+    if(s > bs){ bs = s; best = c; }
+  }
+  return best === null ? Math.random() * TAU : best;
+}
+
+function layoutComponent(ids){
+  const set = new Set(ids);
+  const pos = new Map();
+  const inRing = new Set();
+  const ringsIn = RINGS.filter(r => r.every(id => set.has(id)));
+  ringsIn.forEach(r => r.forEach(id => inRing.add(id)));
+
+  const pending = ringsIn.slice().sort((a, b) => b.length - a.length);
+  if(pending.length){
+    placeRingPolygon(pending.shift(), pos, {x:0, y:0});
+    let guard = 0;
+    while(pending.length && guard++ < 400){
+      let idx = pending.findIndex(r => r.filter(id => pos.has(id)).length >= 2);
+      if(idx < 0) idx = pending.findIndex(r => r.some(id => pos.has(id)));
+      if(idx < 0){ placeRingPolygon(pending.shift(), pos, {x:0, y:0}); continue; }
+      placeRingFused(pending[idx], pos);
+      pending.splice(idx, 1);
+    }
+  }
+  if(!pos.size){
+    let seed = ids[0];
+    for(const id of ids) if(nbrs(id).length === 1){ seed = id; break; }
+    pos.set(seed, {x:0, y:0});
+  }
+  const depth = new Map();
+  const q = [...pos.keys()];
+  q.forEach(id => depth.set(id, 0));
+  let guard = 0;
+  while(q.length && guard++ < 12000){
+    const u = q.shift();
+    const pu = pos.get(u);
+    const used = [];
+    for(const {n} of nbrs(u)){
+      const p = pos.get(n);
+      if(p) used.push(Math.atan2(p.y - pu.y, p.x - pu.x));
+    }
+    for(const {n} of nbrs(u)){
+      if(pos.has(n)) continue;
+      const ang = chooseAngle(pu, pos, used, depth.get(u) || 0);
+      pos.set(n, {x:pu.x + Math.cos(ang) * L, y:pu.y + Math.sin(ang) * L});
+      depth.set(n, (depth.get(u) || 0) + 1);
+      used.push(ang); q.push(n);
+    }
+  }
+  /* détente légère : seuls les atomes hors cycle bougent */
+  const arr = ids.filter(id => pos.has(id));
+  const bset = new Set(doc.bonds.filter(b => set.has(b.a)).map(b => b.a + ':' + b.b));
+  const bonded = (u, v) => bset.has(u + ':' + v) || bset.has(v + ':' + u);
+  for(let it = 0; it < 60; it++){
+    for(let i = 0; i < arr.length; i++){
+      const u = arr[i];
+      if(inRing.has(u)) continue;
+      const pu = pos.get(u);
+      let fx = 0, fy = 0;
+      for(let j = 0; j < arr.length; j++){
+        if(i === j) continue;
+        const pv = pos.get(arr[j]);
+        const dx = pu.x - pv.x, dy = pu.y - pv.y;
+        const d = Math.hypot(dx, dy) || 0.01;
+        if(bonded(u, arr[j])){
+          const f = (d - L) * 0.16;
+          fx -= dx / d * f; fy -= dy / d * f;
+        }else if(d < L * 0.92){
+          const f = (L * 0.92 - d) * 0.22;
+          fx += dx / d * f; fy += dy / d * f;
+        }
+      }
+      pu.x += fx; pu.y += fy;
+    }
+  }
+  return pos;
+}
+
+function tidy(){
+  if(!doc.atoms.length) return;
+  snapshot();
+  buildAdj(); findRings();
+  const comps = components();
+  let cursorX = 0;
+  for(const comp of comps){
+    const pos = layoutComponent(comp);
+    let x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity;
+    for(const [, p] of pos){
+      x1 = Math.min(x1, p.x); x2 = Math.max(x2, p.x);
+      y1 = Math.min(y1, p.y); y2 = Math.max(y2, p.y);
+    }
+    const dx = cursorX - x1, dy = -(y1 + y2) / 2;
+    for(const [id, p] of pos){
+      const a = byId.get(id);
+      if(a){ a.x = p.x + dx; a.y = p.y + dy; }
+    }
+    cursorX += (x2 - x1) + L * 2.2;
+  }
+  centerDoc();
+  if(ui.snap) alignAll();
+}
+/** Translate un ensemble d'atomes pour en poser le maximum sur le réseau. */
+function alignComponent(ids){
+  const list = ids.map(id => byId.get(id)).filter(Boolean);
+  if(!list.length) return;
+  const eps = L * 0.06;
+  let best = {dx:0, dy:0}, bestN = -1;
+  for(const anchor of list){
+    const p = snapLattice(anchor.x, anchor.y);
+    const dx = p.x - anchor.x, dy = p.y - anchor.y;
+    let n = 0;
+    for(const a of list){
+      const q = snapLattice(a.x + dx, a.y + dy);
+      if(Math.hypot(q.x - a.x - dx, q.y - a.y - dy) < eps) n++;
+    }
+    if(n > bestN){ bestN = n; best = {dx, dy}; }
+  }
+  /* Trois translations donnent le même nombre d'atomes sur le réseau mais
+     des sous-réseaux différents : on retient celle qui pose les sommets de
+     cycle sur les sommets du nid d'abeille plutôt qu'au centre des cellules. */
+  const inRing = new Set();
+  RINGS.forEach(r => r.forEach(id => inRing.add(id)));
+  let phase = best, ps = -Infinity;
+  const phases = gridShape() === 'square' ? [[0, 0]] : [[0, 0], [1, 0], [-1, 0]];
+  for(const [pi, pj] of phases){
+    const v = gridShape() === 'square' ? {x:0, y:0} : latticePoint(pi, pj);
+    const t = {dx:best.dx + v.x, dy:best.dy + v.y};
+    let sc = 0;
+    for(const a of list){
+      const p = snapLattice(a.x + t.dx, a.y + t.dy);
+      if(Math.hypot(p.x - a.x - t.dx, p.y - a.y - t.dy) > eps) continue;
+      const onVertex = subLattice(p) !== 0;
+      sc += inRing.has(a.id) ? (onVertex ? 3 : 0) : (onVertex ? 1 : 0.4);
+    }
+    if(sc > ps){ ps = sc; phase = t; }
+  }
+  for(const a of list){ a.x += phase.dx; a.y += phase.dy; }
+}
+/** Rattrape les atomes hors cycle qui ont légèrement dérivé. */
+function snapLooseAtoms(){
+  const inRing = new Set();
+  RINGS.forEach(r => r.forEach(id => inRing.add(id)));
+  for(const a of doc.atoms){
+    if(inRing.has(a.id)) continue;
+    const p = snapLattice(a.x, a.y);
+    const d = Math.hypot(p.x - a.x, p.y - a.y);
+    if(d < 1e-6 || d > L * 0.24) continue;
+    if(doc.atoms.some(o => o !== a && Math.hypot(o.x - p.x, o.y - p.y) < L * 0.5)) continue;
+    a.x = p.x; a.y = p.y;
+  }
+}
+function alignAll(){
+  buildAdj(); findRings();
+  for(const comp of components()) alignComponent(comp);
+  snapLooseAtoms();
+}
+
+function centerDoc(){
+  if(!doc.atoms.length) return;
+  let x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity;
+  for(const a of doc.atoms){
+    x1 = Math.min(x1, a.x); x2 = Math.max(x2, a.x);
+    y1 = Math.min(y1, a.y); y2 = Math.max(y2, a.y);
+  }
+  const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+  for(const a of doc.atoms){ a.x -= cx; a.y -= cy; }
+}
+
+/* ------------------------------------------------------- chaîne principale */
+function longestChain(){
+  buildAdj();
+  const carbons = doc.atoms.filter(a => a.type === 'atom' && a.el === 'C').map(a => a.id);
+  const pool = new Set(carbons.length >= 2 ? carbons : doc.atoms.map(a => a.id));
+  if(!pool.size) return [];
+  const far = s => {
+    const prev = new Map([[s, null]]), q = [s];
+    let last = s;
+    while(q.length){
+      const u = q.shift(); last = u;
+      for(const {n} of nbrs(u)) if(pool.has(n) && !prev.has(n)){ prev.set(n, u); q.push(n); }
+    }
+    return {last, prev};
+  };
+  const start = [...pool][0];
+  const a = far(start);
+  const b = far(a.last);
+  const path = []; let u = b.last;
+  while(u !== null && u !== undefined){ path.push(u); u = b.prev.get(u); }
+  return path;
+}
+
+function fischerLayout(){
+  buildAdj();
+  const chain = longestChain();
+  if(chain.length < 2) return;
+  const chainSet = new Set(chain);
+  /* on oriente la chaîne de haut en bas */
+  const vy = L, hx = L;
+  chain.forEach((id, i) => {
+    const a = byId.get(id);
+    if(a){ a.x = 0; a.y = i * vy; }
+  });
+  const done = new Set(chain);
+  chain.forEach(id => {
+    const outs = nbrs(id).filter(x => !chainSet.has(x.n)).map(x => x.n);
+    const a = byId.get(id);
+    let side = 1, extra = 0;
+    for(const n of outs){
+      const o = byId.get(n);
+      if(!o || done.has(n)) continue;
+      o.x = a.x + side * hx * (1 + extra * 0.55);
+      o.y = a.y + (extra ? (side > 0 ? -1 : 1) * vy * 0.42 : 0);
+      done.add(n);
+      /* branches accrochées à ce substituant : on les déroule vers l'extérieur */
+      const stack = [[n, side]];
+      let g = 0;
+      while(stack.length && g++ < 400){
+        const [u, s] = stack.pop();
+        const pu = byId.get(u);
+        let step = 0;
+        for(const {n:v} of nbrs(u)){
+          if(done.has(v)) continue;
+          const pv = byId.get(v); if(!pv) continue;
+          pv.x = pu.x + s * hx; pv.y = pu.y + step * vy * 0.6;
+          step = step ? -step : 1;
+          done.add(v); stack.push([v, s]);
+        }
+      }
+      if(side > 0) side = -1; else { side = 1; extra++; }
+    }
+  });
+  /* liaisons de la chaîne : toujours des traits simples droits */
+  for(const b of doc.bonds){
+    if(chainSet.has(b.a) && chainSet.has(b.b) && (b.k === 'wedge' || b.k === 'hash' || b.k === 'wavy')) b.k = 's';
+  }
+  centerDoc();
+}
+
+/* ------------------------------------------------- géométrie autour d'un atome */
+/** Directions idéales pour une figure de répulsion à `s` doublets. */
+function vseprDirections(s){
+  const d = (deg, style) => ({ang:deg * Math.PI / 180, style});
+  switch(s){
+    case 1: return [d(0)];
+    case 2: return [d(180), d(0)];
+    case 3: return [d(90), d(210), d(330)];
+    case 4: return [d(90), d(180), d(270), d(0)];
+    /* bipyramide à base triangulaire : deux axiales, trois équatoriales */
+    case 5: return [d(90), d(270), d(180), d(30, 'wedge'), d(-30, 'hash')];
+    /* octaèdre : deux axiales, quatre équatoriales */
+    case 6: return [d(90), d(270), d(150), d(330), d(30, 'wedge'), d(210, 'hash')];
+    default: {
+      const out = [];
+      for(let i = 0; i < s; i++) out.push(d(90 + i * 360 / s));
+      return out;
+    }
+  }
+}
+/** Atomes accrochés à `start` sans repasser par `center` (null si cycle). */
+function branchOf(center, start){
+  const seen = new Set([start]), q = [start];
+  let guard = 0;
+  while(q.length && guard++ < 5000){
+    const u = q.shift();
+    for(const {n} of nbrs(u)){
+      if(n === center){ if(u !== start) return null; continue; }
+      if(seen.has(n)) continue;
+      seen.add(n); q.push(n);
+    }
+  }
+  return [...seen];
+}
+/**
+ * Réarrange les voisins d'un atome selon la répulsion des doublets.
+ * Volontairement libéré de la grille : c'est la seule façon de représenter
+ * proprement PCl5, SF6 ou un ion complexe.
+ */
+function vseprLayout(id){
+  buildAdj(); findRings();
+  const a = byId.get(id);
+  if(!a) return false;
+  const ns = nbrs(id);
+  if(!ns.length) return false;
+  snapshot();
+  const steric = Math.min(8, ns.length + lonePairs(a));
+  const dirs = vseprDirections(steric);
+  const cur = ns.map(({n, b}) => {
+    const o = byId.get(n);
+    return {n, b, ang:Math.atan2(o.y - a.y, o.x - a.x)};
+  }).sort((p, q) => p.ang - q.ang);
+  const used = dirs.map(() => false);
+  for(const c of cur){
+    let bi = -1, bd = Infinity;
+    dirs.forEach((d, i) => {
+      if(used[i]) return;
+      const dd = angDiff(c.ang, d.ang);
+      if(dd < bd){ bd = dd; bi = i; }
+    });
+    if(bi < 0) continue;
+    used[bi] = true;
+    const d = dirs[bi];
+    const o = byId.get(c.n);
+    const nx = a.x + Math.cos(d.ang) * L, ny = a.y + Math.sin(d.ang) * L;
+    const dx = nx - o.x, dy = ny - o.y;
+    const branch = branchOf(id, c.n);
+    if(branch) for(const bid of branch){ const t = byId.get(bid); if(t){ t.x += dx; t.y += dy; } }
+    else { o.x = nx; o.y = ny; }
+    if(d.style && ['s', 'wedge', 'hash'].includes(c.b.k)){
+      c.b.k = d.style;
+      if(c.b.a !== id){ const t = c.b.a; c.b.a = c.b.b; c.b.b = t; }   // pointe fine au centre
+    }
+  }
+  return true;
+}
+
+/** Étiquette condensée d'un carbone terminal : CHO, CH2OH, COOH… */
+function condensedLabel(a, outs){
+  let s = a.el;
+  const h = hCount(a);
+  if(h) s += 'H' + (h > 1 ? h : '');
+  outs.sort((p, q) => bondOrder(q.b) - bondOrder(p.b));
+  for(const o of outs){
+    const n = byId.get(o.n);
+    if(!n) continue;
+    s += n.el;
+    const nh = hCount(n);
+    if(nh) s += 'H' + (nh > 1 ? nh : '');
+    if(n.q) s += (n.q > 0 ? '+' : '\u2212');
+  }
+  return s;
+}
+
+/* ============================================================================
+   GABARITS ET FRAGMENTS
+   ============================================================================ */
+function viewCenter(){
+  const r = cv.getBoundingClientRect();
+  return {x:(r.width / 2 - view.x) / view.k, y:(r.height / 2 - view.y) / view.k};
+}
+
+function insertRing(n, style){
+  snapshot(); buildAdj();
+  const made = [];
+  if(sel.b.size === 1){                                   // accolé à la liaison choisie
+    const bd = doc.bonds.find(b => sel.b.has(b.id));
+    const P = byId.get(bd.a), Q = byId.get(bd.b);
+    const R = L / (2 * Math.sin(Math.PI / n));
+    const mx = (P.x + Q.x) / 2, my = (P.y + Q.y) / 2;
+    const dx = Q.x - P.x, dy = Q.y - P.y, dl = Math.hypot(dx, dy) || 1;
+    const px = -dy / dl, py = dx / dl;
+    const hgt = Math.sqrt(Math.max(0.01, R * R - (dl / 2) ** 2));
+    let cx = 0, cy = 0;
+    for(const a of doc.atoms){ cx += a.x; cy += a.y; }
+    cx /= doc.atoms.length; cy /= doc.atoms.length;
+    const s = ((mx - cx) * px + (my - cy) * py) >= 0 ? 1 : -1;
+    const C = {x:mx + px * hgt * s, y:my + py * hgt * s};
+    const a0 = Math.atan2(P.y - C.y, P.x - C.x);
+    let a1 = Math.atan2(Q.y - C.y, Q.x - C.x) - a0;
+    while(a1 > Math.PI) a1 -= TAU;
+    while(a1 < -Math.PI) a1 += TAU;
+    const step = a1;
+    const ids = [bd.a, bd.b];
+    for(let m = 2; m < n; m++){
+      const at = addAtom(C.x + R * Math.cos(a0 + m * step), C.y + R * Math.sin(a0 + m * step), 'C');
+      ids.push(at.id); made.push(at.id);
+    }
+    for(let m = 1; m < n; m++) addBond(ids[m], ids[(m + 1) % n], 's');
+    applyRingStyle(ids, style, bd);
+  }else{
+    const vc = viewCenter();
+    const c = ui.snap ? snapLattice(vc.x, vc.y) : vc;
+    const R = L / (2 * Math.sin(Math.PI / n));
+    const ids = [];
+    for(let m = 0; m < n; m++){
+      const t = -Math.PI / 2 + m * TAU / n;
+      const at = addAtom(c.x + R * Math.cos(t), c.y + R * Math.sin(t), 'C');
+      ids.push(at.id); made.push(at.id);
+    }
+    for(let m = 0; m < n; m++) addBond(ids[m], ids[(m + 1) % n], 's');
+    applyRingStyle(ids, style, null);
+  }
+  clearSel(); made.forEach(id => sel.a.add(id));
+  refresh();
+}
+function applyRingStyle(ids, style, keepBond){
+  if(!style) return;
+  const n = ids.length;
+  const find = (u, v) => doc.bonds.find(b => (b.a === u && b.b === v) || (b.a === v && b.b === u));
+  if(style === 'arom'){
+    for(let m = 0; m < n; m++){ const b = find(ids[m], ids[(m + 1) % n]); if(b) b.k = 'arom'; }
+  }else if(style === 'kekule'){
+    for(let m = 0; m < n; m++){
+      const b = find(ids[m], ids[(m + 1) % n]);
+      if(b) b.k = m % 2 ? 's' : 'd';
+    }
+    void keepBond;
+  }
+}
+
+function insertChain(n){
+  snapshot();
+  const vc = viewCenter();
+  const c = ui.snap ? snapLattice(vc.x - n * L * SQ3 / 4, vc.y) : {x:vc.x - n * L * SQ3 / 4, y:vc.y};
+  let prev = null;
+  const made = [];
+  for(let i = 0; i < n; i++){
+    const a = addAtom(c.x + i * L * SQ3 / 2, c.y + (i % 2 ? L / 2 : 0), 'C');
+    made.push(a.id);
+    if(prev !== null) addBond(prev, a.id, 's');
+    prev = a.id;
+  }
+  clearSel(); made.forEach(id => sel.a.add(id));
+  refresh();
+}
+
+/** Remplace un groupe condensé par sa structure développée. */
+function expandGroup(id){
+  const a = byId.get(id);
+  if(!a || a.type !== 'group') return false;
+  const g = GMAP[a.gk];
+  if(!g || !g.frag) return false;
+  snapshot(); buildAdj();
+  const link = nbrs(id)[0];
+  let ux = 1, uy = 0;
+  if(link){
+    const o = byId.get(link.n);
+    if(o){
+      const dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy) || 1;
+      ux = dx / d; uy = dy / d;
+    }
+  }
+  const vx = -uy, vy = ux;
+  const made = g.frag.a.map(([el, fx, fy, q]) =>
+    addAtom(a.x + (fx * ux + fy * vx) * L, a.y + (fx * uy + fy * vy) * L, el, {q:q || 0}));
+  g.frag.b.forEach(([i, j, o]) => addBond(made[i].id, made[j].id, o === 2 ? 'd' : o === 3 ? 't' : 's'));
+  for(const {n, b} of nbrs(id)){
+    const nb = addBond(made[0].id, n, b.k);
+    if(nb && b.k === 'wedge') nb.k = 'wedge';
+  }
+  delAtoms([id]);
+  clearSel(); made.forEach(m => sel.a.add(m.id));
+  refresh();
+  return true;
+}
+
+/* ============================================================================
+   CANEVAS
+   ============================================================================ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const stage = document.getElementById('stage');
+let DPR = 1, lastScene = null, drag = null, spaceDown = false;
+const PAPER = '#F2F6F7';
+
+function resizeCanvas(){
+  const r = stage.getBoundingClientRect();
+  DPR = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(r.width * DPR));
+  cv.height = Math.max(1, Math.round(r.height * DPR));
+  draw();
+}
+function draw(){
+  const r = stage.getBoundingClientRect();
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.clearRect(0, 0, r.width, r.height);
+  ctx.fillStyle = PAPER;
+  ctx.fillRect(0, 0, r.width, r.height);
+  lastScene = drawScene(ctx, {
+    ox:view.x, oy:view.y, k:view.k, mode:ui.mode, grid:ui.grid,
+    uiLayer:true, w:r.width, h:r.height, maskColor:PAPER
+  });
+  drawOverlay(r);
+}
+function drawOverlay(r){
+  if(!drag) return;
+  ctx.save();
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if(drag.mode === 'box'){
+    const x = Math.min(drag.x0, drag.x1), y = Math.min(drag.y0, drag.y1);
+    const w = Math.abs(drag.x1 - drag.x0), h = Math.abs(drag.y1 - drag.y0);
+    ctx.fillStyle = 'rgba(18,160,181,.10)';
+    ctx.strokeStyle = '#12A0B5';
+    ctx.lineWidth = 1;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeRect(x + .5, y + .5, w, h);
+  }
+  if(drag.mode === 'bond' && drag.preview){
+    const p = w2s(drag.from), q = w2s(drag.preview);
+    ctx.strokeStyle = '#12A0B5';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = drag.target ? '#12A0B5' : 'rgba(18,160,181,.55)';
+    ctx.beginPath(); ctx.arc(q.x, q.y, drag.target ? 9 : 5, 0, 7); ctx.fill();
+  }
+  ctx.restore();
+  void r;
+}
+const s2w = (sx, sy) => ({x:(sx - view.x) / view.k, y:(sy - view.y) / view.k});
+const w2s = p => ({x:p.x * view.k + view.x, y:p.y * view.k + view.y});
+
+function hitAtom(w, skip){
+  let best = null, bd = Infinity;
+  for(const a of doc.atoms){
+    if(skip && a.id === skip) continue;
+    const d = Math.hypot(a.x - w.x, a.y - w.y);
+    if(d < bd){ bd = d; best = a; }
+  }
+  return bd < Math.max(16, 14 / view.k) ? best : null;
+}
+function hitBond(w){
+  let best = null, bd = Infinity;
+  for(const b of doc.bonds){
+    const A = byId.get(b.a), B = byId.get(b.b);
+    if(!A || !B) continue;
+    const dx = B.x - A.x, dy = B.y - A.y, l2 = dx * dx + dy * dy || 1;
+    let t = ((w.x - A.x) * dx + (w.y - A.y) * dy) / l2;
+    t = Math.max(0.12, Math.min(0.88, t));
+    const d = Math.hypot(A.x + dx * t - w.x, A.y + dy * t - w.y);
+    if(d < bd){ bd = d; best = b; }
+  }
+  return bd < Math.max(9, 8 / view.k) ? best : null;
+}
+/** Hydrogène implicite tracé (vue développée ou Lewis). */
+function hitVirtualH(w){
+  if(!lastScene) return null;
+  let best = null, bd = Infinity;
+  for(const [, n] of lastScene.nodes){
+    if(n.id >= 0) continue;
+    const d = Math.hypot(n.x - w.x, n.y - w.y);
+    if(d < bd){ bd = d; best = n; }
+  }
+  return bd < Math.max(14, 12 / view.k) ? best : null;
+}
+/** Doublet non liant tracé (vue de Lewis). */
+function hitLonePair(w){
+  if(!lastScene) return null;
+  let best = null, bd = Infinity;
+  for(const d of lastScene.dots){
+    const cx = d.x + Math.cos(d.ang) * d.r, cy = d.y + Math.sin(d.ang) * d.r;
+    const dd = Math.hypot(cx - w.x, cy - w.y);
+    if(dd < bd){ bd = dd; best = d; }
+  }
+  return bd < Math.max(12, 10 / view.k) ? best : null;
+}
+/** Transforme un H implicite en atome réel, sans changer la formule brute. */
+function materializeH(v){
+  const p = byId.get(v.parent);
+  if(!p) return null;
+  if(p.hSet !== null && p.hSet !== undefined) p.hSet = Math.max(0, p.hSet - 1);
+  const h = addAtom(v.x, v.y, 'H');
+  addBond(p.id, h.id, 's');
+  reindex(); buildAdj();
+  return h;
+}
+
+/** Direction naturelle pour prolonger une chaîne. */
+function nextBondAngle(a){
+  const ns = nbrs(a.id);
+  if(!ns.length) return -Math.PI / 6;
+  const used = ns.map(({n}) => {
+    const o = byId.get(n);
+    return Math.atan2(o.y - a.y, o.x - a.x);
+  });
+  if(used.length === 1){
+    const cands = [used[0] + TAU / 3, used[0] - TAU / 3];
+    let best = cands[0], bs = -Infinity;
+    for(const c of cands){
+      const x = a.x + Math.cos(c) * L, y = a.y + Math.sin(c) * L;
+      let md = Infinity;
+      for(const o of doc.atoms) md = Math.min(md, Math.hypot(o.x - x, o.y - y));
+      const s = md - (Math.sin(c) > 0 ? 3 : 0);
+      if(s > bs){ bs = s; best = c; }
+    }
+    return best;
+  }
+  return freeDirections(a, 1)[0];
+}
+
+/* ============================================================================
+   INTERACTIONS
+   ============================================================================ */
+const pointers = new Map();
+let pinch = null;
+
+cv.addEventListener('pointerdown', e => {
+  cv.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, {x:e.offsetX, y:e.offsetY});
+  if(pointers.size === 2){
+    const [p, q] = [...pointers.values()];
+    pinch = {d:Math.hypot(p.x - q.x, p.y - q.y), k:view.k,
+             cx:(p.x + q.x) / 2, cy:(p.y + q.y) / 2, vx:view.x, vy:view.y};
+    drag = null; draw(); return;
+  }
+  const sx = e.offsetX, sy = e.offsetY;
+  const w = s2w(sx, sy);
+  let a = hitAtom(w);
+  const b = a ? null : hitBond(w);
+  const pan = () => { drag = {mode:'pan', sx, sy, vx:view.x, vy:view.y}; };
+
+  /* clic droit, clic milieu, barre d'espace, outil main : on fait glisser la feuille */
+  if(e.button === 1 || e.button === 2 || spaceDown || ui.tool === 'pan'){ pan(); return; }
+
+  /* hydrogènes implicites et doublets : modifiables dans les vues développée et Lewis */
+  let vh = null, lph = null;
+  if(!a && !b){ vh = hitVirtualH(w); if(!vh) lph = hitLonePair(w); }
+  if(ui.tool === 'erase' && (vh || lph)){
+    snapshot();
+    if(vh){ const p = byId.get(vh.parent); if(p) p.hSet = Math.max(0, hCount(p) - 1); }
+    else { const p = byId.get(lph.id); if(p) p.lpSet = Math.max(0, lonePairs(p) - 1); }
+    refresh(); return;
+  }
+  if(lph){
+    snapshot();
+    drag = {mode:'lp', id:lph.id, idx:lph.idx};
+    return;
+  }
+  if(vh){
+    snapshot();
+    const h = materializeH(vh);
+    refresh();
+    if(!h) return;
+    a = h; clearSel(); sel.a.add(h.id);
+    if(ui.tool === 'select' || ui.tool === 'atom' || ui.tool === 'group'){
+      drag = {mode:'move', sx, sy, start:new Map([[h.id, {x:h.x, y:h.y}]]), moved:false};
+      syncUI(); return;
+    }
+  }
+  /* sur le fond, les outils ponctuels laissent glisser la feuille */
+  if(!a && !b && (ui.tool === 'erase' || ui.tool === 'plus' || ui.tool === 'minus')){ pan(); return; }
+  switch(ui.tool){
+    case 'select': {
+      if(a){
+        if(e.shiftKey) sel.a.has(a.id) ? sel.a.delete(a.id) : sel.a.add(a.id);
+        else if(!sel.a.has(a.id)){ clearSel(); sel.a.add(a.id); }
+        snapshot();
+        drag = {mode:'move', sx, sy, start:new Map([...sel.a].map(id => {
+          const o = byId.get(id); return [id, {x:o.x, y:o.y}];
+        })), moved:false};
+      }else if(b){
+        if(e.shiftKey) sel.b.has(b.id) ? sel.b.delete(b.id) : sel.b.add(b.id);
+        else { clearSel(); sel.b.add(b.id); }
+      }else if(e.shiftKey){
+        drag = {mode:'box', x0:sx, y0:sy, x1:sx, y1:sy, add:true};
+      }else{
+        clearSel(); pan();
+      }
+      refresh(); break;
+    }
+    case 'bond': {
+      if(a) drag = {mode:'bond', fromId:a.id, from:{x:a.x, y:a.y}, preview:null, target:null, moved:false};
+      else {
+        snapshot();
+        const p = snapPoint(w.x, w.y);
+        const na = addAtom(p.x, p.y, ui.el);
+        drag = {mode:'bond', fromId:na.id, from:{x:na.x, y:na.y}, preview:null, target:null, moved:false, created:na.id};
+        refresh();
+      }
+      break;
+    }
+    case 'atom': {
+      snapshot();
+      if(a){ a.type = 'atom'; a.el = ui.el; a.gk = null; a.txt = null; }
+      else { const p = snapPoint(w.x, w.y); const na = addAtom(p.x, p.y, ui.el); clearSel(); sel.a.add(na.id); }
+      refresh(); break;
+    }
+    case 'group': {
+      snapshot();
+      if(a){ a.type = 'group'; a.gk = ui.group; a.txt = GMAP[ui.group].lbl; a.q = 0; }
+      else { const p = snapPoint(w.x, w.y); const na = addGroup(p.x, p.y, ui.group); clearSel(); sel.a.add(na.id); }
+      refresh(); break;
+    }
+    case 'erase': {
+      if(a){ snapshot(); delAtoms([a.id]); }
+      else if(b){ snapshot(); delBonds([b.id]); }
+      clearSel(); refresh(); break;
+    }
+    case 'plus': case 'minus': {
+      if(a){ snapshot(); a.q = (a.q || 0) + (ui.tool === 'plus' ? 1 : -1); refresh(); }
+      break;
+    }
+  }
+});
+
+cv.addEventListener('pointermove', e => {
+  if(pointers.has(e.pointerId)) pointers.set(e.pointerId, {x:e.offsetX, y:e.offsetY});
+  if(pinch && pointers.size === 2){
+    const [p, q] = [...pointers.values()];
+    const d = Math.hypot(p.x - q.x, p.y - q.y);
+    const k = Math.max(0.15, Math.min(6, pinch.k * d / (pinch.d || 1)));
+    view.x = pinch.cx - (pinch.cx - pinch.vx) * (k / pinch.k);
+    view.y = pinch.cy - (pinch.cy - pinch.vy) * (k / pinch.k);
+    view.k = k; draw(); return;
+  }
+  if(!drag) return;
+  const sx = e.offsetX, sy = e.offsetY;
+  const w = s2w(sx, sy);
+  switch(drag.mode){
+    case 'pan':
+      view.x = drag.vx + (sx - drag.sx);
+      view.y = drag.vy + (sy - drag.sy);
+      draw(); break;
+    case 'box':
+      drag.x1 = sx; drag.y1 = sy; draw(); break;
+    case 'move': {
+      let dx = (sx - drag.sx) / view.k, dy = (sy - drag.sy) / view.k;
+      if(Math.abs(sx - drag.sx) + Math.abs(sy - drag.sy) > 3) drag.moved = true;
+      /* plusieurs atomes : on translate d'un vecteur du réseau, la forme est conservée */
+      if(ui.snap && drag.start.size > 1){ const v = snapLattice(dx, dy); dx = v.x; dy = v.y; }
+      for(const [id, p] of drag.start){
+        const o = byId.get(id); if(!o) continue;
+        let nx = p.x + dx, ny = p.y + dy;
+        if(ui.snap && drag.start.size === 1){ const s = snapLattice(nx, ny); nx = s.x; ny = s.y; }
+        o.x = nx; o.y = ny;
+      }
+      draw(); break;
+    }
+    case 'lp': {
+      const p = byId.get(drag.id);
+      if(p){
+        if(!p.lpAng) p.lpAng = [];
+        p.lpAng[drag.idx] = Math.atan2(w.y - p.y, w.x - p.x);
+        draw();
+      }
+      break;
+    }
+    case 'bond': {
+      if(Math.hypot(sx - w2s(drag.from).x, sy - w2s(drag.from).y) > 5) drag.moved = true;
+      const t = hitAtom(w, drag.fromId);
+      drag.target = t ? t.id : null;
+      drag.preview = t ? {x:t.x, y:t.y} : snapPoint(w.x, w.y, ui.snap ? drag.from : null);
+      draw(); break;
+    }
+  }
+});
+
+function endPointer(e){
+  pointers.delete(e.pointerId);
+  if(pointers.size < 2) pinch = null;
+  if(!drag) return;
+  const d = drag; drag = null;
+  if(d.mode === 'box'){
+    const x1 = Math.min(d.x0, d.x1), x2 = Math.max(d.x0, d.x1);
+    const y1 = Math.min(d.y0, d.y1), y2 = Math.max(d.y0, d.y1);
+    if(x2 - x1 > 3 || y2 - y1 > 3){
+      if(!d.add) clearSel();
+      for(const a of doc.atoms){
+        const p = w2s(a);
+        if(p.x >= x1 && p.x <= x2 && p.y >= y1 && p.y <= y2) sel.a.add(a.id);
+      }
+      for(const b of doc.bonds)
+        if(sel.a.has(b.a) && sel.a.has(b.b)) sel.b.add(b.id);
+    }
+  }
+  if(d.mode === 'bond'){
+    const from = byId.get(d.fromId);
+    if(from){
+      if(!d.moved && d.created === undefined){
+        snapshot();
+        const ang = nextBondAngle(from);
+        let x = from.x + Math.cos(ang) * L, y = from.y + Math.sin(ang) * L;
+        if(ui.snap){ const s = snapLattice(x, y); x = s.x; y = s.y; }
+        const na = ui.tool === 'group' ? addGroup(x, y, ui.group) : addAtom(x, y, ui.el);
+        addBond(from.id, na.id, ui.bond);
+        clearSel(); sel.a.add(na.id);
+      }else if(d.target){
+        snapshot();
+        addBond(from.id, d.target, ui.bond);
+      }else if(d.preview){
+        if(d.created === undefined) snapshot();
+        const na = addAtom(d.preview.x, d.preview.y, ui.el);
+        addBond(from.id, na.id, ui.bond);
+        clearSel(); sel.a.add(na.id);
+      }
+    }
+  }
+  refresh();
+}
+cv.addEventListener('pointerup', endPointer);
+cv.addEventListener('pointercancel', endPointer);
+
+cv.addEventListener('dblclick', e => {
+  const a = hitAtom(s2w(e.offsetX, e.offsetY));
+  if(a){ clearSel(); sel.a.add(a.id); setTool('select'); refresh(); openInspector(); }
+});
+cv.addEventListener('contextmenu', e => e.preventDefault());
+
+/* ------------------------------------------------- glisser-déposer des palettes */
+cv.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+cv.addEventListener('drop', e => {
+  e.preventDefault();
+  const raw = e.dataTransfer.getData('text/plain') || '';
+  const [kind, val] = raw.split(':');
+  if(!kind || !val) return;
+  const w = s2w(e.offsetX, e.offsetY);
+  const at = hitAtom(w), bd = at ? null : hitBond(w);
+  snapshot();
+  if(kind === 'el' || kind === 'grp'){
+    const set = o => {
+      if(kind === 'el'){ o.type = 'atom'; o.el = val; o.gk = null; o.txt = null; }
+      else { o.type = 'group'; o.gk = val; o.txt = GMAP[val].lbl; o.q = 0; }
+    };
+    if(at) set(at);
+    else{
+      const p = snapPoint(w.x, w.y);
+      const na = kind === 'el' ? addAtom(p.x, p.y, val) : addGroup(p.x, p.y, val);
+      set(na);
+      clearSel(); sel.a.add(na.id);
+    }
+    if(kind === 'el') ui.el = val; else ui.group = val;
+  }else if(kind === 'bond'){
+    if(bd) bd.k = val;
+    else if(at){
+      const ang = nextBondAngle(at);
+      let x = at.x + Math.cos(ang) * L, y = at.y + Math.sin(ang) * L;
+      if(ui.snap){ const p = snapLattice(x, y); x = p.x; y = p.y; }
+      const na = addAtom(x, y, ui.el);
+      addBond(at.id, na.id, val);
+      clearSel(); sel.a.add(na.id);
+    }else{
+      const p = snapPoint(w.x, w.y);
+      const n1 = addAtom(p.x, p.y, ui.el);
+      const ang = -Math.PI / 6;
+      let x = p.x + Math.cos(ang) * L, y = p.y + Math.sin(ang) * L;
+      if(ui.snap){ const q = snapLattice(x, y); x = q.x; y = q.y; }
+      const n2 = addAtom(x, y, ui.el);
+      addBond(n1.id, n2.id, val);
+      clearSel(); sel.a.add(n1.id); sel.a.add(n2.id);
+    }
+    ui.bond = val;
+  }
+  refresh();
+});
+
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = Math.exp(-e.deltaY * 0.0015);
+  const k = Math.max(0.15, Math.min(6, view.k * f));
+  view.x = e.offsetX - (e.offsetX - view.x) * (k / view.k);
+  view.y = e.offsetY - (e.offsetY - view.y) * (k / view.k);
+  view.k = k; draw();
+}, {passive:false});
+
+/* ------------------------------------------------------------- clavier */
+const ELKEYS = {c:'C', n:'N', o:'O', s:'S', p:'P', f:'F', h:'H', i:'I', b:'Br', l:'Cl', k:'K'};
+document.addEventListener('keydown', e => {
+  if(e.target.matches('input,textarea,select')) return;
+  const k = e.key;
+  if(k === ' '){ spaceDown = true; e.preventDefault(); return; }
+  if((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'z'){
+    e.preventDefault(); e.shiftKey ? redo() : undo(); return;
+  }
+  if((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'y'){ e.preventDefault(); redo(); return; }
+  if((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'a'){
+    e.preventDefault(); doc.atoms.forEach(a => sel.a.add(a.id));
+    doc.bonds.forEach(b => sel.b.add(b.id)); refresh(); return;
+  }
+  if((e.ctrlKey || e.metaKey) && k.toLowerCase() === 's'){ e.preventDefault(); saveFile(); return; }
+  if(e.ctrlKey || e.metaKey) return;
+
+  if(k === 'Delete' || k === 'Backspace'){
+    e.preventDefault();
+    if(sel.a.size || sel.b.size){
+      snapshot(); delBonds([...sel.b]); delAtoms([...sel.a]); clearSel(); refresh();
+    }
+    return;
+  }
+  if(k === 'Escape'){ clearSel(); refresh(); closeHelp(); return; }
+  if(/^F[1-6]$/.test(k)){ e.preventDefault(); setMode(Object.keys(VIEWS)[+k.slice(1) - 1]); return; }
+
+  const low = k.toLowerCase();
+  if(low === 'v') return setTool('select');
+  if(low === 'b') return setTool('bond');
+  if(low === 'a') return setTool('atom');
+  if(low === 'g') return setTool('group');
+  if(low === 'e') return setTool('erase');
+  if(low === 'r'){ tidy(); refresh(); toast('Schéma réorganisé'); return; }
+  if(low === 'x'){ flipWedges(); return; }
+  if(low === 't'){
+    if(sel.a.size === 1 && vseprLayout([...sel.a][0])){ refresh(); toast('Voisins réarrangés'); }
+    return;
+  }
+  if('123'.includes(k)) return setBond({1:'s', 2:'d', 3:'t'}[k]);
+  if(k === '4') return setBond('wedge');
+  if(k === '5') return setBond('hash');
+  if(k === '+' || k === '=') return bumpCharge(1);
+  if(k === '-' || k === '_') return bumpCharge(-1);
+  if(ELKEYS[low] && !e.shiftKey) return setElement(ELKEYS[low]);
+});
+document.addEventListener('keyup', e => { if(e.key === ' ') spaceDown = false; });
+
+function bumpCharge(d){
+  if(!sel.a.size) return;
+  snapshot();
+  for(const id of sel.a){ const a = byId.get(id); if(a) a.q = (a.q || 0) + d; }
+  refresh();
+}
+function flipWedges(){
+  if(!sel.b.size) return;
+  snapshot();
+  for(const b of doc.bonds){
+    if(!sel.b.has(b.id)) continue;
+    const t = b.a; b.a = b.b; b.b = t;
+  }
+  refresh();
+}
+
+/* ============================================================================
+   INTERFACE
+   ============================================================================ */
+const $ = s => document.querySelector(s);
+const svgIcon = d => `<svg viewBox="0 0 24 24">${d}</svg>`;
+
+const TOOLS = [
+  {k:'select', key:'V', lbl:'Sélectionner et déplacer',
+   i:'<path d="M6 3l12 8-5 1.4L10.5 18z"/>'},
+  {k:'bond', key:'B', lbl:'Tracer une liaison',
+   i:'<circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><path d="M7.6 16.4L16.4 7.6"/>'},
+  {k:'atom', key:'A', lbl:'Poser un atome',
+   i:'<path d="M12 3.2l7.6 4.4v8.8L12 20.8 4.4 16.4V7.6z"/><circle cx="12" cy="12" r="2.1"/>'},
+  {k:'group', key:'G', lbl:'Poser un groupe',
+   i:'<path d="M9 4H6.5A1.5 1.5 0 005 5.5v13A1.5 1.5 0 006.5 20H9M15 4h2.5A1.5 1.5 0 0119 5.5v13a1.5 1.5 0 01-1.5 1.5H15"/><path d="M9.5 12h5"/>'},
+  {k:'erase', key:'E', lbl:'Gommer',
+   i:'<path d="M8.5 19.5h11M4.6 16.2l7-7 5.8 5.8-4.2 4.2H7.6z"/>'},
+  {k:'plus', key:'+', lbl:'Ajouter une charge positive',
+   i:'<circle cx="12" cy="12" r="7.6"/><path d="M12 8.6v6.8M8.6 12h6.8"/>'},
+  {k:'minus', key:'−', lbl:'Ajouter une charge négative',
+   i:'<circle cx="12" cy="12" r="7.6"/><path d="M8.6 12h6.8"/>'},
+  {k:'pan', key:'␣', lbl:'Se déplacer dans la feuille',
+   i:'<path d="M12 4v9M12 20l-3.5-4M12 20l3.5-4M4 12h9M20 12l-4-3.5M20 12l-4 3.5"/>'}
+];
+
+function buildRail(){
+  $('#rail').innerHTML = TOOLS.map((t, i) =>
+    (i === 5 ? '<div class="rail-rule"></div>' : '') +
+    `<button class="tool" data-tool="${t.k}" title="${t.lbl} (${t.key})" aria-label="${t.lbl}">
+       ${svgIcon(t.i)}<em>${t.key}</em></button>`).join('');
+  $('#rail').addEventListener('click', e => {
+    const b = e.target.closest('[data-tool]');
+    if(b) setTool(b.dataset.tool);
+  });
+}
+
+const BOND_ICON = {
+  s:'<path d="M3 13h28"/>',
+  d:'<path d="M3 9h28M3 17h28"/>',
+  t:'<path d="M3 13h28M3 7h28M3 19h28"/>',
+  q:'<path d="M3 5.5h28M3 10.5h28M3 15.5h28M3 20.5h28"/>',
+  arom:'<path d="M3 9h28"/><path d="M5 17h26" stroke-dasharray="4 3"/>',
+  wedge:'<path d="M3 13L30 6.4V19.6z" stroke="none"/>',
+  hash:'<path d="M4 12.4v1.2M9 11.2v3.6M14 10v6M19 8.8v8.4M24 7.6v10.8M29 6.4v13.2"/>',
+  wavy:'<path d="M3 13q3.5-5 7 0t7 0 7 0 7 0" fill="none"/>',
+  dative:'<path d="M3 13h22"/><path d="M24 8.4L31 13l-7 4.6z" stroke="none"/>',
+  dot:'<path d="M3 13h28" stroke-dasharray="2 3.5"/>',
+  part:'<path d="M3 9h28"/><path d="M3 17h28" stroke-dasharray="3 3"/>',
+  dd:'<path d="M3 10.5h28M3 15.5h28"/>'
+};
+const bondSvg = k =>
+  `<svg viewBox="0 0 34 26" fill="none" stroke-width="1.7" stroke-linecap="round">${BOND_ICON[k]}</svg>`;
+
+const RING_ICON = n => {
+  const R = 9, pts = [];
+  for(let i = 0; i < n; i++){
+    const t = -Math.PI / 2 + i * TAU / n;
+    pts.push((12 + R * Math.cos(t)).toFixed(1) + ',' + (12 + R * Math.sin(t)).toFixed(1));
+  }
+  return `<svg viewBox="0 0 24 24"><polygon points="${pts.join(' ')}"/></svg>`;
+};
+
+function buildInspector(){
+  $('#insp').innerHTML = `
+  <section class="sect">
+    <h3>Élément <b id="curEl">C</b></h3>
+    <div class="chips" id="elChips"></div>
+    <details style="margin-top:7px">
+      <summary style="cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--chalk-2);letter-spacing:.1em">TOUS LES ÉLÉMENTS</summary>
+      <div class="chips" id="elAll" style="margin-top:6px"></div>
+    </details>
+  </section>
+
+  <section class="sect">
+    <h3>Groupe <b id="curGrp">OH</b></h3>
+    <div class="chips" id="grpChips"></div>
+  </section>
+
+  <section class="sect">
+    <h3>Liaison <b id="curBond">Simple</b></h3>
+    <div class="bondgrid" id="bondChips"></div>
+  </section>
+
+  <section class="sect">
+    <h3>Sélection</h3>
+    <div id="selBody"></div>
+  </section>
+
+  <section class="sect">
+    <h3>Gabarits</h3>
+    <div class="tmpl" id="ringT"></div>
+    <div class="btn2" style="margin-top:6px">
+      <button class="btn" data-tmpl="benz">Benzène</button>
+      <button class="btn" data-tmpl="arom">Cycle délocalisé</button>
+    </div>
+    <div class="btn2" style="margin-top:6px">
+      <button class="btn" data-tmpl="c4">Chaîne C4</button>
+      <button class="btn" data-tmpl="c6">Chaîne C6</button>
+    </div>
+    <p class="empty" style="margin:8px 0 0">Un cycle se soude à la liaison sélectionnée, sinon il est posé au centre.</p>
+  </section>
+
+  <section class="sect">
+    <h3>Affichage</h3>
+    <div class="row"><label for="oGrid">Grille hexagonale</label><input type="checkbox" id="oGrid" checked></div>
+    <div class="row"><label for="oSnap">Aimanter à la grille</label><input type="checkbox" id="oSnap" checked></div>
+    <div class="row"><label for="oHet">Colorer les hétéroatomes</label><input type="checkbox" id="oHet" checked></div>
+    <div class="row"><label for="oColor">Colorer aussi les carbones</label><input type="checkbox" id="oColor"></div>
+    <div class="row"><label for="oShowC">Écrire tous les C</label><input type="checkbox" id="oShowC"></div>
+    <div class="row"><label for="oSym">Doubles toujours symétriques</label><input type="checkbox" id="oSym"></div>
+    <div class="row"><label for="oDots">Lewis : liaisons en doublets</label><input type="checkbox" id="oDots"></div>
+    <div class="row"><label for="oShape">Pavage du fond</label>
+      <select id="oShape"><option value="auto">Auto</option><option value="hex">Hexagonal</option>
+      <option value="square">Rectangulaire</option></select></div>
+    <div class="row"><label>Écart des liaisons multiples</label>
+      <span class="stepper"><button id="gapM">−</button><span id="gapV">5.1</span><button id="gapP">+</button></span></div>
+    <div class="row"><label>Longueur de liaison</label>
+      <span class="stepper"><button id="lenM" title="Raccourcir">−</button><span id="lenV">46</span><button id="lenP" title="Rallonger">+</button></span></div>
+    <div class="row"><label>Taille des symboles</label>
+      <span class="stepper"><button id="fsM">−</button><span id="fsV">17</span><button id="fsP">+</button></span></div>
+    <button class="btn" id="oAlign">Poser la molécule sur la grille</button>
+  </section>
+
+  <section class="sect">
+    <h3>Exporter</h3>
+    <div class="row"><label for="oScale">Résolution</label>
+      <select id="oScale"><option value="1">1×</option><option value="2">2×</option>
+      <option value="3" selected>3×</option><option value="4">4×</option></select></div>
+    <div class="row"><label for="oBg">Fond</label>
+      <select id="oBg"><option value="white">Blanc</option><option value="paper">Papier</option>
+      <option value="none">Transparent</option></select></div>
+    <button class="btn accent" id="oPng">Enregistrer l'image PNG</button>
+    <button class="btn danger" id="oClear">Vider la feuille</button>
+  </section>`;
+
+  const DG = 'draggable="true"';
+  $('#elChips').innerHTML = EL_COMMON.map(e =>
+    `<button class="chip" ${DG} data-el="${e}" title="${e} — cliquer ou déposer sur la feuille">${e}</button>`).join('');
+  $('#elAll').innerHTML = EL_ALL.map(e =>
+    `<button class="chip" ${DG} data-el="${e}">${e}</button>`).join('');
+  $('#grpChips').innerHTML = GROUPS.map(g =>
+    `<button class="chip" ${DG} data-grp="${g.k}" title="${g.val ? 'Groupe (1 attache)' : 'Molécule entière'} — cliquer ou déposer">${
+      parseText(g.lbl).map(p => p.k === 'sub' ? `<sub>${p.t}</sub>` : p.t).join('')}</button>`).join('');
+  $('#bondChips').innerHTML = BONDS.map(b =>
+    `<button class="bnd" ${DG} data-bond="${b.k}" title="${b.lbl} — cliquer ou déposer sur une liaison">${bondSvg(b.k)}</button>`).join('');
+
+  $('#insp').addEventListener('dragstart', e => {
+    const el = e.target.closest('[data-el]'), g = e.target.closest('[data-grp]'), b = e.target.closest('[data-bond]');
+    const payload = el ? 'el:' + el.dataset.el : g ? 'grp:' + g.dataset.grp : b ? 'bond:' + b.dataset.bond : null;
+    if(!payload){ e.preventDefault(); return; }
+    e.dataTransfer.setData('text/plain', payload);
+    e.dataTransfer.effectAllowed = 'copy';
+  });
+  $('#ringT').innerHTML = [3, 4, 5, 6, 7, 8].map(n =>
+    `<button data-ring="${n}" title="Cycle à ${n} sommets">${RING_ICON(n)}</button>`).join('');
+
+  $('#insp').addEventListener('click', e => {
+    const el = e.target.closest('[data-el]');
+    if(el) return setElement(el.dataset.el);
+    const g = e.target.closest('[data-grp]');
+    if(g) return setGroup(g.dataset.grp);
+    const b = e.target.closest('[data-bond]');
+    if(b) return setBond(b.dataset.bond);
+    const r = e.target.closest('[data-ring]');
+    if(r) return insertRing(+r.dataset.ring, null);
+    const t = e.target.closest('[data-tmpl]');
+    if(t){
+      if(t.dataset.tmpl === 'benz') return insertRing(6, 'kekule');
+      if(t.dataset.tmpl === 'arom') return insertRing(6, 'arom');
+      if(t.dataset.tmpl === 'c4') return insertChain(4);
+      if(t.dataset.tmpl === 'c6') return insertChain(6);
+    }
+  });
+
+  const chk = (id, key, after) => $(id).addEventListener('change', e => {
+    ui[key] = e.target.checked; if(after) after(); refresh();
+  });
+  chk('#oGrid', 'grid'); chk('#oSnap', 'snap'); chk('#oColor', 'carbonColor');
+  chk('#oHet', 'heteroColor');
+  chk('#oShowC', 'showC'); chk('#oSym', 'symDouble'); chk('#oDots', 'lewisDots');
+  $('#oShape').addEventListener('change', e => { ui.gridShape = e.target.value; refresh(); });
+  $('#gapM').addEventListener('click', () => { ui.gap = Math.max(1.5, ui.gap - 0.6); refresh(); });
+  $('#gapP').addEventListener('click', () => { ui.gap = Math.min(14, ui.gap + 0.6); refresh(); });
+  $('#lenM').addEventListener('click', () => setBondLength(L - 4));
+  $('#lenP').addEventListener('click', () => setBondLength(L + 4));
+  $('#fsM').addEventListener('click', () => setTextSize(ui.fs - 1));
+  $('#fsP').addEventListener('click', () => setTextSize(ui.fs + 1));
+  $('#oAlign').addEventListener('click', () => {
+    if(!doc.atoms.length) return;
+    snapshot(); alignAll(); refresh(); toast('Atomes posés sur la grille');
+  });
+  $('#oScale').addEventListener('change', e => ui.scale = +e.target.value);
+  $('#oBg').addEventListener('change', e => ui.bg = e.target.value);
+  $('#oPng').addEventListener('click', exportPNG);
+  $('#oClear').addEventListener('click', () => {
+    if(!doc.atoms.length) return;
+    snapshot(); doc.atoms = []; doc.bonds = []; clearSel(); reindex(); refresh();
+    toast('Feuille vidée — Ctrl+Z pour revenir');
+  });
+}
+
+/* --------------------------------------------------- panneau de sélection */
+let lastSig = '';
+function selPanel(){
+  const sig = [...sel.a].join(',') + '|' + [...sel.b].join(',') + '|' + ui.mode;
+  const body = $('#selBody');
+  if(!body) return;
+  if(sig === lastSig && body.contains(document.activeElement)) return;
+  lastSig = sig;
+
+  if(sel.a.size === 1 && sel.b.size === 0){
+    const a = byId.get([...sel.a][0]);
+    if(!a) return;
+    const iss = valenceIssue(a);
+    body.innerHTML = `
+      <div class="row"><label>Symbole</label>
+        <input type="text" id="pEl" value="${a.type === 'group' ? (a.txt || '') : a.el}" spellcheck="false"></div>
+      <div class="row"><label>Étiquette libre</label>
+        <input type="text" id="pTxt" value="${a.type === 'group' ? '' : (a.txt || '')}" placeholder="ex. R, Nu, H2O" spellcheck="false"></div>
+      ${stepperRow(`Charge (${a.q || 0})`, 'pQ', a.q || 0)}
+      ${stepperRow(`Hydrogènes (${hCount(a)})`, 'pH', a.hSet === null || a.hSet === undefined ? 'auto' : a.hSet)}
+      ${stepperRow(`Doublets libres (${lonePairs(a)})`, 'pLp', a.lpSet === null || a.lpSet === undefined ? 'auto' : a.lpSet)}
+      ${stepperRow(`Électrons seuls (${a.rad || 0})`, 'pRad', a.rad || 0)}
+      <p class="empty" style="margin:9px 0 0">${
+        iss ? `<span style="color:var(--magenta)">${iss}</span>`
+            : `${Math.ceil(sumOrders(a.id))} liaison(s) · ${hCount(a)} H · ${lonePairs(a)} doublet(s) · charge ${a.q || 0}`}</p>
+      ${nbrs(a.id).length >= 2
+        ? `<button class="btn" id="pVsepr" title="Répulsion des doublets — hors grille (T)">Réorganiser les voisins</button>` : ''}
+      ${a.type === 'group' && GMAP[a.gk] && GMAP[a.gk].frag
+        ? `<button class="btn" id="pExpand">Développer le groupe</button>` : ''}
+      ${(a.hSet !== null && a.hSet !== undefined) || (a.lpSet !== null && a.lpSet !== undefined) || a.lpAng
+        ? `<button class="btn" id="pAuto">Revenir au calcul automatique</button>` : ''}
+      <button class="btn danger" id="pDel">Supprimer l'atome</button>`;
+
+    $('#pEl').addEventListener('change', e => {
+      const v = e.target.value.trim();
+      snapshot();
+      if(EL[v]){ a.el = v; a.type = 'atom'; a.gk = null; a.txt = null; }
+      else if(v){ a.type = 'atom'; a.txt = v; }
+      refresh();
+    });
+    $('#pTxt').addEventListener('change', e => {
+      snapshot(); a.txt = e.target.value.trim() || null; refresh();
+    });
+    wireStepper('pQ', d => { snapshot(); a.q = (a.q || 0) + d; refresh(); });
+    wireStepper('pH', d => {
+      snapshot();
+      const cur = a.hSet === null || a.hSet === undefined ? hCount(a) : a.hSet;
+      a.hSet = Math.max(0, cur + d); refresh();
+    });
+    wireStepper('pLp', d => {
+      snapshot();
+      const cur = a.lpSet === null || a.lpSet === undefined ? lonePairs(a) : a.lpSet;
+      a.lpSet = Math.max(0, cur + d); refresh();
+    });
+    wireStepper('pRad', d => { snapshot(); a.rad = Math.max(0, (a.rad || 0) + d); refresh(); });
+    const vs = $('#pVsepr');
+    if(vs) vs.addEventListener('click', () => {
+      if(vseprLayout(a.id)){ refresh(); toast('Voisins réarrangés selon la répulsion des doublets'); }
+    });
+    const ex = $('#pExpand'); if(ex) ex.addEventListener('click', () => expandGroup(a.id));
+    const au = $('#pAuto');
+    if(au) au.addEventListener('click', () => {
+      snapshot(); a.hSet = null; a.lpSet = null; a.lpAng = null; refresh();
+    });
+    $('#pDel').addEventListener('click', () => { snapshot(); delAtoms([a.id]); clearSel(); refresh(); });
+
+  }else if(sel.b.size === 1 && sel.a.size === 0){
+    const b = doc.bonds.find(x => sel.b.has(x.id));
+    if(!b) return;
+    const A = byId.get(b.a), B = byId.get(b.b);
+    body.innerHTML = `
+      <p class="empty" style="margin:0 0 8px">Liaison ${
+        A ? (A.txt || A.el) : '?'} — ${B ? (B.txt || B.el) : '?'} · <b style="color:var(--cyan-hi)">${
+        BMAP[b.k] ? BMAP[b.k].lbl : b.k}</b><br>Choisis un type ci-dessus pour la modifier.</p>
+      <button class="btn" id="bFlip">Inverser le sens du coin</button>
+      <button class="btn danger" id="bDel">Supprimer la liaison</button>`;
+    $('#bFlip').addEventListener('click', flipWedges);
+    $('#bDel').addEventListener('click', () => { snapshot(); delBonds([b.id]); clearSel(); refresh(); });
+
+  }else if(sel.a.size || sel.b.size){
+    body.innerHTML = `
+      <p class="empty" style="margin:0 0 8px">${sel.a.size} atome(s) et ${sel.b.size} liaison(s) sélectionnés.</p>
+      <button class="btn" id="mSnap">Poser sur la grille</button>
+      <button class="btn danger" id="mDel">Supprimer la sélection</button>`;
+    $('#mSnap').addEventListener('click', () => {
+      snapshot();
+      buildAdj(); findRings();
+      alignComponent([...sel.a]);          // translation : la forme est conservée
+      refresh();
+    });
+    $('#mDel').addEventListener('click', () => {
+      snapshot(); delBonds([...sel.b]); delAtoms([...sel.a]); clearSel(); refresh();
+    });
+  }else{
+    body.innerHTML = `<p class="empty">Rien de sélectionné.<br>
+      Avec l'outil <kbd>B</kbd>, clique un atome pour prolonger la chaîne, ou glisse pour choisir la direction.
+      Double-clique un atome pour l'ouvrir ici.</p>`;
+  }
+}
+function stepperRow(lbl, id, val){
+  return `<div class="row"><label>${lbl}</label>
+    <span class="stepper"><button data-st="${id}" data-d="-1">−</button>
+    <span id="${id}">${val}</span>
+    <button data-st="${id}" data-d="1">+</button></span></div>`;
+}
+function wireStepper(id, fn){
+  document.querySelectorAll(`[data-st="${id}"]`).forEach(b =>
+    b.addEventListener('click', () => fn(+b.dataset.d)));
+}
+
+/* ------------------------------------------------------------ synchro UI */
+function setTool(t){ ui.tool = t; syncUI(); updateHint(); }
+function setElement(e){
+  if(sel.a.size){
+    snapshot();
+    for(const id of sel.a){
+      const a = byId.get(id);
+      if(a){ a.el = e; a.type = 'atom'; a.gk = null; a.txt = null; }
+    }
+    ui.el = e; refresh(); return;
+  }
+  ui.el = e;
+  if(ui.tool === 'group') ui.tool = 'bond';
+  syncUI();
+}
+function setGroup(g){
+  if(sel.a.size){
+    snapshot();
+    for(const id of sel.a){
+      const a = byId.get(id);
+      if(a){ a.type = 'group'; a.gk = g; a.txt = GMAP[g].lbl; }
+    }
+    ui.group = g; refresh(); return;
+  }
+  ui.group = g; ui.tool = 'group'; syncUI(); updateHint();
+}
+function setBond(k){
+  if(sel.b.size){
+    snapshot();
+    for(const b of doc.bonds) if(sel.b.has(b.id)) b.k = k;
+    ui.bond = k; refresh(); return;
+  }
+  ui.bond = k;
+  if(ui.tool === 'select') ui.tool = 'bond';
+  syncUI(); updateHint();
+}
+/** Change la longueur de liaison : le dessin suit, le cadrage ne bouge pas. */
+function setBondLength(v){
+  v = Math.max(24, Math.min(96, Math.round(v)));
+  if(v === L) return;
+  const r = v / L;
+  if(doc.atoms.length) snapshot();
+  for(const a of doc.atoms){ a.x *= r; a.y *= r; }
+  L = v;
+  view.k /= r;                       // les atomes gardent leur place à l'écran
+  alignAll();
+  refresh();
+}
+function setTextSize(v){
+  ui.fs = Math.max(10, Math.min(30, Math.round(v)));
+  refresh();
+}
+function setMode(m){
+  if(!VIEWS[m]) return;
+  const prev = ui.mode;
+  ui.mode = m;                                  // le pavage du fond suit la vue
+  if(m === 'fischer' && prev !== m && doc.atoms.length){
+    snapshot();
+    fischerLayout();
+    if(ui.snap) alignAll();
+    toast('Chaîne redressée · fond rectangulaire');
+  }
+  refresh();
+}
+function syncUI(){
+  document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === ui.tool));
+  document.querySelectorAll('[data-el]').forEach(b => b.classList.toggle('on', b.dataset.el === ui.el));
+  document.querySelectorAll('[data-grp]').forEach(b => b.classList.toggle('on', b.dataset.grp === ui.group));
+  document.querySelectorAll('[data-bond]').forEach(b => b.classList.toggle('on', b.dataset.bond === ui.bond));
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === ui.mode));
+  const a = $('#curEl'), g = $('#curGrp'), bd = $('#curBond');
+  if(a) a.textContent = ui.el;
+  if(g) g.textContent = GMAP[ui.group].lbl;
+  if(bd) bd.textContent = BMAP[ui.bond].lbl;
+  const lv = $('#lenV'), fv = $('#fsV'), gv = $('#gapV');
+  if(lv) lv.textContent = L;
+  if(fv) fv.textContent = ui.fs;
+  if(gv) gv.textContent = ui.gap.toFixed(1);
+  selPanel();
+}
+const HINTS = {
+  select:'glisser le fond pour se déplacer · Maj+glisser pour encadrer',
+  bond:'clic sur un atome = prolonger · glisser = choisir la direction',
+  atom:'clic pour poser un atome',
+  group:'clic pour poser le groupe · clic sur un atome pour le remplacer',
+  erase:'clic sur un atome ou une liaison pour l’effacer',
+  plus:'clic sur un atome pour ajouter une charge +',
+  minus:'clic sur un atome pour ajouter une charge −',
+  lewisEdit:'',
+  pan:'glisser pour déplacer la feuille'
+};
+function updateHint(){
+  const h = $('#hint');
+  if(h) h.textContent = ui.tool === 'atom' ? `clic pour poser un ${ui.el}` : HINTS[ui.tool];
+}
+function updatePlate(){
+  const c = formulaCounts();
+  const f = hillFormula(c);
+  const q = totalCharge();
+  $('#fFormula').innerHTML = f
+    ? f + (q ? `<sup>${Math.abs(q) > 1 ? Math.abs(q) : ''}${q > 0 ? '+' : '\u2212'}</sup>` : '')
+    : '<span style="color:#6B7D88;font-size:14px">feuille vide</span>';
+  $('#fMass').textContent = f ? `M = ${molarMass(c).toFixed(2)} g·mol⁻¹` : '';
+  const issues = [];
+  for(const a of doc.atoms){ const i = valenceIssue(a); if(i) issues.push(i); }
+  const w = $('#fWarn');
+  if(issues.length){
+    w.classList.remove('hide');
+    w.innerHTML = issues.slice(0, 3).map(t => '⚠ ' + t).join('<br>') +
+      (issues.length > 3 ? `<br>… ${issues.length - 3} autre(s)` : '');
+  }else w.classList.add('hide');
+}
+function refresh(){
+  reindex(); buildAdj(); findRings();
+  draw(); updatePlate(); syncUI();
+}
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2100);
+}
+function openInspector(){ $('#insp').classList.add('open'); }
+function closeHelp(){ $('#help').classList.remove('open'); }
+
+/* ============================================================================
+   VUE, EXPORT, FICHIERS
+   ============================================================================ */
+function sceneBBox(measureCtx){
+  buildAdj(); findRings();
+  const sc = buildScene(ui.mode, measureCtx, ui.fs);
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity, any = false;
+  const eat = (a, b, c, d) => { x1 = Math.min(x1, a); y1 = Math.min(y1, b); x2 = Math.max(x2, c); y2 = Math.max(y2, d); any = true; };
+  for(const [, n] of sc.nodes){
+    if(n.box) eat(n.box.x1, n.box.y1, n.box.x2, n.box.y2);
+    else eat(n.x - 5, n.y - 5, n.x + 5, n.y + 5);
+  }
+  for(const d of sc.dots){
+    const cx = d.x + Math.cos(d.ang) * d.r, cy = d.y + Math.sin(d.ang) * d.r;
+    eat(cx - d.fs * 0.3, cy - d.fs * 0.3, cx + d.fs * 0.3, cy + d.fs * 0.3);
+  }
+  return any ? {x1, y1, x2, y2} : null;
+}
+function fitView(){
+  const bb = sceneBBox(ctx);
+  const r = stage.getBoundingClientRect();
+  if(!bb){ view = {x:r.width / 2, y:r.height / 2, k:1}; draw(); return; }
+  const pad = 48;
+  const k = Math.max(0.2, Math.min(2.4,
+    Math.min((r.width - pad * 2) / Math.max(1, bb.x2 - bb.x1),
+             (r.height - pad * 2) / Math.max(1, bb.y2 - bb.y1))));
+  view.k = k;
+  view.x = r.width / 2 - (bb.x1 + bb.x2) / 2 * k;
+  view.y = r.height / 2 - (bb.y1 + bb.y2) / 2 * k;
+  draw();
+}
+function zoomBy(f){
+  const r = stage.getBoundingClientRect();
+  const k = Math.max(0.15, Math.min(6, view.k * f));
+  view.x = r.width / 2 - (r.width / 2 - view.x) * (k / view.k);
+  view.y = r.height / 2 - (r.height / 2 - view.y) * (k / view.k);
+  view.k = k; draw();
+}
+
+function exportPNG(){
+  const probe = document.createElement('canvas').getContext('2d');
+  const bb = sceneBBox(probe);
+  if(!bb){ toast('Rien à exporter'); return; }
+  const pad = 28, k = ui.scale;
+  const w = Math.ceil((bb.x2 - bb.x1 + pad * 2) * k);
+  const h = Math.ceil((bb.y2 - bb.y1 + pad * 2) * k);
+  const off = document.createElement('canvas');
+  off.width = w; off.height = h;
+  const c2 = off.getContext('2d');
+  const bg = ui.bg === 'white' ? '#FFFFFF' : ui.bg === 'paper' ? PAPER : null;
+  drawScene(c2, {
+    ox:(-bb.x1 + pad) * k, oy:(-bb.y1 + pad) * k, k, mode:ui.mode,
+    grid:false, uiLayer:false, w, h, bg, maskColor:bg
+  });
+  off.toBlob(b => {
+    const url = URL.createObjectURL(b);
+    const a = document.createElement('a');
+    const f = hillFormula(formulaCounts()) || 'molecule';
+    a.href = url;
+    a.download = f.replace(/<[^>]+>/g, '') + '-' + VIEWS[ui.mode].lbl.toLowerCase().replace(/[^a-z]/g, '') + '.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Image enregistrée');
+  }, 'image/png');
+}
+function saveFile(){
+  const blob = new Blob([JSON.stringify({v:1, doc, mode:ui.mode}, null, 1)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (hillFormula(formulaCounts()) || 'molecule').replace(/<[^>]+>/g, '') + '.paillasse.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast('Fichier enregistré');
+}
+function openFile(file){
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const j = JSON.parse(rd.result);
+      if(!j.doc || !Array.isArray(j.doc.atoms)) throw 0;
+      snapshot();
+      doc = j.doc;
+      doc.nid = Math.max(1, ...doc.atoms.map(a => a.id), ...doc.bonds.map(b => b.id)) + 1;
+      if(j.mode && VIEWS[j.mode]) ui.mode = j.mode;
+      clearSel(); reindex();
+      if(ui.snap) alignAll();
+      refresh(); fitView();
+      toast('Fichier ouvert');
+    }catch(err){ toast('Fichier illisible — attendu : .paillasse.json'); }
+  };
+  rd.readAsText(file);
+}
+
+/* ============================================================================
+   DÉMARRAGE
+   ============================================================================ */
+function demo(){
+  const ring = [];
+  for(let i = 0; i < 6; i++) ring.push(addAtom(0, 0, 'C'));
+  for(let i = 0; i < 6; i++) addBond(ring[i].id, ring[(i + 1) % 6].id, i % 2 ? 's' : 'd');
+  const oh = addAtom(0, 0, 'O');  addBond(ring[0].id, oh.id, 's');
+  const n  = addAtom(0, 0, 'N');  addBond(ring[3].id, n.id, 's');
+  const c  = addAtom(0, 0, 'C');  addBond(n.id, c.id, 's');
+  const o2 = addAtom(0, 0, 'O');  addBond(c.id, o2.id, 'd');
+  const me = addAtom(0, 0, 'C');  addBond(c.id, me.id, 's');
+  reindex(); buildAdj(); findRings(); tidy();
+  hist.length = 0; future.length = 0;
+}
+
+buildRail();
+buildInspector();
+demo();
+reindex();
+refresh();
+new ResizeObserver(() => resizeCanvas()).observe(stage);
+resizeCanvas();
+fitView();
+updateHint();
+
+$('#views').addEventListener('click', e => {
+  const b = e.target.closest('[data-view]');
+  if(b) setMode(b.dataset.view);
+});
+$('#btnTidy').addEventListener('click', () => { tidy(); refresh(); fitView(); toast('Schéma réorganisé'); });
+$('#btnPng').addEventListener('click', exportPNG);
+$('#btnSave').addEventListener('click', saveFile);
+$('#btnOpen').addEventListener('click', () => $('#fileIn').click());
+$('#fileIn').addEventListener('change', e => { if(e.target.files[0]) openFile(e.target.files[0]); e.target.value = ''; });
+$('#btnHelp').addEventListener('click', () => $('#help').classList.add('open'));
+$('#helpClose').addEventListener('click', closeHelp);
+$('#help').addEventListener('click', e => { if(e.target.id === 'help') closeHelp(); });
+$('#inspToggle').addEventListener('click', () => $('#insp').classList.toggle('open'));
+$('#zIn').addEventListener('click', () => zoomBy(1.25));
+$('#zOut').addEventListener('click', () => zoomBy(0.8));
+$('#zFit').addEventListener('click', fitView);
+
+</script>
+</body>
+</html>

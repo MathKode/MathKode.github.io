@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calque — éditeur de schémas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14161B;
+  --ink-2:#1B1E25;
+  --ink-3:#232731;
+  --line:#2E333F;
+  --paper:#F4F3EE;
+  --text:#E9E8E4;
+  --muted:#8B909D;
+  --accent:#FFC53D;
+  --accent-dim:#B08420;
+  --teal:#3AA391;
+  --danger:#E4685D;
+  --ui:"Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --rail:236px;
+  --insp:272px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ink);color:var(--text);
+  font-family:var(--ui);font-size:13px;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:3px}
+
+#app{display:grid;grid-template-columns:var(--rail) 1fr var(--insp);height:100dvh}
+
+/* ---------- panneaux ---------- */
+.panel{background:var(--ink);display:flex;flex-direction:column;min-height:0}
+#rail{border-right:1px solid var(--line)}
+#inspector{border-left:1px solid var(--line)}
+.panel-head{
+  display:flex;align-items:baseline;gap:8px;
+  padding:16px 16px 12px;border-bottom:1px solid var(--line);
+}
+.wordmark{font-weight:700;font-size:15px;letter-spacing:-.02em}
+.wordmark .dot{color:var(--accent)}
+.panel-head .tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);
+}
+.panel-body{overflow-y:auto;flex:1;min-height:0;padding-bottom:16px}
+.panel-body::-webkit-scrollbar{width:8px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:8px}
+
+/* ---------- menus déroulants ---------- */
+details{border-bottom:1px solid var(--line)}
+summary{
+  list-style:none;cursor:pointer;padding:11px 16px;
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);user-select:none;
+}
+summary::-webkit-details-marker{display:none}
+summary:hover{color:var(--text)}
+summary .chev{
+  margin-left:auto;width:8px;height:8px;border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .18s ease;
+}
+details[open] summary{color:var(--text)}
+details[open] summary .chev{transform:rotate(45deg)}
+.details-inner{padding:2px 12px 14px}
+
+/* ---------- palette de formes ---------- */
+.shape-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tool{
+  background:var(--ink-2);border:1px solid var(--line);border-radius:7px;
+  padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;
+  cursor:pointer;transition:border-color .14s,background .14s,transform .14s;
+}
+.tool:hover{background:var(--ink-3);border-color:#3D4457}
+.tool:active{transform:translateY(1px)}
+.tool svg{display:block}
+.tool span{font-size:11px;color:var(--muted)}
+.tool[aria-pressed="true"]{border-color:var(--accent);background:#2A2417}
+.tool[aria-pressed="true"] span{color:var(--accent)}
+.tool[aria-pressed="true"] svg *{stroke:var(--accent)}
+
+.stack{display:flex;flex-direction:column;gap:6px}
+.btn{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:var(--ink-2);border:1px solid var(--line);border-radius:7px;
+  padding:9px 11px;cursor:pointer;color:var(--text);
+  transition:background .14s,border-color .14s;
+}
+.btn:hover{background:var(--ink-3);border-color:#3D4457}
+.btn .k{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.btn.primary{background:var(--accent);color:#14161B;border-color:var(--accent);font-weight:500}
+.btn.primary:hover{background:#FFD264}
+.btn.primary .k{color:#6B5312}
+.btn.ghost{background:transparent}
+.btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+.hint{
+  font-size:11px;line-height:1.55;color:var(--muted);
+  padding:0 4px;
+}
+.hint b{color:var(--text);font-weight:500}
+kbd{
+  font-family:var(--mono);font-size:10px;background:var(--ink-3);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+  padding:1px 5px;color:var(--text);
+}
+
+/* ---------- scène ---------- */
+#stage{position:relative;background:var(--paper);overflow:hidden;touch-action:none}
+#canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:default}
+#stage[data-tool="pan"] #canvas{cursor:grab}
+#stage[data-panning="1"] #canvas{cursor:grabbing}
+#stage[data-tool="shape"] #canvas{cursor:crosshair}
+#stage[data-tool="arrow"] #canvas{cursor:crosshair}
+.shape{cursor:move}
+.anchor{cursor:crosshair}
+.handle{cursor:nwse-resize}
+.handle[data-h="n"],.handle[data-h="s"]{cursor:ns-resize}
+.handle[data-h="e"],.handle[data-h="w"]{cursor:ew-resize}
+.handle[data-h="ne"],.handle[data-h="sw"]{cursor:nesw-resize}
+
+/* ---------- overlays scène ---------- */
+#empty{
+  position:absolute;inset:0;display:grid;place-content:center;justify-items:center;
+  gap:10px;text-align:center;pointer-events:none;color:#8C8A80;
+}
+#empty .big{font-size:15px;color:#4A4940;font-weight:500}
+#empty .small{font-size:12px;max-width:290px;line-height:1.6}
+#empty[hidden]{display:none}
+
+#editor{
+  position:absolute;display:none;margin:0;padding:8px;resize:none;
+  background:#fff;border:2px solid var(--accent);border-radius:4px;
+  color:#1B1E24;overflow:hidden;text-align:center;line-height:1.35;
+  box-shadow:0 6px 22px rgba(20,22,27,.18);
+}
+
+.hud{
+  position:absolute;display:flex;align-items:center;gap:2px;
+  background:rgba(20,22,27,.94);border:1px solid #30343F;border-radius:9px;
+  padding:4px;box-shadow:0 8px 24px rgba(20,22,27,.22);
+}
+#zoom-hud{right:14px;bottom:14px}
+#zoom-hud button{
+  background:none;border:0;color:var(--text);cursor:pointer;
+  width:28px;height:26px;border-radius:6px;font-size:14px;line-height:1;
+}
+#zoom-hud button:hover{background:var(--ink-3)}
+#zoom-hud .lvl{
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  min-width:46px;text-align:center;cursor:pointer;background:none;border:0;
+}
+#status{
+  left:14px;bottom:14px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  padding:7px 11px;gap:8px;
+}
+#status .sep{width:1px;height:11px;background:#30343F}
+#status b{color:var(--accent);font-weight:500}
+
+/* ---------- inspecteur ---------- */
+.insp-empty{padding:26px 18px;color:var(--muted);font-size:12px;line-height:1.6}
+.field{padding:0 16px;margin-bottom:12px}
+.field > label,.field-label{
+  display:block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px;
+}
+.row{display:flex;gap:6px;align-items:center}
+.row.two > *{flex:1;min-width:0}
+input[type="text"],input[type="number"],select,textarea.prop{
+  width:100%;background:var(--ink-2);border:1px solid var(--line);border-radius:6px;
+  padding:7px 9px;font-size:12px;
+}
+textarea.prop{resize:vertical;min-height:64px;line-height:1.45;font-family:var(--ui)}
+input[type="number"]{font-family:var(--mono);font-size:11px}
+select{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 14px) 13px,calc(100% - 9px) 13px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:26px}
+input:focus,select:focus,textarea:focus{border-color:#4A5164;outline:none}
+input[type="color"]{
+  -webkit-appearance:none;appearance:none;width:34px;height:30px;padding:0;
+  border:1px solid var(--line);border-radius:6px;background:var(--ink-2);cursor:pointer;flex:0 0 auto;
+}
+input[type="color"]::-webkit-color-swatch-wrapper{padding:3px}
+input[type="color"]::-webkit-color-swatch{border:0;border-radius:4px}
+input[type="range"]{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;background:none;cursor:pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track{height:3px;background:var(--ink-3);border-radius:3px}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);
+  margin-top:-5px;border:0;
+}
+input[type="range"]::-moz-range-track{height:3px;background:var(--ink-3);border-radius:3px}
+input[type="range"]::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:var(--accent)}
+.val{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:38px;text-align:right}
+.seg{display:flex;background:var(--ink-2);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{
+  flex:1;background:none;border:0;padding:7px 4px;cursor:pointer;color:var(--muted);
+  font-size:11px;border-right:1px solid var(--line);
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--ink-3);color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#14161B;font-weight:500}
+.swatches{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.swatch{
+  width:19px;height:19px;border-radius:5px;border:1px solid rgba(255,255,255,.16);cursor:pointer;padding:0;
+}
+.swatch.none{background:var(--ink-2);position:relative;overflow:hidden}
+.swatch.none::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent 45%,var(--danger) 45%,var(--danger) 55%,transparent 55%);
+}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.insp-title{
+  display:flex;align-items:center;gap:8px;padding:14px 16px 12px;
+}
+.insp-title .name{font-weight:500;font-size:13px}
+.insp-title .badge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-dim);border-radius:4px;padding:2px 6px;
+}
+
+/* ---------- responsive ---------- */
+.panel-toggle{display:none}
+@media (max-width:900px){
+  #app{grid-template-columns:1fr}
+  .panel{
+    position:absolute;top:0;bottom:0;width:246px;z-index:20;
+    box-shadow:0 0 40px rgba(0,0,0,.4);transition:transform .22s ease;
+  }
+  #rail{left:0;transform:translateX(-100%)}
+  #inspector{right:0;transform:translateX(100%)}
+  .panel.open{transform:none}
+  .panel-toggle{
+    display:flex;position:absolute;top:12px;z-index:21;align-items:center;gap:6px;
+    background:rgba(20,22,27,.94);border:1px solid #30343F;color:var(--text);
+    border-radius:8px;padding:8px 11px;cursor:pointer;font-family:var(--mono);
+    font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  }
+  #toggle-rail{left:12px}
+  #toggle-insp{right:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════ RAIL GAUCHE ══════════ -->
+  <aside class="panel" id="rail">
+    <div class="panel-head">
+      <span class="wordmark">Calque<span class="dot">.</span></span>
+      <span class="tag">maquette</span>
+    </div>
+    <div class="panel-body">
+
+      <details open>
+        <summary>Formes <i class="chev"></i></summary>
+        <div class="details-inner">
+          <div class="shape-grid" id="shape-palette"></div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Liens <i class="chev"></i></summary>
+        <div class="details-inner stack">
+          <button class="btn" id="tool-arrow" aria-pressed="false">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h5a2 2 0 0 1 2 2v6h3" stroke="#8B909D" stroke-width="1.4"/><path d="M11 8.5 14 11l-3 2.5z" fill="#8B909D"/></svg>
+            Relier deux formes <span class="k">A</span>
+          </button>
+          <p class="hint">Ou tirez depuis un <b>point de connexion</b> (les ronds jaunes d'une forme sélectionnée) jusqu'à la forme cible. Les flèches suivent la grille, jamais de diagonale.</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Toile <i class="chev"></i></summary>
+        <div class="details-inner stack">
+          <button class="btn" id="btn-fit">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8B909D" stroke-width="1.4"><path d="M2 5.5V2h3.5M14 5.5V2h-3.5M2 10.5V14h3.5M14 10.5V14h-3.5"/></svg>
+            Tout afficher <span class="k">⇧1</span>
+          </button>
+          <button class="btn" id="btn-reset">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8B909D" stroke-width="1.4"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>
+            Recentrer à 100 % <span class="k">⇧0</span>
+          </button>
+          <button class="btn danger" id="btn-clear">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8B909D" stroke-width="1.4"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5 5 13h6l.5-8.5"/></svg>
+            Vider la toile
+          </button>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Exporter <i class="chev"></i></summary>
+        <div class="details-inner stack">
+          <button class="btn primary" id="btn-png">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#14161B" stroke-width="1.5"><path d="M8 2v8m0 0L5 7m3 3 3-3M3 12v2h10v-2"/></svg>
+            Télécharger le PNG
+          </button>
+          <button class="btn ghost" id="btn-svg">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8B909D" stroke-width="1.4"><path d="M8 2v8m0 0L5 7m3 3 3-3M3 12v2h10v-2"/></svg>
+            Télécharger le SVG
+          </button>
+          <label class="hint" style="display:flex;gap:7px;align-items:center;padding-top:2px">
+            <input type="checkbox" id="opt-bg" checked style="accent-color:var(--accent)">
+            Fond blanc dans l'image
+          </label>
+        </div>
+      </details>
+
+      <details>
+        <summary>Raccourcis <i class="chev"></i></summary>
+        <div class="details-inner">
+          <p class="hint">
+            <kbd>V</kbd> sélection · <kbd>R</kbd> rectangle · <kbd>O</kbd> ellipse · <kbd>D</kbd> losange · <kbd>T</kbd> texte · <kbd>A</kbd> flèche<br><br>
+            <kbd>Double-clic</kbd> écrire dans une forme · <kbd>Suppr</kbd> supprimer · <kbd>⌘Z</kbd> annuler · <kbd>⌘⇧Z</kbd> rétablir · <kbd>⌘D</kbd> dupliquer<br><br>
+            <kbd>Molette</kbd> se déplacer · <kbd>⌘ + molette</kbd> zoomer · <kbd>Glisser le fond</kbd> naviguer
+          </p>
+        </div>
+      </details>
+
+    </div>
+  </aside>
+
+  <!-- ══════════ SCÈNE ══════════ -->
+  <main id="stage" data-tool="select">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+          <path id="grid-minor" fill="none" stroke="#DEDCD2" stroke-width="1"
+            d="M0 20h100M0 40h100M0 60h100M0 80h100M20 0v100M40 0v100M60 0v100M80 0v100"/>
+          <path id="grid-major" fill="none" stroke="#CDCABC" stroke-width="1.2" d="M0 0h100M0 0v100"/>
+        </pattern>
+      </defs>
+      <rect id="bg" x="0" y="0" width="100%" height="100%" fill="url(#grid)"></rect>
+      <g id="scene">
+        <g id="layer-arrows"></g>
+        <g id="layer-shapes"></g>
+        <g id="layer-ui"></g>
+      </g>
+    </svg>
+
+    <div id="empty">
+      <div class="big">La toile est vide</div>
+      <div class="small">Choisissez une forme dans le menu de gauche, puis cliquez sur la grille pour la poser.</div>
+    </div>
+
+    <textarea id="editor" spellcheck="false"></textarea>
+
+    <button class="panel-toggle" id="toggle-rail">Formes</button>
+    <button class="panel-toggle" id="toggle-insp">Réglages</button>
+
+    <div class="hud" id="status">
+      <span id="status-mode">Sélection</span>
+      <i class="sep"></i>
+      <span id="status-count">0 forme</span>
+    </div>
+
+    <div class="hud" id="zoom-hud">
+      <button id="zoom-out" title="Dézoomer">−</button>
+      <button class="lvl" id="zoom-lvl" title="Revenir à 100 %">100 %</button>
+      <button id="zoom-in" title="Zoomer">+</button>
+    </div>
+  </main>
+
+  <!-- ══════════ INSPECTEUR DROIT ══════════ -->
+  <aside class="panel" id="inspector">
+    <div class="panel-head">
+      <span class="wordmark" style="font-size:13px">Réglages</span>
+      <span class="tag" id="insp-tag">rien de sélectionné</span>
+    </div>
+    <div class="panel-body" id="insp-body"></div>
+  </aside>
+
+</div>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   Calque — maquette d'éditeur de schémas (statique, sans dépendance)
+   ═══════════════════════════════════════════════════════════ */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const GRID = 20;                 // grille invisible d'accrochage
+const HALF = 10;                 // pas des couloirs de flèches
+const SHAPE_FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const MINW = 40, MINH = 30;
+const $ = s => document.querySelector(s);
+const meas = document.createElement('canvas').getContext('2d');
+
+const TYPES = {
+  rect:    { label:'Rectangle', w:180, h:100 },
+  square:  { label:'Carré',     w:120, h:120 },
+  diamond: { label:'Losange',   w:170, h:120 },
+  ellipse: { label:'Ellipse',   w:170, h:110 },
+  round:   { label:'Pilule',    w:180, h:70  },
+  text:    { label:'Texte',     w:160, h:44  }
+};
+const PREVIEW = {
+  rect:    '<rect x="3" y="6" width="28" height="16" rx="3"/>',
+  square:  '<rect x="7" y="4" width="20" height="20" rx="3"/>',
+  diamond: '<path d="M17 3 31 14 17 25 3 14z"/>',
+  ellipse: '<ellipse cx="17" cy="14" rx="14" ry="9"/>',
+  round:   '<rect x="3" y="6" width="28" height="16" rx="8"/>',
+  text:    '<path d="M6 7h22M17 7v16M12 23h10"/>'
+};
+
+let state = { shapes:[], arrows:[] , sel:null };
+let view  = { x:0, y:0, k:1 };
+let tool  = 'select';            // 'select' | 'arrow' | un type de forme
+let editing = null;              // id de la forme en cours d'édition texte
+let hovered = null;
+let pending = null;              // source de l'outil flèche
+let seq = 1;
+
+const canvas = $('#canvas'), stage = $('#stage'), scene = $('#scene');
+const layerA = $('#layer-arrows'), layerS = $('#layer-shapes'), layerU = $('#layer-ui');
+
+/* ── utilitaires ───────────────────────────────────────── */
+const uid  = p => p + (seq++);
+const snap = (v, g=GRID) => Math.round(v/g)*g;
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const byId = id => state.shapes.find(s => s.id === id);
+const arrowById = id => state.arrows.find(a => a.id === id);
+
+function el(tag, attrs={}, parent){
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function dashOf(style, w){
+  if (style === 'dashed') return (w*3.2)+' '+(w*2.6);
+  if (style === 'dotted') return '0.1 '+(w*2.4);
+  return null;
+}
+function worldOf(e){
+  const r = canvas.getBoundingClientRect();
+  return { x:(e.clientX - r.left - view.x)/view.k, y:(e.clientY - r.top - view.y)/view.k };
+}
+
+/* ── historique ────────────────────────────────────────── */
+let undoStack = [], redoStack = [], pendingSnap = null;
+const snapshot = () => JSON.stringify({ shapes:state.shapes, arrows:state.arrows });
+function begin(){ if (pendingSnap === null) pendingSnap = snapshot(); }
+function commit(){
+  if (pendingSnap === null) return;
+  if (pendingSnap !== snapshot()){ undoStack.push(pendingSnap); if (undoStack.length > 80) undoStack.shift(); redoStack.length = 0; }
+  pendingSnap = null;
+}
+function restore(str){
+  const d = JSON.parse(str);
+  state.shapes = d.shapes; state.arrows = d.arrows;
+  if (state.sel && !byId(state.sel.id) && !arrowById(state.sel.id)) state.sel = null;
+  render(); buildInspector();
+}
+function undo(){ if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); }
+function redo(){ if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); }
+
+/* ── modèle ────────────────────────────────────────────── */
+function newShape(type, cx, cy){
+  const t = TYPES[type];
+  return {
+    id:uid('f'), type,
+    x:snap(cx - t.w/2), y:snap(cy - t.h/2), w:t.w, h:t.h,
+    text: type === 'text' ? 'Texte libre' : t.label,
+    fill: type === 'text' ? 'none' : '#FFFFFF',
+    stroke: type === 'text' ? 'none' : '#2B303B',
+    sw: 2, dash:'solid',
+    radius: (type === 'round') ? 999 : (type === 'rect' || type === 'square') ? 8 : 0,
+    opacity: 1,
+    fontSize: 15, fontColor:'#22262F', bold:false, align:'center'
+  };
+}
+function addShape(type, cx, cy){
+  begin();
+  const s = newShape(type, cx, cy);
+  state.shapes.push(s);
+  state.sel = { kind:'shape', id:s.id };
+  commit(); render(); buildInspector();
+  return s;
+}
+function connect(fromId, toId, fromSide){
+  if (fromId === toId) return null;
+  const dup = state.arrows.find(a => a.from.id === fromId && a.to.id === toId);
+  if (dup) return dup;
+  begin();
+  const a = { id:uid('l'), from:{ id:fromId, side:fromSide||null }, to:{ id:toId, side:null },
+              stroke:'#2B303B', sw:2, dash:'solid', head:'end', label:'' };
+  state.arrows.push(a);
+  state.sel = { kind:'arrow', id:a.id };
+  commit(); render(); buildInspector();
+  return a;
+}
+function removeSelected(){
+  if (!state.sel) return;
+  begin();
+  if (state.sel.kind === 'shape'){
+    state.shapes = state.shapes.filter(s => s.id !== state.sel.id);
+    state.arrows = state.arrows.filter(a => a.from.id !== state.sel.id && a.to.id !== state.sel.id);
+  } else {
+    state.arrows = state.arrows.filter(a => a.id !== state.sel.id);
+  }
+  state.sel = null;
+  commit(); render(); buildInspector();
+}
+function duplicateSelected(){
+  if (!state.sel || state.sel.kind !== 'shape') return;
+  begin();
+  const c = JSON.parse(JSON.stringify(byId(state.sel.id)));
+  c.id = uid('f'); c.x += GRID*2; c.y += GRID*2;
+  state.shapes.push(c);
+  state.sel = { kind:'shape', id:c.id };
+  commit(); render(); buildInspector();
+}
+
+/* ── géométrie des formes ──────────────────────────────── */
+const center = s => ({ x:s.x + s.w/2, y:s.y + s.h/2 });
+function anchorPoint(s, side){
+  const c = center(s);
+  if (side === 'left')   return { x:s.x,       y:snap(c.y, HALF) };
+  if (side === 'right')  return { x:s.x + s.w, y:snap(c.y, HALF) };
+  if (side === 'top')    return { x:snap(c.x, HALF), y:s.y };
+  return { x:snap(c.x, HALF), y:s.y + s.h };
+}
+const DIR = { left:{x:-1,y:0}, right:{x:1,y:0}, top:{x:0,y:-1}, bottom:{x:0,y:1} };
+
+/* ── routage orthogonal (jamais de diagonale) ──────────── */
+function autoSides(s, t){
+  const a = center(s), b = center(t);
+  const dx = b.x - a.x, dy = b.y - a.y;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? ['right','left'] : ['left','right'];
+  return dy >= 0 ? ['bottom','top'] : ['top','bottom'];
+}
+function routeOf(a){
+  const s = byId(a.from.id), t = byId(a.to.id);
+  if (!s || !t) return null;
+  const auto = autoSides(s, t);
+  const sSide = a.from.side || auto[0];
+  const tSide = a.to.side   || auto[1];
+  const p1 = anchorPoint(s, sSide), p2 = anchorPoint(t, tSide);
+  const d1 = DIR[sSide], d2 = DIR[tSide];
+  const M = 24;
+  const a1 = { x:p1.x + d1.x*M, y:p1.y + d1.y*M };
+  const b1 = { x:p2.x + d2.x*M, y:p2.y + d2.y*M };
+  const pts = [p1, a1];
+  const h1 = d1.x !== 0, h2 = d2.x !== 0;
+  if (h1 && h2){
+    if (Math.abs(a1.y - b1.y) > 0.5){
+      const mx = snap((a1.x + b1.x)/2, HALF);
+      pts.push({ x:mx, y:a1.y }, { x:mx, y:b1.y });
+    }
+  } else if (!h1 && !h2){
+    if (Math.abs(a1.x - b1.x) > 0.5){
+      const my = snap((a1.y + b1.y)/2, HALF);
+      pts.push({ x:a1.x, y:my }, { x:b1.x, y:my });
+    }
+  } else if (h1){
+    pts.push({ x:b1.x, y:a1.y });
+  } else {
+    pts.push({ x:a1.x, y:b1.y });
+  }
+  pts.push(b1, p2);
+  // supprime les points confondus et les points alignés inutiles
+  const out = [];
+  for (const p of pts){
+    const last = out[out.length-1];
+    if (!last || Math.abs(last.x - p.x) > 0.5 || Math.abs(last.y - p.y) > 0.5) out.push(p);
+  }
+  return out;
+}
+function orthPath(pts, r){
+  if (!pts || pts.length < 2) return '';
+  let d = 'M' + pts[0].x + ' ' + pts[0].y;
+  for (let i = 1; i < pts.length - 1; i++){
+    const p = pts[i], a = pts[i-1], b = pts[i+1];
+    const la = Math.hypot(a.x-p.x, a.y-p.y), lb = Math.hypot(b.x-p.x, b.y-p.y);
+    const rr = Math.min(r, la/2, lb/2);
+    const ux = (a.x-p.x)/la, uy = (a.y-p.y)/la, vx = (b.x-p.x)/lb, vy = (b.y-p.y)/lb;
+    d += ' L' + (p.x+ux*rr) + ' ' + (p.y+uy*rr) + ' Q' + p.x + ' ' + p.y + ' ' + (p.x+vx*rr) + ' ' + (p.y+vy*rr);
+  }
+  const last = pts[pts.length-1];
+  return d + ' L' + last.x + ' ' + last.y;
+}
+function headPath(tip, from, size){
+  const dx = tip.x - from.x, dy = tip.y - from.y;
+  const l = Math.hypot(dx, dy) || 1;
+  const ux = dx/l, uy = dy/l, px = -uy, py = ux;
+  const bx = tip.x - ux*size, by = tip.y - uy*size;
+  const w = size*0.42;
+  return 'M' + tip.x + ' ' + tip.y + 'L' + (bx+px*w) + ' ' + (by+py*w) + 'L' + (bx-px*w) + ' ' + (by-py*w) + 'Z';
+}
+
+/* ── texte : découpe en lignes ─────────────────────────── */
+function wrapLines(s){
+  const pad = s.type === 'text' ? 4 : 12;
+  const maxW = Math.max(16, s.w - pad*2);
+  meas.font = (s.bold ? '700 ' : '400 ') + s.fontSize + 'px ' + SHAPE_FONT;
+  const lines = [];
+  for (const para of String(s.text).split('\n')){
+    if (!para){ lines.push(''); continue; }
+    let line = '';
+    for (const word of para.split(' ')){
+      const test = line ? line + ' ' + word : word;
+      if (meas.measureText(test).width > maxW && line){ lines.push(line); line = word; }
+      else line = test;
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+
+/* ── rendu des formes ──────────────────────────────────── */
+function drawShape(s){
+  const g = el('g', { class:'shape', 'data-id':s.id }, layerS);
+  const c = center(s);
+  let node;
+  if (s.type === 'ellipse'){
+    node = el('ellipse', { cx:c.x, cy:c.y, rx:s.w/2, ry:s.h/2 });
+  } else if (s.type === 'diamond'){
+    node = el('polygon', { points:[c.x,s.y, s.x+s.w,c.y, c.x,s.y+s.h, s.x,c.y].join(' ') });
+  } else {
+    const r = Math.min(s.radius, s.w/2, s.h/2);
+    node = el('rect', { x:s.x, y:s.y, width:s.w, height:s.h, rx:r, ry:r });
+  }
+  node.setAttribute('fill', s.fill === 'none' ? 'none' : s.fill);
+  node.setAttribute('stroke', s.stroke === 'none' ? 'none' : s.stroke);
+  node.setAttribute('stroke-width', s.sw);
+  node.setAttribute('opacity', s.opacity);
+  const dd = dashOf(s.dash, s.sw);
+  if (dd) { node.setAttribute('stroke-dasharray', dd); node.setAttribute('stroke-linecap','round'); }
+  if (s.type === 'text' && s.fill === 'none' && s.stroke === 'none'){
+    // zone cliquable invisible pour le texte libre
+    el('rect', { x:s.x, y:s.y, width:s.w, height:s.h, fill:'#000', opacity:0 }, g);
+  }
+  g.appendChild(node);
+
+  if (s.id === editing || !String(s.text).trim()) return;
+  const lines = wrapLines(s);
+  const lh = s.fontSize * 1.32;
+  const pad = s.type === 'text' ? 4 : 12;
+  const top = c.y - (lines.length * lh)/2 + s.fontSize * 0.82;
+  const tx = s.align === 'left' ? s.x + pad : s.align === 'right' ? s.x + s.w - pad : c.x;
+  const t = el('text', {
+    x:tx, y:top, fill:s.fontColor, 'font-family':SHAPE_FONT, 'font-size':s.fontSize,
+    'font-weight': s.bold ? 700 : 400, opacity:s.opacity,
+    'text-anchor': s.align === 'left' ? 'start' : s.align === 'right' ? 'end' : 'middle',
+    'style':'user-select:none'
+  }, g);
+  lines.forEach((ln, i) => {
+    el('tspan', { x:tx, y:top + i*lh }, t).textContent = ln || ' ';
+  });
+}
+
+/* ── rendu des flèches ─────────────────────────────────── */
+function drawArrow(a){
+  const pts = routeOf(a);
+  if (!pts) return;
+  const g = el('g', { class:'arrow', 'data-id':a.id }, layerA);
+  const size = 5 + a.sw * 2;
+  const d = orthPath(pts, 9);
+  el('path', { d, fill:'none', stroke:'transparent', 'stroke-width':Math.max(14, a.sw*6),
+               'pointer-events':'stroke' }, g);
+  const line = el('path', { d, fill:'none', stroke:a.stroke, 'stroke-width':a.sw,
+                            'stroke-linecap':'round', 'stroke-linejoin':'round' }, g);
+  const dd = dashOf(a.dash, a.sw);
+  if (dd) line.setAttribute('stroke-dasharray', dd);
+  if (a.head === 'end' || a.head === 'both')
+    el('path', { d:headPath(pts[pts.length-1], pts[pts.length-2], size), fill:a.stroke }, g);
+  if (a.head === 'start' || a.head === 'both')
+    el('path', { d:headPath(pts[0], pts[1], size), fill:a.stroke }, g);
+
+  if (a.label){
+    let best = 0, bl = -1;
+    for (let i = 0; i < pts.length-1; i++){
+      const l = Math.hypot(pts[i+1].x-pts[i].x, pts[i+1].y-pts[i].y);
+      if (l > bl){ bl = l; best = i; }
+    }
+    const mx = (pts[best].x + pts[best+1].x)/2, my = (pts[best].y + pts[best+1].y)/2;
+    meas.font = '400 12px ' + SHAPE_FONT;
+    const w = meas.measureText(a.label).width + 12;
+    el('rect', { x:mx-w/2, y:my-10, width:w, height:20, rx:5, fill:'#F4F3EE' }, g);
+    const t = el('text', { x:mx, y:my+4, fill:a.stroke, 'font-family':SHAPE_FONT, 'font-size':12,
+                           'text-anchor':'middle', style:'user-select:none' }, g);
+    t.textContent = a.label;
+  }
+}
+
+/* ── habillage de sélection ────────────────────────────── */
+function drawSelectionUI(){
+  const k = view.k;
+  if (pending){
+    const s = byId(pending);
+    if (s) el('rect', { x:s.x-4/k, y:s.y-4/k, width:s.w+8/k, height:s.h+8/k, rx:6/k,
+                        fill:'none', stroke:'#3AA391', 'stroke-width':2/k,
+                        'stroke-dasharray':(6/k)+' '+(4/k) }, layerU);
+  }
+  if (connectDraft){
+    el('path', { d:orthPath(connectDraft, 9), fill:'none', stroke:'#B08420', 'stroke-width':1.6/k,
+                 'stroke-dasharray':(6/k)+' '+(4/k) }, layerU);
+  }
+  const sel = state.sel;
+  if (!sel) return;
+
+  if (sel.kind === 'arrow'){
+    const a = arrowById(sel.id); if (!a) return;
+    const pts = routeOf(a); if (!pts) return;
+    el('path', { d:orthPath(pts, 9), fill:'none', stroke:'#FFC53D', 'stroke-width':(a.sw+4)/1,
+                 'stroke-linecap':'round', 'stroke-linejoin':'round', opacity:.35 }, layerU);
+    [pts[0], pts[pts.length-1]].forEach(p =>
+      el('circle', { cx:p.x, cy:p.y, r:4/k, fill:'#FFC53D', stroke:'#14161B', 'stroke-width':1.2/k }, layerU));
+    return;
+  }
+
+  const s = byId(sel.id); if (!s) return;
+  el('rect', { x:s.x, y:s.y, width:s.w, height:s.h, fill:'none',
+               stroke:'#FFC53D', 'stroke-width':1.5/k }, layerU);
+
+  // poignées de redimensionnement
+  const hs = 7/k;
+  const H = { nw:[s.x,s.y], n:[s.x+s.w/2,s.y], ne:[s.x+s.w,s.y], e:[s.x+s.w,s.y+s.h/2],
+              se:[s.x+s.w,s.y+s.h], s:[s.x+s.w/2,s.y+s.h], sw:[s.x,s.y+s.h], w:[s.x,s.y+s.h/2] };
+  for (const key in H){
+    el('rect', { class:'handle', 'data-h':key, x:H[key][0]-hs/2, y:H[key][1]-hs/2,
+                 width:hs, height:hs, rx:1.5/k, fill:'#FFFFFF', stroke:'#B08420', 'stroke-width':1.3/k }, layerU);
+  }
+  // points de connexion
+  if (!editing){
+    ['top','right','bottom','left'].forEach(side => {
+      const p = anchorPoint(s, side);
+      el('circle', { class:'anchor', 'data-side':side, cx:p.x, cy:p.y, r:5/k,
+                     fill:'#FFC53D', stroke:'#14161B', 'stroke-width':1.3/k }, layerU);
+    });
+  }
+  // étiquette de cote, à la manière d'un plan
+  const label = Math.round(s.w) + ' × ' + Math.round(s.h);
+  meas.font = '500 11px monospace';
+  const lw = (meas.measureText(label).width + 14)/k, lh = 18/k;
+  el('rect', { x:s.x + s.w - lw, y:s.y + s.h + 7/k, width:lw, height:lh, rx:3/k, fill:'#14161B' }, layerU);
+  const t = el('text', { x:s.x + s.w - lw/2, y:s.y + s.h + 7/k + lh*0.7, fill:'#FFC53D',
+                         'font-family':'monospace', 'font-size':11/k, 'text-anchor':'middle',
+                         style:'user-select:none' }, layerU);
+  t.textContent = label;
+}
+
+/* ── rendu global ──────────────────────────────────────── */
+let connectDraft = null;
+function render(){
+  layerA.textContent = ''; layerS.textContent = ''; layerU.textContent = '';
+  state.arrows.forEach(drawArrow);
+  state.shapes.forEach(drawShape);
+  drawSelectionUI();
+  scene.setAttribute('transform', 'translate(' + view.x + ' ' + view.y + ') scale(' + view.k + ')');
+  $('#grid').setAttribute('patternTransform', 'translate(' + view.x + ' ' + view.y + ') scale(' + view.k + ')');
+  $('#grid-minor').setAttribute('stroke-width', 1/view.k);
+  $('#grid-minor').setAttribute('opacity', view.k < 0.55 ? 0 : 1);
+  $('#grid-major').setAttribute('stroke-width', 1.2/view.k);
+  $('#empty').hidden = state.shapes.length > 0;
+  $('#zoom-lvl').textContent = Math.round(view.k*100) + ' %';
+  const n = state.shapes.length, m = state.arrows.length;
+  $('#status-count').textContent = n + (n > 1 ? ' formes' : ' forme') + (m ? ' · ' + m + (m > 1 ? ' liens' : ' lien') : '');
+  syncInspector();
+}
+
+/* ── outils ────────────────────────────────────────────── */
+function setTool(t){
+  tool = t;
+  if (t !== 'arrow') pending = null;
+  document.querySelectorAll('#shape-palette .tool').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.type === t)));
+  $('#tool-arrow').setAttribute('aria-pressed', String(t === 'arrow'));
+  stage.dataset.tool = t === 'select' ? 'select' : t === 'arrow' ? 'arrow' : 'shape';
+  $('#status-mode').textContent =
+    t === 'select' ? 'Sélection' : t === 'arrow' ? (pending ? 'Choisissez la forme d’arrivée' : 'Choisissez la forme de départ') : 'Poser un ' + TYPES[t].label.toLowerCase();
+  render();
+}
+function select(kind, id){
+  state.sel = kind ? { kind, id } : null;
+  buildInspector();
+  render();
+}
+
+/* ── interactions pointeur ─────────────────────────────── */
+let mode = null, drag = null;
+
+canvas.addEventListener('pointerdown', e => {
+  if (e.button === 2) return;
+  closeEditor();
+  const p = worldOf(e);
+  const handleEl = e.target.closest('.handle');
+  const anchorEl = e.target.closest('.anchor');
+  const shapeEl  = e.target.closest('.shape');
+  const arrowEl  = e.target.closest('.arrow');
+  canvas.setPointerCapture(e.pointerId);
+
+  if (e.button === 1){ startPan(e); return; }
+
+  if (handleEl && state.sel && state.sel.kind === 'shape'){
+    begin();
+    const s = byId(state.sel.id);
+    mode = 'resize';
+    drag = { h:handleEl.dataset.h, orig:{ x:s.x, y:s.y, w:s.w, h:s.h }, s };
+    return;
+  }
+  if (anchorEl && state.sel && state.sel.kind === 'shape'){
+    mode = 'connect';
+    drag = { from:state.sel.id, side:anchorEl.dataset.side };
+    return;
+  }
+  if (shapeEl){
+    const s = byId(shapeEl.dataset.id);
+    if (tool === 'arrow'){ arrowToolClick(s); return; }
+    if (!state.sel || state.sel.id !== s.id) select('shape', s.id);
+    begin();
+    mode = 'drag';
+    drag = { s, dx:p.x - s.x, dy:p.y - s.y, moved:false };
+    render();
+    return;
+  }
+  if (arrowEl && tool === 'select'){ select('arrow', arrowEl.dataset.id); render(); return; }
+
+  // fond de toile
+  if (tool !== 'select' && tool !== 'arrow'){
+    addShape(tool, p.x, p.y);
+    if (!e.shiftKey) setTool('select');
+    return;
+  }
+  if (tool === 'arrow' && pending){ pending = null; setTool('arrow'); return; }
+  if (state.sel){ select(null); }
+  startPan(e);
+});
+
+function startPan(e){
+  mode = 'pan';
+  drag = { sx:e.clientX, sy:e.clientY, vx:view.x, vy:view.y };
+  stage.dataset.panning = '1';
+}
+
+canvas.addEventListener('pointermove', e => {
+  if (!mode){
+    const shapeEl = e.target.closest('.shape');
+    const id = shapeEl ? shapeEl.dataset.id : null;
+    if (id !== hovered){ hovered = id; }
+    return;
+  }
+  const p = worldOf(e);
+  if (mode === 'pan'){
+    view.x = drag.vx + (e.clientX - drag.sx);
+    view.y = drag.vy + (e.clientY - drag.sy);
+    render();
+  } else if (mode === 'drag'){
+    const nx = snap(p.x - drag.dx), ny = snap(p.y - drag.dy);
+    if (nx !== drag.s.x || ny !== drag.s.y) drag.moved = true;
+    drag.s.x = nx; drag.s.y = ny;
+    render();
+  } else if (mode === 'resize'){
+    const o = drag.orig, s = drag.s, h = drag.h;
+    let x = o.x, y = o.y, w = o.w, ht = o.h;
+    if (h.includes('e')) w = Math.max(MINW, snap(p.x) - o.x);
+    if (h.includes('s')) ht = Math.max(MINH, snap(p.y) - o.y);
+    if (h.includes('w')){ const nx = Math.min(snap(p.x), o.x + o.w - MINW); w = o.x + o.w - nx; x = nx; }
+    if (h.includes('n')){ const ny = Math.min(snap(p.y), o.y + o.h - MINH); ht = o.y + o.h - ny; y = ny; }
+    s.x = x; s.y = y; s.w = w; s.h = ht;
+    render();
+  } else if (mode === 'connect'){
+    const s = byId(drag.from);
+    const a1 = anchorPoint(s, drag.side), d = DIR[drag.side];
+    const m = { x:a1.x + d.x*24, y:a1.y + d.y*24 };
+    const pts = d.x !== 0 ? [a1, m, { x:m.x, y:p.y }, { x:p.x, y:p.y }]
+                          : [a1, m, { x:p.x, y:m.y }, { x:p.x, y:p.y }];
+    connectDraft = pts.filter((q, i, arr) => i === 0 || Math.hypot(q.x-arr[i-1].x, q.y-arr[i-1].y) > 1);
+    render();
+  }
+});
+
+canvas.addEventListener('pointerup', e => {
+  if (mode === 'connect'){
+    connectDraft = null;
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const shapeEl = target && target.closest ? target.closest('.shape') : null;
+    if (shapeEl && shapeEl.dataset.id !== drag.from) connect(drag.from, shapeEl.dataset.id, drag.side);
+    else render();
+  } else if (mode === 'drag' || mode === 'resize'){
+    commit(); buildInspector();
+  }
+  stage.dataset.panning = '0';
+  mode = null; drag = null;
+});
+canvas.addEventListener('pointercancel', () => { mode = null; drag = null; connectDraft = null; stage.dataset.panning = '0'; render(); });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+function arrowToolClick(s){
+  if (!pending){ pending = s.id; setTool('arrow'); return; }
+  if (pending !== s.id) connect(pending, s.id, null);
+  pending = null; setTool('select');
+}
+
+/* ── double-clic : édition du texte ────────────────────── */
+canvas.addEventListener('dblclick', e => {
+  const shapeEl = e.target.closest('.shape');
+  if (!shapeEl) return;
+  const s = byId(shapeEl.dataset.id);
+  select('shape', s.id);
+  openEditor(s);
+});
+
+const editor = $('#editor');
+function openEditor(s){
+  begin();
+  editing = s.id;
+  const pad = s.type === 'text' ? 4 : 12;
+  editor.style.display   = 'block';
+  editor.style.left      = (view.x + s.x*view.k) + 'px';
+  editor.style.top       = (view.y + s.y*view.k) + 'px';
+  editor.style.width     = (s.w*view.k) + 'px';
+  editor.style.height    = (s.h*view.k) + 'px';
+  editor.style.padding   = (pad*view.k) + 'px';
+  editor.style.fontSize  = (s.fontSize*view.k) + 'px';
+  editor.style.fontFamily = SHAPE_FONT;
+  editor.style.fontWeight = s.bold ? '700' : '400';
+  editor.style.textAlign  = s.align;
+  editor.style.color      = s.fontColor;
+  editor.value = s.text;
+  render();
+  requestAnimationFrame(() => { editor.focus(); editor.select(); });
+}
+function closeEditor(keep = true){
+  if (!editing) return;
+  const s = byId(editing);
+  if (s && keep) s.text = editor.value;
+  editing = null;
+  editor.style.display = 'none';
+  commit(); render(); buildInspector();
+}
+editor.addEventListener('blur', () => closeEditor(true));
+editor.addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.key === 'Escape'){ editor.blur(); }
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)){ editor.blur(); }
+});
+editor.addEventListener('input', () => { const s = byId(editing); if (s){ s.text = editor.value; } });
+
+/* ── zoom & déplacement ────────────────────────────────── */
+function zoomAt(cx, cy, factor){
+  const r = canvas.getBoundingClientRect();
+  const px = cx - r.left, py = cy - r.top;
+  const k2 = clamp(view.k * factor, 0.15, 4);
+  view.x = px - (px - view.x) * (k2/view.k);
+  view.y = py - (py - view.y) * (k2/view.k);
+  view.k = k2;
+  render();
+}
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  closeEditor();
+  if (e.ctrlKey || e.metaKey) zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0022));
+  else { view.x -= e.deltaX; view.y -= e.deltaY; render(); }
+}, { passive:false });
+
+function contentBBox(pad){
+  if (!state.shapes.length) return null;
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  state.shapes.forEach(s => {
+    x1 = Math.min(x1, s.x); y1 = Math.min(y1, s.y);
+    x2 = Math.max(x2, s.x + s.w); y2 = Math.max(y2, s.y + s.h);
+  });
+  state.arrows.forEach(a => {
+    const pts = routeOf(a); if (!pts) return;
+    pts.forEach(p => { x1 = Math.min(x1, p.x); y1 = Math.min(y1, p.y); x2 = Math.max(x2, p.x); y2 = Math.max(y2, p.y); });
+  });
+  return { x:x1-pad, y:y1-pad, w:(x2-x1)+pad*2, h:(y2-y1)+pad*2 };
+}
+function fitView(){
+  const b = contentBBox(60);
+  const r = canvas.getBoundingClientRect();
+  if (!b){ view = { x:r.width/2, y:r.height/2, k:1 }; render(); return; }
+  const k = clamp(Math.min(r.width/b.w, r.height/b.h), 0.15, 2);
+  view.k = k;
+  view.x = (r.width - b.w*k)/2 - b.x*k;
+  view.y = (r.height - b.h*k)/2 - b.y*k;
+  render();
+}
+function resetView(){
+  const b = contentBBox(0), r = canvas.getBoundingClientRect();
+  view.k = 1;
+  if (b){ view.x = r.width/2 - (b.x + b.w/2); view.y = r.height/2 - (b.y + b.h/2); }
+  else { view.x = r.width/2; view.y = r.height/2; }
+  render();
+}
+
+/* ── clavier ───────────────────────────────────────────── */
+window.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+  const meta = e.metaKey || e.ctrlKey;
+  if (meta && e.key.toLowerCase() === 'z'){ e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if (meta && e.key.toLowerCase() === 'y'){ e.preventDefault(); redo(); return; }
+  if (meta && e.key.toLowerCase() === 'd'){ e.preventDefault(); duplicateSelected(); return; }
+  if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); removeSelected(); return; }
+  if (e.key === 'Escape'){ pending = null; setTool('select'); select(null); render(); return; }
+  if (e.shiftKey && e.key === '1'){ fitView(); return; }
+  if (e.shiftKey && e.key === '0'){ resetView(); return; }
+  if (e.key === 'Enter' && state.sel && state.sel.kind === 'shape'){ e.preventDefault(); openEditor(byId(state.sel.id)); return; }
+  if (state.sel && state.sel.kind === 'shape' && e.key.startsWith('Arrow')){
+    e.preventDefault(); begin();
+    const s = byId(state.sel.id), step = e.shiftKey ? GRID*5 : GRID;
+    if (e.key === 'ArrowLeft') s.x -= step;
+    if (e.key === 'ArrowRight') s.x += step;
+    if (e.key === 'ArrowUp') s.y -= step;
+    if (e.key === 'ArrowDown') s.y += step;
+    commit(); render(); return;
+  }
+  const map = { v:'select', r:'rect', o:'ellipse', d:'diamond', t:'text', a:'arrow', c:'square', p:'round' };
+  const k = e.key.toLowerCase();
+  if (!meta && map[k]) setTool(map[k]);
+});
+
+/* ── inspecteur ────────────────────────────────────────── */
+const inspBody = $('#insp-body'), inspTag = $('#insp-tag');
+const FILLS  = ['#FFFFFF','#FFF3D6','#E3F1EE','#EAE7FB','#FBE6E4','#14161B','none'];
+const INKS   = ['#2B303B','#B08420','#2F7D6E','#5B4BC4','#C0483C','#7A808E','none'];
+const seg = (name, opts, cur) => '<div class="seg" data-seg="' + name + '">' +
+  opts.map(o => '<button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === cur) + '">' + o[1] + '</button>').join('') + '</div>';
+const swatches = (name, list) => '<div class="swatches">' +
+  list.map(c => '<button type="button" class="swatch' + (c === 'none' ? ' none' : '') + '" data-sw="' + name + '" data-c="' + c + '" title="' + c + '"' +
+    (c === 'none' ? '' : ' style="background:' + c + '"') + '></button>').join('') + '</div>';
+
+function buildInspector(){
+  const sel = state.sel;
+  if (!sel){
+    inspTag.textContent = 'rien de sélectionné';
+    inspBody.innerHTML = '<div class="insp-empty">Sélectionnez une forme ou une flèche pour régler son apparence.<br><br>' +
+      'Astuce : maintenez <kbd>⇧</kbd> en posant une forme pour en enchaîner plusieurs.</div>';
+    return;
+  }
+  if (sel.kind === 'arrow') return buildArrowInspector(arrowById(sel.id));
+  const s = byId(sel.id);
+  if (!s) { state.sel = null; return buildInspector(); }
+  inspTag.textContent = 'forme';
+  const showRadius = s.type === 'rect' || s.type === 'square' || s.type === 'round';
+
+  inspBody.innerHTML =
+   '<div class="insp-title"><span class="name">' + TYPES[s.type].label + '</span><span class="badge">' + s.id + '</span></div>' +
+
+   '<div class="field"><label>Texte</label>' +
+     '<textarea class="prop" id="p-text">' + String(s.text).replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</textarea></div>' +
+
+   '<div class="field"><label>Taille du texte</label><div class="row">' +
+     '<input type="range" id="p-fs" min="10" max="42" step="1" value="' + s.fontSize + '">' +
+     '<span class="val" id="v-fs">' + s.fontSize + ' px</span></div>' +
+     '<div class="row" style="margin-top:6px">' +
+       '<input type="color" id="p-fc" value="' + s.fontColor + '">' +
+       seg('bold', [['0','Normal'],['1','Gras']], s.bold ? '1' : '0') +
+     '</div>' +
+     '<div class="row" style="margin-top:6px">' +
+       seg('align', [['left','Gauche'],['center','Centre'],['right','Droite']], s.align) +
+     '</div></div>' +
+
+   '<div class="divider"></div>' +
+
+   '<div class="field"><label>Remplissage</label><div class="row">' +
+     '<input type="color" id="p-fill" value="' + (s.fill === 'none' ? '#ffffff' : s.fill) + '">' +
+     '<span class="val" style="flex:1;text-align:left" id="v-fill">' + (s.fill === 'none' ? 'aucun' : s.fill) + '</span></div>' +
+     swatches('fill', FILLS) + '</div>' +
+
+   '<div class="field"><label>Bordure</label><div class="row">' +
+     '<input type="color" id="p-stroke" value="' + (s.stroke === 'none' ? '#2B303B' : s.stroke) + '">' +
+     '<span class="val" style="flex:1;text-align:left" id="v-stroke">' + (s.stroke === 'none' ? 'aucune' : s.stroke) + '</span></div>' +
+     swatches('stroke', INKS) +
+     '<div class="row" style="margin-top:8px">' +
+       '<input type="range" id="p-sw" min="0" max="10" step="0.5" value="' + s.sw + '">' +
+       '<span class="val" id="v-sw">' + s.sw + ' px</span></div>' +
+     '<div class="row" style="margin-top:4px">' + seg('dash', [['solid','Plein'],['dashed','Tirets'],['dotted','Points']], s.dash) + '</div>' +
+   '</div>' +
+
+   (showRadius ?
+   '<div class="field"><label>Arrondi des angles</label><div class="row">' +
+     '<input type="range" id="p-r" min="0" max="60" step="2" value="' + Math.min(s.radius, 60) + '">' +
+     '<span class="val" id="v-r">' + Math.min(s.radius, 60) + '</span></div></div>' : '') +
+
+   '<div class="field"><label>Opacité</label><div class="row">' +
+     '<input type="range" id="p-op" min="10" max="100" step="5" value="' + Math.round(s.opacity*100) + '">' +
+     '<span class="val" id="v-op">' + Math.round(s.opacity*100) + ' %</span></div></div>' +
+
+   '<div class="divider"></div>' +
+
+   '<div class="field"><label>Position et dimensions</label>' +
+     '<div class="row two"><input type="number" id="p-x" step="20" value="' + s.x + '"><input type="number" id="p-y" step="20" value="' + s.y + '"></div>' +
+     '<div class="row two" style="margin-top:6px"><input type="number" id="p-w" step="20" value="' + s.w + '"><input type="number" id="p-h" step="20" value="' + s.h + '"></div>' +
+     '<div class="row two" style="margin-top:4px"><span class="val" style="text-align:left">X · Y</span><span class="val" style="text-align:left">L · H</span></div>' +
+   '</div>' +
+
+   '<div class="field stack" style="display:flex;flex-direction:column;gap:6px">' +
+     '<button class="btn" id="p-front">Mettre au premier plan</button>' +
+     '<button class="btn" id="p-back">Mettre en arrière-plan</button>' +
+     '<button class="btn" id="p-dup">Dupliquer <span class="k">⌘D</span></button>' +
+     '<button class="btn danger" id="p-del">Supprimer <span class="k">Suppr</span></button>' +
+   '</div>';
+
+  const q = id => inspBody.querySelector(id);
+  const live = () => render();
+  q('#p-text').addEventListener('input', e => { s.text = e.target.value; live(); });
+  q('#p-fs').addEventListener('input', e => { s.fontSize = +e.target.value; q('#v-fs').textContent = s.fontSize + ' px'; live(); });
+  q('#p-fc').addEventListener('input', e => { s.fontColor = e.target.value; live(); });
+  q('#p-fill').addEventListener('input', e => { s.fill = e.target.value; q('#v-fill').textContent = s.fill; live(); });
+  q('#p-stroke').addEventListener('input', e => { s.stroke = e.target.value; q('#v-stroke').textContent = s.stroke; live(); });
+  q('#p-sw').addEventListener('input', e => { s.sw = +e.target.value; q('#v-sw').textContent = s.sw + ' px'; live(); });
+  q('#p-op').addEventListener('input', e => { s.opacity = +e.target.value/100; q('#v-op').textContent = e.target.value + ' %'; live(); });
+  if (showRadius) q('#p-r').addEventListener('input', e => { s.radius = +e.target.value; q('#v-r').textContent = e.target.value; live(); });
+  ['x','y','w','h'].forEach(k => q('#p-' + k).addEventListener('input', e => {
+    const v = +e.target.value; if (Number.isNaN(v)) return;
+    s[k] = (k === 'w') ? Math.max(MINW, v) : (k === 'h') ? Math.max(MINH, v) : v; live();
+  }));
+  inspBody.querySelectorAll('[data-sw]').forEach(b => b.addEventListener('click', () => {
+    begin();
+    const c = b.dataset.c, key = b.dataset.sw;
+    s[key] = c;
+    q('#p-' + key).value = c === 'none' ? (key === 'fill' ? '#ffffff' : '#2B303B') : c;
+    q('#v-' + key).textContent = c === 'none' ? (key === 'fill' ? 'aucun' : 'aucune') : c;
+    commit(); live();
+  }));
+  inspBody.querySelectorAll('[data-seg] button').forEach(b => b.addEventListener('click', () => {
+    begin();
+    const group = b.closest('[data-seg]').dataset.seg, v = b.dataset.v;
+    if (group === 'bold') s.bold = v === '1';
+    if (group === 'align') s.align = v;
+    if (group === 'dash') s.dash = v;
+    b.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    commit(); live();
+  }));
+  q('#p-front').addEventListener('click', () => { begin(); state.shapes = state.shapes.filter(x => x !== s).concat(s); commit(); live(); });
+  q('#p-back').addEventListener('click',  () => { begin(); state.shapes = [s].concat(state.shapes.filter(x => x !== s)); commit(); live(); });
+  q('#p-dup').addEventListener('click', duplicateSelected);
+  q('#p-del').addEventListener('click', removeSelected);
+}
+
+function buildArrowInspector(a){
+  if (!a){ state.sel = null; return buildInspector(); }
+  inspTag.textContent = 'flèche';
+  const sideOpts = v => ['auto','top','right','bottom','left']
+    .map(o => '<option value="' + o + '"' + ((v || 'auto') === o ? ' selected' : '') + '>' +
+      ({ auto:'Automatique', top:'Haut', right:'Droite', bottom:'Bas', left:'Gauche' })[o] + '</option>').join('');
+
+  inspBody.innerHTML =
+   '<div class="insp-title"><span class="name">Flèche</span><span class="badge">' + a.id + '</span></div>' +
+   '<div class="field"><label>Étiquette</label><input type="text" id="a-label" value="' + a.label.replace(/"/g,'&quot;') + '" placeholder="ex. oui, non, étape 2"></div>' +
+   '<div class="field"><label>Couleur du trait</label><div class="row">' +
+     '<input type="color" id="a-stroke" value="' + a.stroke + '">' +
+     '<span class="val" style="flex:1;text-align:left">' + a.stroke + '</span></div>' + swatches('astroke', INKS.slice(0,6)) + '</div>' +
+   '<div class="field"><label>Épaisseur</label><div class="row">' +
+     '<input type="range" id="a-sw" min="1" max="8" step="0.5" value="' + a.sw + '"><span class="val" id="v-asw">' + a.sw + ' px</span></div>' +
+     '<div class="row" style="margin-top:4px">' + seg('adash', [['solid','Plein'],['dashed','Tirets'],['dotted','Points']], a.dash) + '</div></div>' +
+   '<div class="field"><label>Pointes</label>' + seg('ahead', [['none','Aucune'],['end','Arrivée'],['both','Les deux']], a.head) + '</div>' +
+   '<div class="divider"></div>' +
+   '<div class="field"><label>Sortie de la forme de départ</label><select id="a-from">' + sideOpts(a.from.side) + '</select></div>' +
+   '<div class="field"><label>Entrée dans la forme d’arrivée</label><select id="a-to">' + sideOpts(a.to.side) + '</select></div>' +
+   '<div class="field"><p class="hint" style="padding:0">Le tracé reste orthogonal : il n’emprunte que les lignes de la grille invisible, avec un couloir de ' + HALF + ' px.</p></div>' +
+   '<div class="field"><button class="btn danger" id="a-del">Supprimer la flèche <span class="k">Suppr</span></button></div>';
+
+  const q = id => inspBody.querySelector(id);
+  q('#a-label').addEventListener('input', e => { a.label = e.target.value; render(); });
+  q('#a-stroke').addEventListener('input', e => { a.stroke = e.target.value; render(); });
+  q('#a-sw').addEventListener('input', e => { a.sw = +e.target.value; q('#v-asw').textContent = a.sw + ' px'; render(); });
+  q('#a-from').addEventListener('change', e => { begin(); a.from.side = e.target.value === 'auto' ? null : e.target.value; commit(); render(); });
+  q('#a-to').addEventListener('change',   e => { begin(); a.to.side   = e.target.value === 'auto' ? null : e.target.value; commit(); render(); });
+  inspBody.querySelectorAll('[data-sw]').forEach(b => b.addEventListener('click', () => {
+    begin(); a.stroke = b.dataset.c; commit(); buildInspector(); render();
+  }));
+  inspBody.querySelectorAll('[data-seg] button').forEach(b => b.addEventListener('click', () => {
+    begin();
+    const group = b.closest('[data-seg]').dataset.seg;
+    if (group === 'adash') a.dash = b.dataset.v;
+    if (group === 'ahead') a.head = b.dataset.v;
+    b.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    commit(); render();
+  }));
+  q('#a-del').addEventListener('click', removeSelected);
+}
+
+function syncInspector(){
+  if (!state.sel || state.sel.kind !== 'shape') return;
+  const s = byId(state.sel.id); if (!s) return;
+  ['x','y','w','h'].forEach(k => {
+    const inp = inspBody.querySelector('#p-' + k);
+    if (inp && document.activeElement !== inp) inp.value = Math.round(s[k]);
+  });
+}
+inspBody.addEventListener('pointerdown', begin, true);
+inspBody.addEventListener('keydown', begin, true);
+inspBody.addEventListener('change', commit);
+inspBody.addEventListener('focusout', commit);
+
+/* ── export ────────────────────────────────────────────── */
+function toast(msg){
+  let t = document.getElementById('toast');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'toast'; t.className = 'hud';
+    t.style.cssText = 'left:50%;bottom:14px;transform:translateX(-50%);padding:9px 14px;font-size:12px;color:#E9E8E4';
+    stage.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; }, 2200);
+}
+function buildExportSVG(){
+  closeEditor();
+  const b = contentBBox(48);
+  if (!b){ toast('Rien à exporter : la toile est vide.'); return null; }
+  const svg = document.createElementNS(SVGNS, 'svg');
+  svg.setAttribute('xmlns', SVGNS);
+  svg.setAttribute('width', Math.round(b.w));
+  svg.setAttribute('height', Math.round(b.h));
+  svg.setAttribute('viewBox', [b.x, b.y, b.w, b.h].join(' '));
+  if ($('#opt-bg').checked)
+    el('rect', { x:b.x, y:b.y, width:b.w, height:b.h, fill:'#FFFFFF' }, svg);
+  [layerA, layerS].forEach(layer => {
+    const g = layer.cloneNode(true);
+    g.removeAttribute('id');
+    svg.appendChild(g);
+  });
+  svg.querySelectorAll('[stroke="transparent"]').forEach(n => n.remove());
+  return { svg, b };
+}
+function download(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+const stamp = () => new Date().toISOString().slice(0,10);
+
+function exportPNG(){
+  const out = buildExportSVG(); if (!out) return;
+  const str = new XMLSerializer().serializeToString(out.svg);
+  const scale = clamp(Math.min(4000/out.b.w, 4000/out.b.h), 1, 2);
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = Math.round(out.b.w * scale);
+    c.height = Math.round(out.b.h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    c.toBlob(blob => {
+      download(blob, 'schema-' + stamp() + '.png');
+      toast('PNG téléchargé — ' + c.width + ' × ' + c.height + ' px');
+    }, 'image/png');
+  };
+  img.onerror = () => toast('L’image n’a pas pu être générée. Réessayez.');
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(str);
+}
+function exportSVG(){
+  const out = buildExportSVG(); if (!out) return;
+  const str = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(out.svg);
+  download(new Blob([str], { type:'image/svg+xml' }), 'schema-' + stamp() + '.svg');
+  toast('SVG téléchargé');
+}
+
+/* ── mise en place ─────────────────────────────────────── */
+$('#shape-palette').innerHTML = Object.keys(TYPES).map(t =>
+  '<button class="tool" data-type="' + t + '" aria-pressed="false">' +
+    '<svg width="34" height="28" viewBox="0 0 34 28" fill="none" stroke="#8B909D" stroke-width="1.5">' + PREVIEW[t] + '</svg>' +
+    '<span>' + TYPES[t].label + '</span></button>').join('');
+document.querySelectorAll('#shape-palette .tool').forEach(b =>
+  b.addEventListener('click', () => setTool(tool === b.dataset.type ? 'select' : b.dataset.type)));
+$('#tool-arrow').addEventListener('click', () => setTool(tool === 'arrow' ? 'select' : 'arrow'));
+$('#btn-fit').addEventListener('click', fitView);
+$('#btn-reset').addEventListener('click', resetView);
+$('#btn-clear').addEventListener('click', () => {
+  if (!state.shapes.length) return;
+  begin(); state.shapes = []; state.arrows = []; state.sel = null; commit();
+  render(); buildInspector(); toast('Toile vidée — ⌘Z pour revenir en arrière');
+});
+$('#btn-png').addEventListener('click', exportPNG);
+$('#btn-svg').addEventListener('click', exportSVG);
+$('#zoom-in').addEventListener('click', () => { const r = canvas.getBoundingClientRect(); zoomAt(r.left + r.width/2, r.top + r.height/2, 1.2); });
+$('#zoom-out').addEventListener('click', () => { const r = canvas.getBoundingClientRect(); zoomAt(r.left + r.width/2, r.top + r.height/2, 1/1.2); });
+$('#zoom-lvl').addEventListener('click', resetView);
+$('#toggle-rail').addEventListener('click', () => $('#rail').classList.toggle('open'));
+$('#toggle-insp').addEventListener('click', () => $('#inspector').classList.toggle('open'));
+window.addEventListener('resize', () => render());
+
+/* exemple de départ : un petit flux pour montrer le routage */
+(function seed(){
+  const mk = (type, cx, cy, text, extra) => {
+    const s = newShape(type, cx, cy); s.text = text; Object.assign(s, extra || {});
+    state.shapes.push(s); return s;
+  };
+  const a = mk('round',   0, -180, 'Brief client', { fill:'#FFF3D6', stroke:'#B08420' });
+  const b = mk('rect',    0,  -20, 'Maquette statique');
+  const c = mk('diamond', 0,  160, 'Ça tient ?');
+  const d = mk('ellipse', 320, 160, 'Livraison', { fill:'#E3F1EE', stroke:'#2F7D6E' });
+  const push = (f, t, label, side) => state.arrows.push({
+    id:uid('l'), from:{ id:f.id, side:side || null }, to:{ id:t.id, side:null },
+    stroke:'#2B303B', sw:2, dash:'solid', head:'end', label:label || ''
+  });
+  push(a, b); push(b, c);
+  push(c, d, 'oui', 'right');
+  const back = { id:uid('l'), from:{ id:c.id, side:'left' }, to:{ id:b.id, side:'left' },
+                 stroke:'#C0483C', sw:2, dash:'dashed', head:'end', label:'non' };
+  state.arrows.push(back);
+})();
+
+setTool('select');
+resetView();
+buildInspector();
+render();
+
+</script>
+</body>
+</html>
