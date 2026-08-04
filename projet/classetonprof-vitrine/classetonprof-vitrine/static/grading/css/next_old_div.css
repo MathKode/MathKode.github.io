@@ -1,0 +1,57 @@
+:root {
+    /*The translate distance*/
+    --translate-x: 200px;
+    --translate-y: 200px;
+    --angle: 23deg;
+}
+.red_flag {
+    width: 38px;
+    position: absolute;
+    right: 10px;
+    top: 20px;
+    transition: 0.8s;
+    transform-origin: 0% 100%;
+}
+.red_flag:hover {
+    transform: rotate(10deg);
+}
+
+
+#middle_div {
+    z-index: 1;
+}
+
+#next_div {
+    filter: opacity(0.5);
+    transform: translate(var(--translate-x), var(--translate-y)) rotate(var(--angle));
+    background: rgba(216, 229, 255, 0.36);
+}
+#old_div {
+    filter: opacity(0.5);
+    background: rgba(216, 229, 255, 0.36);
+    transform: translate(calc(var(--translate-x)*-1), var(--translate-y)) rotate(calc(var(--angle)*-1));
+}
+
+#next_next_div {
+    filter: opacity(0.5);
+    background: rgba(216, 229, 255, 0.36);
+    transform: translate(calc(var(--translate-x)*2), calc(var(--translate-y)*2)) rotate(calc(var(--angle)));
+}
+#old_old_div {
+    filter: opacity(0.5);
+    background: rgba(216, 229, 255, 0.36);
+    transform: translate(calc(var(--translate-x)*-2), calc(var(--translate-y)*2)) rotate(calc(var(--angle)*-1));
+}
+
+#next_div.disparition {
+    filter: opacity(0.001);
+}
+#old_div.disparition {
+    filter: opacity(0.001);
+}
+#old_old_div.disparition {
+    filter: opacity(0.001);
+}
+#next_next_div.disparition {
+    filter: opacity(0.001);
+}

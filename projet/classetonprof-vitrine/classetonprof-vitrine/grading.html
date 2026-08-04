@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ClasseTonProf</title>
+        <link rel="shortcut icon" type="image/x-icon" href="static/grading/icon_grading/logo4.jpg" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/page.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/middle_div.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/next_old_div.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/animation.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/tuto.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/arrow_part.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/search_button.css" />
+        <link rel="stylesheet" type="text/css" href="static/grading/css/media_phone.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
+        <script src="static/data/data.js"></script>
+        <script src="static/js/ctp.js"></script>
+        <script>
+            // Remplace le contexte Django (ecole / ecole_id / strprof)
+            var static_url = "static/";
+            var media_url = "static/";
+            var ECOLE_ID = Number(CTP.parametre("id") || 1);
+            var ECOLE = CTP.getEcole(ECOLE_ID);
+            if (!ECOLE) { ECOLE_ID = 1; ECOLE = CTP.getEcole(1); }
+            var ECOLE_NOM = ECOLE.nom;
+        </script>
+    </head>
+    <header>
+        <!-- <h1 class="txt1">Classe Ton Prof</h1> -->
+        <div class="logo title1" id="logo" onclick="main_page_href();">ClasseTonProf!</div>
+        <h1 class="txt2" id="ecole_name"></h1>
+    </header>
+    <!--
+    <div id="search_button_div" title="Chercher un prof" onmouseenter="add_text_search();">
+        <img id="search_pic" src="static/grading/icon_grading/loupe.png">
+    </div>
+    -->
+    <body onresize="set_variable_px()">
+        <div class="center">
+            <input type=text id='search_input' placeholder='Rechercher...' oninput='search_input();'>
+            <div class="div_prof" id="middle_div">
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png" title="Signaler" onclick="red_flag();">
+                <h1 class="txt3" id="name">Prof 1</h1>
+                <div class="matiere" id="icon">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4">Maths</h1>
+                </div>
+                <h1 class="txt5">Ambiance</h1>
+                <div class="etoile center" id="et1" >
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseenter="etoile('et1',0)" onmouseout="re_etoile('et1',0)" onclick="set_etoile('et1',0)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseenter="etoile('et1',1)" onmouseout="re_etoile('et1',1)" onclick="set_etoile('et1',1)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseenter="etoile('et1',2)" onmouseout="re_etoile('et1',2)" onclick="set_etoile('et1',2)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et1',3)" onmouseout="re_etoile('et1',3)" onclick="set_etoile('et1',3)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et1',4)" onmouseout="re_etoile('et1',4)" onclick="set_etoile('et1',4)">
+                </div>
+                <h1 class="txt5">Cours</h1>
+                <div class="etoile center" id="et2">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et2',0)" onmouseout="re_etoile('et2',0)" onclick="set_etoile('et2',0)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et2',1)" onmouseout="re_etoile('et2',1)" onclick="set_etoile('et2',1)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et2',2)" onmouseout="re_etoile('et2',2)" onclick="set_etoile('et2',2)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et2',3)" onmouseout="re_etoile('et2',3)" onclick="set_etoile('et2',3)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et2',4)" onmouseout="re_etoile('et2',4)" onclick="set_etoile('et2',4)">
+                </div>
+                <h1 class="txt5">Controle</h1>
+                <div class="etoile center" id="et3">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et3',0)" onmouseout="re_etoile('et3',0)" onclick="set_etoile('et3',0)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et3',1)" onmouseout="re_etoile('et3',1)" onclick="set_etoile('et3',1)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et3',2)" onmouseout="re_etoile('et3',2)" onclick="set_etoile('et3',2)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et3',3)" onmouseout="re_etoile('et3',3)" onclick="set_etoile('et3',3)">
+                    <img src="static/grading/icon_grading/etoile_w2.png" onmouseover="etoile('et3',4)" onmouseout="re_etoile('et3',4)" onclick="set_etoile('et3',4)">
+                </div>
+                <div class="creation_prof_div disparition2" name="prof_creation">
+                    <div class="grid_div">
+                        <h1 class="crt">Ajouter un Prof</h1>
+                        <h1 class="crt1">Nom de Famille</h1>
+                        <input type="text" class="crt2" id="new_prof_name">
+                        <h1 class="crt3">Matière</h1>
+                        <select class="crt4" id="new_prof_matiere">
+                            <option value="1">Maths</option>
+                            <option value="2">SVT</option>
+                            <option value="3">Physique</option>
+                            <option value="4">Anglais</option>
+                            <option value="5">Espagnol</option>
+                            <option value="6">Allemand</option>
+                            <option value="7">Philo</option>
+                            <option value="8">Histoire</option>
+                            <option value="9">EMC</option>
+                            <option value="10">Musique</option>
+                            <option value="11">Art</option>
+                            <option value="12">EPS</option>
+                        </select>
+                        <div class="center3">
+                            <button class="crt5" onclick="create_prof();">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="div_prof" id="next_div">
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png">
+                <h1 class="txt3 txt6" id="name_next">Prof 2</h1>
+                <div class="matiere" id="icon_next">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4 txt6">Maths</h1>
+                </div>
+                <h1 class="txt5 txt6">Ambiance</h1>
+                <div class="etoile center" id="et1_next" >
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Cours</h1>
+                <div class="etoile center" id="et2_next">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Controle</h1>
+                <div class="etoile center" id="et3_next">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <div class="creation_prof_div disparition2" name="prof_creation">
+                    <div class="grid_div">
+                        <h1 class="crt">Ajouter un Prof</h1>
+                        <h1 class="crt1">Nom de Famille</h1>
+                        <input class="crt2">
+                        <h1 class="crt3">Matière</h1>
+                        <select class="crt4">
+                            <option value="1">Maths</option>
+                            <option value="2">SVT</option>
+                            <option value="3">Physique</option>
+                            <option value="4">Anglais</option>
+                            <option value="5">Espagnol</option>
+                            <option value="6">Allemand</option>
+                            <option value="7">Philo</option>
+                            <option value="8">Histoire</option>
+                            <option value="9">EMC</option>
+                            <option value="10">Musique</option>
+                            <option value="11">Art</option>
+                            <option value="12">EPS</option>
+                        </select>
+                        <div class="center3">
+                            <button class="crt5">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="div_prof" id="old_div">
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png">
+                <h1 class="txt3 txt6" id="name_old">Prof 0</h1>
+                <div class="matiere" id="icon_old">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4 txt6">Maths</h1>
+                </div>
+                <h1 class="txt5 txt6">Ambiance</h1>
+                <div class="etoile center" id="et1_old" >
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Cours</h1>
+                <div class="etoile center" id="et2_old">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Controle</h1>
+                <div class="etoile center" id="et3_old">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+            </div>
+            <div class="div_prof" id="next_next_div">
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png">
+                <h1 class="txt3 txt6" id="name_next_next">Prof 2</h1>
+                <div class="matiere" id="icon_next_next">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4 txt6">Maths</h1>
+                </div>
+                <h1 class="txt5 txt6">Ambiance</h1>
+                <div class="etoile center" id="et1_next_next" >
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Cours</h1>
+                <div class="etoile center" id="et2_next_next">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Controle</h1>
+                <div class="etoile center" id="et3_next_next">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <div class="creation_prof_div disparition2" name="prof_creation">
+                    <div class="grid_div">
+                        <h1 class="crt">Ajouter un Prof</h1>
+                        <h1 class="crt1">Nom de Famille</h1>
+                        <input class="crt2">
+                        <h1 class="crt3">Matière</h1>
+                        <select class="crt4">
+                            <option value="1">Maths</option>
+                            <option value="2">SVT</option>
+                            <option value="3">Physique</option>
+                            <option value="4">Anglais</option>
+                            <option value="5">Espagnol</option>
+                            <option value="6">Allemand</option>
+                            <option value="7">Philo</option>
+                            <option value="8">Histoire</option>
+                            <option value="9">EMC</option>
+                            <option value="10">Musique</option>
+                            <option value="11">Art</option>
+                            <option value="12">EPS</option>
+                        </select>
+                        <div class="center3">
+                            <button class="crt5">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="div_prof" id="old_old_div">
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png">
+                <h1 class="txt3 txt6" id="name_old_old">Prof -1</h1>
+                <div class="matiere" id="icon_old_old">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4 txt6">Maths</h1>
+                </div>
+                <h1 class="txt5 txt6">Ambiance</h1>
+                <div class="etoile center" id="et1_old_old" >
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Cours</h1>
+                <div class="etoile center" id="et2_old_old">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 txt6">Controle</h1>
+                <div class="etoile center" id="et3_old_old">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                    <img class="img_out" src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+            </div>
+        </div>
+
+        <div id="space_phone">.</div>
+        
+        <footer class="center2">
+            <div class="txt10">
+                
+                <div class="menu-element firstElement" onclick="window.location = 'school.html?id=' + ECOLE_ID">
+                    <i class="fa-solid fa-arrow-left-long"></i>
+                    <p class="menu-text">Lycée</p>
+                </div>
+
+                <div class= "vertical"></div>
+
+                 <div class="menu-element secondElement" onclick="window.location='index.html'">
+                    <i class="fa-solid fa-house"></i>
+                    <p class="menu-text">Accueil</p>
+                </div>
+                 
+                <div class= "vertical"></div>
+
+                 <div class="menu-element thirdElement" onclick="window.location.reload();">
+                    <i class="fa-solid fa-question"></i>
+                    <p class="menu-text">Aide</p>
+                </div>
+            </h1>
+        </footer>
+
+        <!-- TUTO1 PART -->
+        <div class="tuto-wrapper" id="tuto-wrapper" onclick="var screen = document.querySelector('#tuto-wrapper');screen.style = 'display:none;'">
+            <div class="div_prof" id="tuto_div">
+                <p id="signalement_tuto">
+                    Signaler
+                </p>
+                <img class="red_flag" src="static/grading/icon_grading/red_flag.png" title="Signaler" onclick="red_flag();">
+                <h1 class="txt3" id="name">Professeur</h1>
+                <div class="matiere opacity_tuto" id="icon">
+                    <img class="img1" src="static/grading/icon_grading/math.png">
+                    <h1 class="txt4">Matiere</h1>
+                </div>
+                <h1 class="txt5" id="txt5_tuto">Noter avec les étoiles</h1>
+                <div class="etoile center">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 opacity_tuto">Cours</h1>
+                <div class="etoile center opacity_tuto">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+                <h1 class="txt5 opacity_tuto">Controle</h1>
+                <div class="etoile center opacity_tuto">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_y2.png">
+                    <img src="static/grading/icon_grading/etoile_w2.png">
+                </div>
+            </div>
+            <div class="tuto-container">
+                <svg class="icon first_column" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.1" d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" fill="#ffffff"></path> <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" stroke="#ffffff" stroke-width="2"></path> <path d="M8 12L16 12" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M11 9L8.08704 11.913V11.913C8.03897 11.961 8.03897 12.039 8.08704 12.087V12.087L11 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                <div class="tuto-text-wrapper second_column">
+                    <p class="tuto-text">Swipe de prof</p>
+                </div>
+                <svg class="icon third_column" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.1" d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" fill="#ffffff"></path> <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" stroke="#ffffff" stroke-width="2"></path> <path d="M16 12L8 12" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13 15L15.913 12.087V12.087C15.961 12.039 15.961 11.961 15.913 11.913V11.913L13 9" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </div>
+            <h2 class="tuto_txt_info">Naviguer avec les flèches du clavier</h2>
+            <div class="tuto-agreement-container">
+                <div class="tuto-agreement-wrapper">
+                    <p class="agreement" id="agreement">J'ai compris</p>
+                </div>
+            </div>
+        </div>
+        <script src="static/grading/js/tuto.js"></script>
+        <!-- END TUTO PART -->
+
+        <!-- ARROW PART -->
+        <div class="fleche_div" id="bt1">
+            <h2>></h2>
+        </div>
+        <div class="fleche_div" id="bt2">
+            <h2><</h2>
+        </div>
+        <!-- END ARROW PART -->
+    </body>
+</html>
+<!-- csrf_token = <input type="hidden" name="csrfmiddlewaretoken" value="XXX"> -->
+
+<script src="static/grading/js/end_animation.js"></script>
+<script src="static/grading/js/etoile.js"></script>
+<script src="static/grading/js/gap_translate_calculator.js"></script>
+<script src="static/grading/js/matiere.js"></script>
+<script src="static/grading/js/send_info.js"></script>
+<script src="static/grading/js/creation_prof.js"></script>
+<script src="static/grading/js/set_info.js"></script>
+<script>
+function getParameters() { 
+    //Retrieve the Get parameter
+  address = window.location.search 
+
+  parameterList = new URLSearchParams(address) 
+
+  let map = new Map() 
+
+  parameterList.forEach((value, key) => { 
+      map.set(key, value) 
+  }) 
+  return map 
+} 
+
+    // Recupère les profs de ce lycée (remplace le contexte Django "strprof")
+    document.getElementById("ecole_name").innerText = ECOLE_NOM;
+    document.title = "ClasseTonProf - " + ECOLE_NOM;
+    liste = CTP.getProfs(ECOLE_ID).map(function (p) {
+        return [p.nom, -1, -1, -1, p.matiere, p.id];
+    });
+    liste.push([-1, -1, -1, -1, 1, 1]); //Div "Ajouter un prof" en fin de liste
+    liste = sort_liste_by_alphabetic(liste)
+    index = 0
+    set_prof_by_cookie(liste) //Mettre à jour les notes des profs avec les données du cookie (si il a déjà mis des notes, ses notes sont saves)
+    liste_visible = liste.slice()
+    paramatre = getParameters() //Check la request get (Elle peut contenir l'info ajouter un prof)
+    try {
+        if ( paramatre.get("create_prof") == 1 ) {
+            index = liste_visible.length-1
+            set_info(liste_visible,liste_visible.length-1)
+        } else {
+            index=0
+            set_info(liste_visible,0) //Afficher les infos
+        }
+    } catch {
+        index=0
+        set_info(liste_visible,0) //Afficher les infos
+    }
+</script>
+<script src="static/grading/js/key_press.js"></script>
+<script src="static/grading/js/red_flag.js"></script>
+<script src="static/grading/js/arrow_part.js"></script>
+<script src="static/grading/js/animation_search.js"></script>
+<script>
+
+function main_page_href() {
+    window.location = "index.html";
+}
+</script>
+<script src="https://kit.fontawesome.com/bf85678e21.js" crossorigin="anonymous"></script>

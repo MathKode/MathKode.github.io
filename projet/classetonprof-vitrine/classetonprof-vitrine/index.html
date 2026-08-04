@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClasseTonProf!</title>
+    <link rel="shortcut icon" type="image/x-icon" href="static/grading/icon_grading/logo4.jpg" />
+    <link rel="stylesheet" type="text/css" href="static/index/css/style.css" />
+    <script src="static/data/data.js"></script>
+    <script src="static/js/ctp.js"></script>
+</head>
+<body>
+
+    <div class="navbar-wrapper">
+        <div class="logo title1" id="logo" onclick="window.location='index.html';">ClasseTonProf!</div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="about.html">À Propos</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="document-wrapper">
+        <div class="searchbar-wrapper">
+            <form autocomplete="off" action="javascript:void(0);">
+                <div class="searchbar-container autocomplete">
+                        <i class="fa-solid fa-magnifying-glass searchIcon"></i>
+                        <input name="ecole" id="myInput" type="text" class="searchbar" placeholder="Choisis ton école">
+                        <button class="searchbutton" onclick="exit();">Rechercher</button>
+                        <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
+                    
+                </div>
+            </form>
+        </div>
+        <div class="info-wrapper">
+            <div class="section1 section">
+                <i class="fa-solid fa-lock fa-5x" style="color: #031c16;"></i>
+                <p class="primary-text">Sécurisé</p>
+                <p class="secondary-text">Vos données ne seront jamais divulgués, nous les protégerons pour que vous puissiez profiter de notre site dans n'importe quels conditions</p>
+            </div>
+
+            <div class="section2 section">
+                <i class="fa-solid fa-user fa-5x" style="color: #031c16;"></i>
+                <p class="primary-text">100% Anonyme</p>
+                <p class="secondary-text">Votre anonymat est notre priorité !</p>
+            
+            </div>
+
+            <div class="section3 section">
+                <i class="fa-solid fa-share fa-5x" style="color: #031c16;"></i>
+                <p class="primary-text">Partagez à vos amis !</p>
+                <p class="secondary-text">Comparez vos profs préférés avec vos amis ! (Ne nous sommes pas responsables si vous vous frappez !) </p>
+            
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src="static/index/js/main.js"></script>
+<script src="https://kit.fontawesome.com/bf85678e21.js" crossorigin="anonymous"></script>

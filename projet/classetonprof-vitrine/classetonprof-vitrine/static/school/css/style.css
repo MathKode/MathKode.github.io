@@ -1,0 +1,210 @@
+/* ---------------------------------------------------------------------------
+   school/css/style.css
+   ATTENTION : ce fichier ne faisait pas partie des sources fournies
+   (plusieurs fichiers portaient le nom "style.css" et un seul a survecu).
+   Il a ete reconstruit a partir des classes utilisees dans school.html et de
+   la charte du projet. Remplace-le par ton fichier d'origine si tu l'as :
+   le chemin est identique a celui de la version Django.
+--------------------------------------------------------------------------- */
+
+:root{
+    --background: #e9faff;
+    --primary: rgba(188, 211, 255, 0.36);
+    --accent: rgb(145 183 255 / 96%);
+    --secondary:rgb(123 195 241);
+    --text: #031c16;
+    --hover: #2866d9;
+}
+
+/* -------------- Navbar ---------------*/
+
+.navbar-wrapper {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background-color: var(--background);
+}
+
+.title1 {
+    cursor: pointer;
+    color: #031c16;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: var(--secondary);
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+    color: var(--hover);
+}
+
+/* -------------- Nom de l'etablissement ---------------*/
+
+.school-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.school-name-background {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: var(--primary);
+    border-radius: 25px;
+    padding: 10px 30px;
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.15);
+    color: var(--text);
+    font-size: 22px;
+}
+
+.school-name {
+    margin: 0;
+    font-weight: bold;
+}
+
+/* -------------- Boutons ---------------*/
+
+.main {
+    position: relative;
+    padding-bottom: 60px;
+}
+
+.myrank {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.myrank-button,
+.myrank-buttontwo,
+.myrank-buttonthree {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 14px 26px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.myrank-buttontwo {
+    background-color: var(--secondary);
+}
+
+.myrank-buttonthree {
+    background-color: rgb(180 205 255 / 96%);
+}
+
+.myrank-button:hover,
+.myrank-buttontwo:hover,
+.myrank-buttonthree:hover {
+    background-color: var(--hover);
+}
+
+/* -------------- Message "aucun prof" ---------------*/
+
+#txt_info {
+    position: absolute;
+    top: 130px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+    color: var(--text);
+    opacity: 0;
+}
+
+#txt_info h1 {
+    font-size: 24px;
+    margin: 0 auto;
+    max-width: 80%;
+}
+
+/* -------------- Podium ---------------*/
+
+.profrank-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.rank-leaderboard {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 20px;
+}
+
+.profrank-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: var(--primary);
+    border-radius: 10px 10px 0px 0px;
+    padding: 15px 20px;
+    width: 180px;
+    text-align: center;
+    color: var(--text);
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.10);
+}
+
+.profrank-section.one {
+    height: 200px;
+    background-color: var(--accent);
+}
+
+.profrank-section.two {
+    height: 155px;
+    background-color: var(--secondary);
+}
+
+.profrank-section.three {
+    height: 125px;
+}
+
+.ranking {
+    font-size: 26px;
+    font-weight: bold;
+    margin: 5px 0px;
+}
+
+.profrank-section .primary-text {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 2px 0px;
+    word-break: break-word;
+}
+
+.profrank-section .secondary-text {
+    font-size: 14px;
+    margin: 2px 0px;
+}

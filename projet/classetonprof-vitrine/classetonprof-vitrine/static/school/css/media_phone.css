@@ -1,0 +1,58 @@
+/* ---------------------------------------------------------------------------
+   school/css/media_phone.css
+   ATTENTION : fichier reconstruit (le media_phone.css fourni etait celui de la
+   page de notation - grading). Remplace-le par ton original si tu l'as.
+--------------------------------------------------------------------------- */
+
+@media (max-width:600px)  {
+    .navbar-wrapper{
+        flex-direction: column;
+    }
+    .title1 {
+        font-size: 30px;
+    }
+    .school-name-background {
+        font-size: 17px;
+        padding: 8px 15px;
+        margin: 0px 10px;
+    }
+    .myrank {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .myrank-button,
+    .myrank-buttontwo,
+    .myrank-buttonthree {
+        width: 80vw;
+    }
+    /* PODIUM */
+    .rank-leaderboard {
+        gap: 6px;
+    }
+    .profrank-section {
+        width: 28vw;
+        padding: 8px 5px;
+    }
+    .profrank-section .primary-text {
+        font-size: 15px;
+    }
+    .profrank-section .secondary-text {
+        font-size: 12px;
+    }
+    .ranking {
+        font-size: 20px;
+    }
+    /* TABLEAU */
+    #tableau {
+        font-size: 13px;
+        width: 96%;
+        margin-left: 2%;
+    }
+    th, td {
+        padding: 6px 4px;
+    }
+    #txt_info h1 {
+        font-size: 18px;
+    }
+}

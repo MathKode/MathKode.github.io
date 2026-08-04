@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contact</title>
+        <link rel="shortcut icon" type="image/x-icon" href="static/grading/icon_grading/logo4.jpg" />
+        <link rel="stylesheet" type="text/css" href="static/contact/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="static/contact/css/phone.css" />
+    </head>
+
+    <body>
+        <div class="navbar-wrapper">
+            <div class="logo title1" id="logo" onclick="window.location='index.html';">ClasseTonProf!</div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="about.html">À Propos</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+
+        <div class="general-wrapper">
+            <div class ="report-section">
+                <form>
+                    <label>Sujet</label>
+                    <input type="text" id="sujet"/>
+                    
+                    <label>Description</label>
+                    <textarea id="description"></textarea>
+
+                    <label></label>
+                    <input type="button" value="Envoyer" onclick="recupererValeur()"/>
+                </form>
+            </div>
+
+            <div class="info-wrapper">
+                <h2>Avant de nous envoyer un message</h2>
+                <ul>
+                    <li><p>Soyez sûr qu'un simple report n'aurait pas suffit (sur la page de notation, vous pouvez faire un reporte en appuyant sur le drapeau rougee en haut à droite des cartes)</p></li>
+                    <li><p>Rédigez un message clair et précis</p></li>
+                    <li><p>Nous analyserons votre message dans les plus bref délais</p></li>
+                </ul>
+                <p>Merci de nous faire confiance et d'utiliser notre site</p>
+            </div>
+        </div>
+
+    </body>
+
+    <script src="static/contact/js/script.js"></script>
+</html>

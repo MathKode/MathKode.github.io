@@ -1,0 +1,54 @@
+/*
+ <CIBLE>_<MOUVEMENT>
+*/
+
+@keyframes next_next {
+    100% {
+        filter: opacity(1);
+        background: rgba(188, 211, 255, 0.36);
+        transform: translate(0, 0) rotate(0);
+    }
+}
+@keyframes middle_next {
+    100% {
+        filter: opacity(0.5);
+        background: rgba(216, 229, 255, 0.36);
+        transform: translate(calc(var(--translate-x)*-1), var(--translate-y)) rotate(calc(var(--angle)*-1));
+    }
+}
+@keyframes old_next {
+    100% {
+        transform: translate(calc(var(--translate-x)*-2), calc(var(--translate-y)*2)) rotate(calc(var(--angle)*-1));
+    }
+}
+
+@keyframes old_old {
+    100% {
+        filter: opacity(1);
+        background: rgba(188, 211, 255, 0.36);
+        transform: translate(0, 0) rotate(0);
+    }
+}
+@keyframes middle_old {
+    100% {
+        filter: opacity(0.5);
+        background: rgba(216, 229, 255, 0.36);
+        transform: translate(var(--translate-x), var(--translate-y)) rotate(var(--angle));
+    }
+}
+@keyframes next_old {
+    100% {
+        transform: translate(calc(var(--translate-x)*2), calc(var(--translate-y)*2)) rotate(calc(var(--angle)*-1));
+    }
+}
+
+@keyframes old_old_div {
+    100% {
+        transform: translate(calc(var(--translate-x)*-1), var(--translate-y)) rotate(calc(var(--angle)*-1));
+    }
+}
+@keyframes next_next_div {
+    100% {
+        transform: translate(var(--translate-x), var(--translate-y)) rotate(var(--angle));
+    }   
+}

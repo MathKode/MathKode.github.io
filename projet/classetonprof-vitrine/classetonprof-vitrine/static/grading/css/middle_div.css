@@ -1,0 +1,41 @@
+
+
+.div_prof {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto; 
+    margin-right: auto;
+    color: #000;
+    margin-top: 120px;
+    width: 411px;
+    height: 365px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(188, 211, 255, 0.36);
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.25); 
+}
+.center {
+    width: 100%;
+}
+.center2 {
+    display: flex;
+    justify-content: center;
+}
+.matiere {
+    border-radius: 30px;
+    background: #2BFF99;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    width: max-content;
+    padding: 2px 15px;
+    grid-gap: 7px;
+    align-items: center;
+    margin-top: 7px;
+    margin-bottom: 15px;
+}
+.disparition {
+    filter: opacity(0.1);
+    box-shadow: none;
+}
+

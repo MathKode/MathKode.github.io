@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="static/school/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="static/school/css/tableau.css" />
+    <link rel="stylesheet" type="text/css" href="static/school/css/media_phone.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="static/grading/icon_grading/logo4.jpg" />
+    <title>Ecole</title>
+    <script src="static/data/data.js"></script>
+    <script src="static/js/ctp.js"></script>
+    <script>
+        // Remplace le contexte Django (ecole / ecole_id / prof)
+        var ECOLE_ID = Number(CTP.parametre("id") || 1);
+        var ECOLE = CTP.getEcole(ECOLE_ID);
+        if (!ECOLE) { ECOLE_ID = 1; ECOLE = CTP.getEcole(1); }
+    </script>
+</head>
+<body onresize="set_box_size();">
+    <div class="navbar-wrapper">
+        <div class="logo title1" id="logo">ClasseTonProf!</div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="about.html">À Propos</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div>
+        <div class="school-wrapper">
+            <div class="school-name-background"> 
+                <i class="fa-solid fa-school"></i>
+                <p class="school-name" id="school_name"></p>
+            </div>
+        </div>
+
+        <div class="main">
+
+            <div class="myrank">
+                <button class="myrank-button" onclick="note_page(ECOLE_ID)">
+                    Noter mes professeurs 
+                </button>
+                <button class="myrank-buttontwo" onclick="add_prof_page(ECOLE_ID)">
+                    Ajouter un professeur
+                </button>
+                <button class="myrank-buttonthree" onclick="tier_list(ECOLE_ID)">
+                    Faire une tierlist
+                </button>
+            </div>
+            
+            <div id="txt_info">
+                <h1>Ce lycée n'a pas encore de professeurs... Ajoutez les dès maintenant !</h1>
+            </div>
+            <div id="leader_board_section">
+                
+                <div class="profrank-wrapper">
+
+                    <div class="rank-leaderboard">
+                        <div id="twotwo" class="profrank-section two ranked">
+                            <p class="ranking">#2</p>
+                            <p class="primary-text" id="name2">Prof2</p>
+                            <p class="secondary-text">Moyenne : <br><i><span id="moyenne_2">4.7</span>/5</i></p>
+                        </div>
+            
+                        <div class="profrank-section one ranked">
+                            <i class="fa-solid fa-crown fa-3x" style="color: #031c16;"></i>
+                            <p class="ranking">#1</p>
+                            <p class="primary-text" id="name1">Prof1</p>
+                            <p class="secondary-text">Moyenne : <br><i><span id="moyenne_1">4.89</span>/5</i></p>
+                        
+                        </div>
+            
+                        <div id="threethree" class="profrank-section three ranked">
+                            <p class="ranking">#3</p>
+                            <p class="primary-text" id="name3">Prof3</p>
+                            <p class="secondary-text">Moyenne : <br><i><span id="moyenne_3">3.8</span>/5</i></p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="tableau_div">
+                    <!-- TABLEAU -->
+                    <table id="tableau">
+                        <!-- Entête -->
+                        <thead>
+                            <tr>
+                                <th class="titre-colonne text-gauche" onclick="new_table(0)">Nom Prof  <span class="fleche"></span></th>
+                                <th class="titre-colonne" onclick="new_table(1)">Moyenne</th>
+                                <th class="titre-colonne" onclick="new_table(2)">Ambience</th>
+                                <th class="titre-colonne" onclick="new_table(3)">Cours</th>
+                                <th class="titre-colonne" onclick="new_table(4)">Contrôle</th>
+                                <th class="titre-colonne" onclick="new_table(5)">Nombre de Vote</th>
+                            </tr>
+                        </thead>
+                        <!-- LIGNE DATA -->
+                        <tbody id="tableau_body">
+                            <tr>
+                                <td class="text-gauche">Prof1</td>
+                                <td class="text-center">Moyenne</td>
+                                <td class="text-center">Note1</td>
+                                <td class="text-center">Note2</td>
+                                <td class="text-center">Note3</td>
+                                <td class="text-center">Votes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- FIN TABLEAU -->
+                </div>
+            </div>
+    
+        </div>
+    </div>
+</body>
+</html>
+<script src="https://kit.fontawesome.com/bf85678e21.js" crossorigin="anonymous"></script>
+<script src="static/school/js/script.js"></script>
+<script>
+    document.getElementById('school_name').innerText = ECOLE.nom;
+    document.title = ECOLE.nom;
+
+    // Contient prof = [ [NOM, Note1, Note2, Note3, Nb_votant ] ]
+    // (equivalent de la boucle de school_page() dans views.py)
+    liste_prof = CTP.getProfs(ECOLE_ID).map(function (p) {
+        return [p.nom, p.note1 + 1, p.note2 + 1, p.note3 + 1,
+                Math.round((p.n1 + p.n2 + p.n3) / 3)];
+    })
+
+    // Calcul Moyenne
+    liste_prof = moyenne_calcul(liste_prof)
+    
+    
+    // Trier par moyenne
+    liste_prof = sort_liste(liste_prof, 1, -1)
+    if (liste_prof.length == 0) {
+        document.getElementById('txt_info').style.opacity = 1;
+        ld = document.getElementById('leader_board_section')
+        ld.style.filter = "blur(4px)"
+        ld.style.backgroundColor  = "#42a7ff26"
+        ld.style.padding = '10px'
+        ld.style.borderRadious = '5px'
+    } else {
+        document.getElementById('txt_info').style.opacity = 0;
+    }
+    // Top 3 prof (prof 1)
+    try {
+        document.getElementById('name1').innerText = liste_prof[0][0]
+        document.getElementById('moyenne_1').innerText = liste_prof[0][1]
+        // prof 2
+        try {
+            document.getElementById('name2').innerText = liste_prof[1][0]
+            document.getElementById('moyenne_2').innerText = liste_prof[1][1]
+        } catch(err) {
+            document.getElementById('twotwo').style.filter = "blur(4px)"
+        }
+        // prof 3
+        try {
+            document.getElementById('name3').innerText = liste_prof[2][0]
+            document.getElementById('moyenne_3').innerText = liste_prof[2][1]
+        } catch(err) {
+            document.getElementById('threethree').style.filter = "blur(4px)"
+        }
+    } catch(err) {
+        console.log("Normal erreur if len prof <3 : " + err.message);
+    }
+    // Trier par ordre alphabétique
+    liste_prof = sort_liste(liste_prof, 0, 1)
+    //Actualiser les infos du tableau
+    set_info(liste_prof)
+</script>

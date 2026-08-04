@@ -1,0 +1,300 @@
+/*
+--- CLASS ---
+txt1 : Titre ClasseTonProf
+txt2 : Nom de l'ecole
+txt3 : Nom du Prof
+txt4 : Nom de la matière
+txt5 : Nom des catégories
+txt6 : Couleu du texte de la div next prof (décoloré)
+txt10 : Footer avec les liens de redirection
+img1 : Image Icone de la matière
+center : Centre les éléments en x
+matiere : Div contenant une matière (img1 et txt4)
+ltr : direction de gauche à droite (direction normale qu'on doit ajouter à tous les élements car le )
+etoile : Div contenant les 5 étoiles
+etoile_yellow : Image d'une étoile jaune -> Mettre cette Class pour passer d'une étoile blanche à une étoile jaune (et l'enlever pour revenir à une étoile blanche)
+etoile_yellow_end : Etoile Jaune finale (image choisi au click)
+img_out : Rendre les étoiles des divs next et old plus grise
+disparition : faire disparaitre un objet avec un display none
+center2 : footer
+
+--- ID ---
+middle_div : Div principale ou on note les profs (ordre n)
+next_div : Div couper du prochain prof (ordre n+1)
+old_div : Div de l'ancien prof (ordre n-1)
+storage : div de stockage à cacher
+
+*/
+:root {
+    --title-x:100px;
+    --background: #e9faff;
+    --primary: rgba(188, 211, 255, 0.36);
+    --accent: rgb(145 183 255 / 96%);
+    --secondary:rgb(123 195 241);
+    --text: #031c16;
+    --hover: #2866d9;
+}
+
+
+
+@font-face {
+    font-family: "Lexend Deca";
+    src: url('../../font/LexendDeca-VariableFont_wght.ttf') format("truetype");
+  }
+
+html {
+    margin: 0px;
+    padding: 0px;
+    background-color: var(--background);
+}
+body {
+    margin: 0px;
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    line-height: normal;
+    color: #000; 
+    overflow: hidden;
+    /*direction: rtl;*/
+    width:100%;
+}
+
+.title1 {
+    cursor: pointer;
+    color: var(--text);
+    margin-top: 8px;
+    margin-left: 8px;
+    font-size: 26px;
+    font-weight: 400;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: var(--secondary);
+    width: fit-content;
+}
+
+.txt1 {
+    margin: 6px;
+    font-size: 33px;
+    font-weight: 400;
+    direction: ltr;
+}
+.txt2 {
+    margin: 15px 6px;
+    font-size: 20px;
+    font-weight: 400;
+    position: absolute;
+    right: 0px;
+    top: 0px; 
+    direction: ltr;
+    max-width: var(--title-x);
+    overflow-x: hidden;
+}
+
+.center3{
+    display: flex;
+    justify-content: center;
+}
+
+.center2{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    bottom: 10px;
+    transform: scale(0.8);
+    opacity: 0.9;
+}
+
+.txt10 {
+    font-size: 18px;
+    align-items: center;
+    display:flex;
+    gap: 15px;
+    background-color: var(--primary);
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px transparent;
+    justify-content: center;
+    border-radius: 25px;
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.30);
+}
+
+
+.menu-text{
+    margin: 0;
+    padding: 0;
+    transition: all 0.5s ease-out;
+}
+
+.menu-element:hover .menu-text{
+    text-decoration: underline;
+}
+  
+.menu-element{
+    gap:10px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.5s ease-out;
+}
+
+
+.vertical {
+    border-left: 2px solid rgb(145, 145, 145);
+    height:50%;
+    border-radius: 10px;
+}
+
+.txt3 {
+    font-weight: 400;
+    font-size: 35px;
+    margin: 3px;
+    direction: ltr;
+}
+.txt4 {
+    font-weight: 100;
+    font-size: 18px;
+    font-weight: 400;
+    margin: 5px 0px;
+    direction: ltr;
+}
+.txt5 {
+    font-weight: 300;
+    margin: 3px;
+    direction: ltr;
+}
+
+.ltr {
+    direction: ltr;
+}
+
+.img1 {
+    width: 25px;
+    height: 25px;
+}
+
+.etoile_yellow {
+    content:url("../icon_grading/etoile_y2.png");
+}
+.etoile_yellow_end {
+    content:url("../icon_grading/etoile_y2.png");
+}
+
+.etoile img {
+    width: 40px;
+    height: 35px;
+    margin: 0px;
+}
+
+.etoile {
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.disparition2 {
+    display: none;
+}
+.disparition2.matiere {
+    display: none;
+}
+
+.grid_div {
+    display: grid;
+    text-align: center;
+    justify-content: center;
+}
+.crt {
+    margin: 6px;
+    padding-bottom: 10px;
+    font-size: 33px;
+    font-weight: 600;
+    text-decoration-line: underline;
+    text-decoration-color: var(--secondary);
+    text-decoration-thickness: 4px;
+}
+.crt1 {
+    padding-top: 2px;
+    margin: 10px;
+    font-size: 29px;
+    font-weight: 400; 
+}
+.crt2 {
+    width: 300px;
+    background-color: rgba(255, 255, 255, 1);
+    border: none;
+    border-bottom: 3px solid #000000;
+    border-radius: 2px;
+    height: 28px;
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    text-align: center;
+    font-size: 21px;
+}
+.crt3 {
+    padding-top: 2px;
+    margin: 10px;
+    font-size: 28px;
+    font-weight: 400; 
+}
+.crt4 {
+    width: 200px;
+    height: 25px;
+    border-radius: 2px;
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-size: 18px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+}
+.crt5 {
+margin-top: 15px;
+  width: 100px;
+  height: 35px;
+  padding: 5px;
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-size: 18px;
+  background-color: aliceblue;
+  border: none;
+  border-radius: 3px;
+}
+.crt5:hover{
+    opacity: 1;
+    border: 3px solid var(--secondary);
+}
+
+*:focus {
+    outline: none;
+}
+
+span {
+    transition: 0.5s;
+}
+span:hover {
+    color: var(--hover);
+    cursor: pointer;
+}
+
+#space_phone {
+    display: none;
+}
+
+@keyframes green {
+    0% {
+        background-color: rgb(0, 199, 0);
+    }
+    100% {
+        background-color: rgba(188, 211, 255, 0.36);
+    }   
+}
+
+@media only screen and (max-width: 415px) {
+    .txt10 {
+        gap: 20px;
+    }
+}
+    

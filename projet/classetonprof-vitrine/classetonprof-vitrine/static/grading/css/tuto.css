@@ -1,0 +1,109 @@
+:root {
+    --tuto-top: 100px;
+}
+
+.tuto-wrapper{
+    opacity: 1;
+    background-color: rgba(0,0,0,0.65);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    top: 0;
+    left: 0;
+    color: #FFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: 0.3;
+}
+
+.icon{
+    transform: scale(0.5);
+}
+.tuto-container{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    gap: 20%;
+}
+
+.tuto-text{
+    font-size: 38px;
+    margin: 5px;
+}
+
+.tuto_txt_info {
+    font-size: 28px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 78%;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+}
+
+.tuto-text-wrapper{
+    width:100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.tuto-agreement-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 15px;
+    font-size: 21px;
+}
+
+.tuto-agreement-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.agreement{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#tuto_div {
+    z-index: 10;
+    position: absolute;
+    top: 0px;
+    margin-top: var(--tuto-top);
+    background-color: rgb(215, 231, 255);
+}
+
+#signalement_tuto {
+    font-size: 24px;
+    position: absolute;
+    right: 10px;
+    top: 43px;
+}
+
+/*
+#txt5_tuto {
+    font-weight: 300;
+    margin-top: 20px;
+}
+*/
+
+.opacity_tuto {
+    opacity: 0.3;
+}
+
+@media screen and (max-width: 710px){
+    .icon{
+        transform: scale(0.8);
+    }
+}
+@media screen and (max-width: 370px){
+    .icon{
+        transform: scale(1);
+    }
+}

@@ -1,0 +1,211 @@
+/* ---------------------------------------------------------------------------
+   index/css/style.css
+   ATTENTION : ce fichier ne faisait pas partie des sources fournies
+   (plusieurs fichiers portaient le nom "style.css" et un seul a survecu).
+   Il a ete reconstruit a partir des classes utilisees dans index.html et de
+   la charte du projet (memes variables CSS, meme navbar que contact/style.css).
+   Remplace-le simplement par ton fichier d'origine : le chemin est identique.
+--------------------------------------------------------------------------- */
+
+:root{
+    --background: #e9faff;
+    --primary: rgba(188, 211, 255, 0.36);
+    --accent: rgb(145 183 255 / 96%);
+    --secondary:rgb(123 195 241);
+    --text: #031c16;
+    --hover: #2866d9;
+}
+
+html {
+    background-color: var(--background);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background);
+}
+
+/* -------------- Navbar ---------------*/
+
+.navbar-wrapper {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background-color: var(--background);
+}
+
+.title1 {
+    cursor: pointer;
+    color: #031c16;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: var(--secondary);
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+    color: var(--hover);
+}
+
+/* -------------- Barre de recherche ---------------*/
+
+.document-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.searchbar-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 12vh;
+    margin-bottom: 10vh;
+}
+
+.searchbar-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 55vw;
+    background-color: #ffffff;
+    border-radius: 30px;
+    padding: 6px 6px 6px 18px;
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.15);
+}
+
+.searchIcon {
+    color: var(--text);
+    opacity: 0.6;
+    margin-right: 10px;
+}
+
+.searchbar {
+    flex: 1;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 18px;
+    font-family: inherit;
+    color: var(--text);
+    padding: 12px 5px;
+}
+
+.searchbutton {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.searchbutton:hover {
+    background-color: var(--hover);
+}
+
+.autocomplete-suggestions {
+    display: none;
+    position: absolute;
+    top: 105%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.20);
+}
+
+.autocomplete-suggestion {
+    padding: 12px 18px;
+    cursor: pointer;
+    color: var(--text);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.autocomplete-suggestion:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-suggestion:hover {
+    background-color: var(--primary);
+    color: var(--hover);
+}
+
+/* -------------- Les 3 sections ---------------*/
+
+.info-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 25px;
+    width: 90%;
+    margin-bottom: 40px;
+}
+
+.section {
+    flex: 1;
+    background-color: var(--primary);
+    border-radius: 5px;
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.primary-text {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 5px;
+}
+
+.secondary-text {
+    font-size: 16px;
+    color: var(--text);
+    margin-top: 0;
+}
+
+@media (max-width:600px)  {
+    .navbar-wrapper{
+        flex-direction: column;
+    }
+    .title1 {
+        font-size:40px;
+    }
+    .searchbar-container{
+        width:90vw;
+    }
+    .searchbar-wrapper {
+        margin-top: 5vh;
+        margin-bottom: 5vh;
+    }
+    .info-wrapper{
+        flex-direction: column;
+        width: 90%;
+    }
+}

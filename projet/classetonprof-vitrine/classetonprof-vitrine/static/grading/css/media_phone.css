@@ -1,0 +1,156 @@
+@media (max-width:600px)  { 
+    /* BODY */
+    body {
+        overflow: visible;
+    }
+    #space_phone {
+        display: block;
+        opacity: 0;
+        margin-top: 740px;
+    }
+    /* HEADER */
+    header {
+        text-align: center;
+    }
+    .title1 {
+        margin-left: 0px;
+        width: auto;
+        font-size: 35px;
+    }
+    .txt2 {
+        height: 40px;
+        font-size: 27px;
+        position: inherit;
+        overflow: hidden;
+        max-width: none;
+    }
+
+    /* SEARCH INPUT */
+    #search_input {
+        margin-top: 13px;
+        font-size: 31px;
+        height: 43px;
+        width: 270px;
+    }
+
+    /* DIV PROF */
+    .div_prof {
+        width: auto;
+        height: auto;
+        margin-left: 13px;
+        margin-right: 13px;
+    }
+    .txt3 {
+        font-weight: 400;
+        font-size: 42px;
+    }
+    .txt5 {
+        font-weight: 300;
+        font-size:38px;
+    }
+    .etoile img {
+        width: 50px;
+        height: 45px;
+        margin: 10px 0px;
+    }
+    .red_flag {
+        width: 50px;
+    }
+
+    /* AJOUTER UN PROF DIV */
+    .crt {
+        font-size: 40px;
+    }
+    .crt4 {
+        height:45px;
+        font-size: 24px;
+    }
+    .crt5 {
+        width: 150px;
+        height: 55px;
+        font-size: 23px;
+    }
+
+    /* NEXT_DIV */
+    #next_div {
+        display: none;
+    }
+    /* NEXT_NEXT_DIV */
+    #next_next_div {
+        display: none;
+    }
+    /* OLD_DIV */
+    #old_div {
+        display: none;
+    }
+    /* OLD_OLD_DIV */
+    #old_old_div {
+        display: none;
+    }
+
+    /* TUTO PART */
+    .tuto-text {
+        opacity: 0;
+    }
+    .tuto_txt_info {
+        opacity: 0;
+    }
+    .tuto-wrapper {
+        height: -webkit-calc(100% + 250px);
+        height: -moz-calc(100% + 250px);
+        height: -o-calc(100% + 250px);
+        height: calc(100% + 250px);
+    }
+    #tuto_div {
+        position: absolute;
+        top: 0px;
+        margin-top: 65px;
+    }
+    .tuto-agreement-wrapper {
+        bottom: 150px;
+        font-size: 30px;
+    }
+    .tuto-wrapper {
+        background-color: rgba(0,0,0,0.85);
+    }
+
+    /* ARROW */
+    .fleche_div {
+        position: fixed;
+        background-color: rgb(201 201 201);
+    }
+    .fleche_div:hover {
+        background-color: rgb(201 201 201);
+    }
+
+    /* ANIMATION TRANSITION */
+    @keyframes middle_next {
+        100% {
+            filter: opacity(0);
+        }
+    }
+    @keyframes middle_old{
+        100% {
+            filter: opacity(0);
+        }
+    }
+    @keyframes middle_reapear {
+        0% {
+            filter: opacity(0)
+        }
+        100% {
+            filter: opacity(1);
+        }
+    }
+}
+
+
+@media (max-width: 330px) {
+    .etoile img {
+      width: 40px;
+      height: 35px;
+    }
+    #new_prof_name {
+        width: 100%;
+    }
+}

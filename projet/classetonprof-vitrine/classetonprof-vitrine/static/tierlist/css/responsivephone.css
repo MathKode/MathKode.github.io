@@ -1,0 +1,52 @@
+@media (max-width:600px)  { 
+    /* NAV BAR */
+    .info-wrapper{
+        flex-direction: column;
+    }
+    .navbar-wrapper{
+        flex-direction: column;
+    }
+    .searchbar-container{
+        width:90vw;
+    }
+    .title1 {
+        font-size:40px;
+    }
+    /* TIER LIST */
+    .label-container {
+        min-height: 60px;
+        height: innerHeight;
+    }
+    .label {
+        font-size: 25px;
+    }
+    .card {
+        font-size: 20px;
+        height: 60px;
+        width: 90px;
+        margin-right: 4px;
+        margin-bottom: 4px;
+    }
+    #bank {
+        min-height: 120px;
+    }
+    /* BODY */
+    body {
+        position: absolute;
+        top: 0px;
+    }
+    /* SCREENSHOT */
+    .screenshot_card {
+        height: 50px;
+        min-height: 60px;
+        width: 90px;
+        background-color: #d8d8d8;
+        z-index: 2;
+        margin-right: 2px;
+        margin-bottom: 2px;
+        font-size: 16px;
+    }
+    .screenshot_label {
+        font-size: 16px;
+    }
+}

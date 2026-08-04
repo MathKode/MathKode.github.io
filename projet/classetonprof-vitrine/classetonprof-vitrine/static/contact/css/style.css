@@ -1,0 +1,126 @@
+:root{
+    --background: #e9faff;
+    --primary: rgba(188, 211, 255, 0.36);
+    --accent: rgb(145 183 255 / 96%);
+    --secondary:rgb(123 195 241);
+    --text: #031c16;
+    --hover: #2866d9;
+}
+
+html {
+    background-color: var(--background);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+#sujet {
+    width: 90%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: left;
+  }
+
+#description {
+    width: 90%;
+    height: 200px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: left;
+    padding: 20px 10px 200px 10px;
+}
+
+input[type=button] {
+  width: 50%;
+  background-color: var(--accent);
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=button]:hover {
+  background-color: var(--hover)
+}
+
+
+.report-section {
+  border-radius: 5px;
+  padding: 20px;
+  margin-top: 8vh;
+  width: 40%
+}
+
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.general-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    background-color: var(--background);
+}
+
+.info-wrapper{
+    margin-top: 8vh;
+    width: 60%;
+    border-radius: 5px;
+    background-color: rgba(188, 211, 255, 0.36);
+    padding: 10px;
+}
+
+.info-wrapper p{
+    font-size: 20px;
+}
+
+/* -------------- Navbar ---------------*/
+
+.navbar-wrapper {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center; /* Ajout de cette ligne pour centrer le contenu */
+    background-color: var(--background);
+}
+
+.title1 {
+    cursor: pointer;
+    color: #031c16;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: var(--secondary);
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+    color: var(--hover);
+}

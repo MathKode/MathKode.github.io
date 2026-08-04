@@ -1,0 +1,33 @@
+@media (max-width:600px)  {
+    /* REQUEST */
+    .general-wrapper {
+        display: block;
+    }
+    .report-section {
+        width: auto;
+    }
+
+    /* HEADER */
+    .info-wrapper{
+        flex-direction: column;
+    }
+    .navbar-wrapper{
+        flex-direction: column;
+    }
+    .searchbar-container{
+        width:90vw;
+    }
+
+    /* GENERAL */
+    body {
+        margin: 0px;
+        padding: 0px;
+    }
+    .navbar-wrapper {
+        padding: 0px;
+    }
+    .info-wrapper {
+        width: 80%;
+        margin-left: 4%;
+    }
+}

@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400&display=swap');
+
+html,body{
+    height: 100vh;
+    margin: 0;
+    background-color: #e9faff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+#tableau_div {
+  margin-top: 50px;
+}
+
+#tableau {
+  width: 90%;
+  margin-left: 5%;
+  background-color: white;
+  border-collapse: collapse;
+  table-layout:fixed;
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+th, td{
+  border: 1px solid black;
+  border-top-width: 0px;
+  border-right-width: 0px;
+  border-left-width: 0px;
+  padding: 10px 20px;
+}
+td {
+  word-wrap: break-word;
+}
+
+.text-gauche {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+
+.titre-colonne {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    line-height: normal;
+    font-weight: 800;
+    border-bottom-width: 3px;
+}
+
+.titre-colonne:hover {
+  background-color: rgb(236, 236, 236);
+}
+
+/* Ajout Flèche */
+.fleche:after{
+    vertical-align: top;
+    font-size: 10px;
+    content : "\0025BC";
+}

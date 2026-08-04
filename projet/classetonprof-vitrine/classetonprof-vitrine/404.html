@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<style>
+ :root {
+    --margin-line: #941c5a;
+    --lines: #1d97b8;
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Zeyada&display=swap');
+
+html,
+body {
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Zeyada', cursive;
+    
+}
+
+
+.paper {
+    width: 850px;
+    height: 1100px;
+    background-color: #fff;
+    background-image: linear-gradient(var(--lines) 0.05em, transparent 0.05em);
+    background-size: 100% 2em;
+    position: relative;
+    box-shadow: 15px 15px 33px rgba(27, 27, 27, 0.1);
+    
+    &:before,
+    &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+    }
+
+    &:before {
+        height: 100%;
+        width: 2px;
+        background-color: var(--margin-line);
+        left: 4em;
+        z-index: 2;
+    }
+
+    &:after {
+        height: 6em;
+        width: 100%;
+        background-color: #fff;
+        left: 0;
+        z-index: 1;
+    }
+
+    .holes {
+        background-color: #eee;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: block;
+        z-index: 10;
+        margin-left: 1em;
+        margin-top: 6em;
+
+        &:before,
+        &:after {
+            content: "";
+            width: 35px;
+            height: 35px;
+            background-color: #eee;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        &:before {
+            top: 50%;
+        }
+
+        &:after {
+            top: calc(100% - 6em);
+        }
+    }
+}
+
+textarea {
+    position: absolute;
+    top: 6rem;
+    left: 4rem;
+    width: calc(100% - 5rem);
+    height: calc(100% - 7rem);
+    background-color: transparent;
+    border: none;
+    font-family: 'Zeyada', cursive;
+    font-size: 2rem;
+    line-height: 1;
+    padding-left: 1rem;
+    margin: 0;
+    resize: none;
+}
+
+.note404{
+    position: absolute;
+    font-size: 50px;
+    top:0;
+    z-index: 5;
+    color: #ff0000;
+    padding: 20px;
+} 
+
+textarea:focus{
+    outline: none;
+}
+</style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur 404</title>
+    <link rel="stylesheet" type="text/css" href="css/style404.css" />
+</head>
+<body>
+    
+    <div class="paper">
+        <div class="holes"></div>
+        <textarea placeholder="Cette page n'existe pas !&#10;&#10;Cependant, si vous voulez vous amuser, vous pouvez noter tout ce qui vous passe par la tête ici."></textarea>
+        
+    </div>
+    
+    <div class="note404">404 / 20 </div>
+
+</body>
+</html>

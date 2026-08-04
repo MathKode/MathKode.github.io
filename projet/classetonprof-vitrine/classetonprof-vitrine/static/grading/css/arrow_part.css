@@ -1,0 +1,39 @@
+
+.fleche_div h1 {
+    font-size: 30px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+}
+.fleche_div {
+    position:absolute;
+    top: 0px;
+    bottom: 0px;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    height: 80px;
+    width: 45px;
+    background-color: rgb(235, 235, 235);
+
+    transition: 0.15s;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    z-index: 1;
+}
+.fleche_div:hover {
+    background-color: rgb(243, 243, 243);
+}
+#bt1 {
+    right:0px;
+    border-radius: 7px 0px 0px 7px;
+}
+#bt2 {
+    left:0px;
+    border-radius: 0px 7px 7px 0px;
+}

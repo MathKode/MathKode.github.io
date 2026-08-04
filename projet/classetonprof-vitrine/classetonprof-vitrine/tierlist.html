@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tier List des Professeurs</title>
+    <link rel="shortcut icon" type="image/x-icon" href="static/grading/icon_grading/logo4.jpg" />
+    <link rel="stylesheet" type="text/css" href="static/tierlist/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="static/tierlist/css/responsivephone.css" />
+    <script src="static/data/data.js"></script>
+    <script src="static/js/ctp.js"></script>
+    <script>
+        var ECOLE_ID = Number(CTP.parametre("id") || 1);
+        var ECOLE = CTP.getEcole(ECOLE_ID);
+        if (!ECOLE) { ECOLE_ID = 1; ECOLE = CTP.getEcole(1); }
+    </script>
+</head>
+
+  <body>
+    <div class="navbar-wrapper">
+      <div class="logo title1" id="logo" onclick="window.location='index.html';">ClasseTonProf!</div>
+      <nav class="navbar">
+          <ul>
+              <li><a href="index.html">Accueil</a></li>
+              <li><a href="about.html">À Propos</a></li>
+              <li><a href="#">Services</a></li>
+              <li><a href="contact.html">Contact</a></li>
+          </ul>
+      </nav>
+    </div>
+    <span class="headerContainer">
+      <h1>Tier List</h1>
+    </span>
+    <div id="board">
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row1">S</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row1">
+        </div>
+      </div>
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row2">A</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row2">
+        </div>
+      </div>
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row3">B</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row3">
+        </div>
+      </div>
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row4">C</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row4">
+        </div>
+      </div>
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row5">D</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row5">
+        </div>
+      </div>
+      <div class="row">
+        <div class="label-container">
+          <div class="label" id="label-row6">E</div>
+        </div>
+        <div class="cards-container" ondragover="onDragOver(event)" ondrop="onDrop(event)" id="row6">
+        </div>
+      </div>
+      <h3 id="title_site">ClasseTonProf!</h3>
+    </div>
+
+    <div class="reset-div">
+      <button class="reset-button" onclick="resetTierList(event)">Réinitialiser la tier list</button>
+      <button class="reset-button" onclick="screen_shot('board')">Sauvegarder les données</button>
+    </div>
+    <div class="reset-div">
+      
+    </div>
+
+    <h2 id="title-bank">Banque de cartes</h2>
+    <div id="fix-card">
+      <div style="display:flex;justify-content: right;">
+        <button id="bt-fix" onclick="fix_card()">
+          Fixer
+        </button>
+      </div>
+      <div id="bank" ondragover="onDragOver(event)" ondrop="onDrop(event)">
+      </div>
+    </div>
+  </body>
+
+  <script>
+    // Remplace le contexte Django "prof_ls"
+    document.title = "Tier List - " + ECOLE.nom;
+    liste = CTP.getProfs(ECOLE_ID).map(function (p) { return p.nom; })
+    if (liste.length == 0) {
+      alert("Ce lycée ne possède actuellement aucun prof...\nMais vous pouvez ajouter les votres sur la pages grading ! (Redirection Automatique)")
+      window.location = "grading.html?id=" + ECOLE_ID + "&create_prof=1"
+    }
+  </script>
+  <script src="static/tierlist/js/cards.js"></script>
+  <script src="static/tierlist/js/rows.js"></script>
+  <script src="static/tierlist/js/bank.js"></script>
+  <script src ="static/tierlist/js/update_url.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js">//API ScreenShot</script>
+  <script>
+    function screen_shot(div_id) {
+      //Apparition du titre
+      document.getElementById("title_site").style.display="block";
+      //Set la taille de la tier list
+      document.getElementById('board').style.width = "650px";
+      for (const cardEl of document.getElementsByClassName('card')) {
+        cardEl.classList.add('screenshot_card')
+      }
+      for (const labelEl of document.getElementsByClassName('label')) {
+        labelEl.classList.add('screenshot_label')
+      }
+
+      try {
+        html2canvas(document.querySelector("#" + div_id)).then(canvas => {
+          
+          //document.body.appendChild(canvas)
+          var anchor = document.createElement("a");
+          anchor.href = canvas.toDataURL("image/png");
+          anchor.download = "ClasseTonProf_TierList.PNG";
+          anchor.click();
+        });
+      } catch {
+        alert("Pensez à Verfier votre connection internet")
+      }
+      
+      //Disparition du titre
+      document.getElementById("title_site").style.display="none";
+      document.getElementById('board').style.width = "80vw";
+      for (const cardEl of document.getElementsByClassName('card')) {
+        cardEl.classList.remove('screenshot_card')
+      }
+      for (const labelEl of document.getElementsByClassName('label')) {
+        labelEl.classList.remove('screenshot_label')
+      }
+      
+    }
+  </script>
+
+</html>
