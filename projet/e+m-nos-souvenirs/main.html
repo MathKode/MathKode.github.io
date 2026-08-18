@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>E+M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <!-- ============================================================
+       ÉCRAN DE CHARGEMENT
+       ============================================================ -->
+  <div id="loader">
+    <svg viewBox="0 0 24 24">
+      <defs>
+        <linearGradient id="heartGradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ff5478"/>
+          <stop offset="100%" stop-color="#a01f45"/>
+        </linearGradient>
+      </defs>
+      <path id="heartPath" d="M 12 21.1 C 12 21.1 2.4 14.9 2.4 8.3 C 2.4 4.8 5.1 2.4 8.1 2.4 C 10 2.4 11.3 3.4 12 6 C 12.7 3.4 14 2.4 15.9 2.4 C 18.9 2.4 21.6 4.8 21.6 8.3 C 21.6 14.9 12 21.1 12 21.1 Z"></path>
+    <div class="loader-text">E+M</div>
+    <div class="loader-sub">Nos souvenirs</div>
+  </div>
+
+  <!-- ============================================================
+       APPLICATION
+       ============================================================ -->
+  <div id="app">
+    <div class="top-label"><span>Nos souvenirs</span></div>
+    <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Activer le son">
+      <span class="sound-toggle-pulse"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fbf3ee" stroke-width="1.8">
+        <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="#fbf3ee" stroke="none"/>
+        <path d="M16 9l5 6M21 9l-5 6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div id="feed"></div>
+  </div>
+
+  <div id="overlay"></div>
+  <div id="commentSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="commentCountLabel">Commentaires</h3>
+      <button class="sheet-close" id="closeSheet">✕</button>
+    </div>
+    <div class="comment-list" id="commentList"></div>
+    <div class="comment-input-row">
+      <input type="text" placeholder="Ajouter un commentaire..." id="commentInput">
+      <button class="comment-send" id="commentSend">Envoyer</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
