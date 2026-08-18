@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suivi de budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --papier:#F0F2F5; --carte:#FFFFFF; --encre:#101B2D; --doux:#6B7A90;
+  --alerte:#A5342F; --entree:#16716A; --ocre:#C08A2E; --trait:#D3D9E1; --clair:#E7EBF0;
+  --display:'Fraunces',Georgia,serif; --body:'Public Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papier);color:var(--encre);font-family:var(--body);
+  font-size:16px;-webkit-font-smoothing:antialiased;padding-bottom:56px}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1{font-family:var(--display);font-weight:800;letter-spacing:-.02em;
+  font-size:clamp(27px,5vw,38px);margin:0 0 14px;line-height:1.05}
+h2{font-family:var(--display);font-weight:600;font-size:20px;margin:32px 0 0;letter-spacing:-.01em}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ocre);outline-offset:1px}
+input{font-family:inherit;font-size:15px;color:var(--encre);border:1px solid var(--trait);
+  border-radius:3px;padding:9px 11px;background:#fff;width:100%}
+input:focus{outline:2px solid var(--ocre);outline-offset:-1px;border-color:var(--ocre)}
+header{padding:32px 0 18px;border-bottom:2px solid var(--encre)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--doux);margin:0 0 10px}
+.carte{background:var(--carte);border:1px solid var(--trait);border-radius:4px;padding:17px 19px}
+.btnP{background:var(--encre);color:#fff;padding:10px 18px;border-radius:3px;font-weight:600;font-size:14.5px;
+  display:inline-flex;align-items:center;gap:8px}
+.btnS{background:#fff;border:1px solid var(--trait);padding:8px 14px;border-radius:3px;
+  font-size:13.5px;font-weight:500}
+.lab{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--doux);margin-bottom:6px;font-weight:600}
+.bar{height:9px;background:var(--clair);border-radius:5px;overflow:hidden}
+.fill{height:100%;border-radius:5px;transition:width .35s ease}
+.grille-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0 16px}
+.catbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:11px 5px 9px;border-radius:5px;border:1.5px solid var(--trait);background:#fff;
+  font-size:11.5px;font-weight:600;line-height:1.15;text-align:center;transition:.14s ease}
+.catbtn:hover{transform:translateY(-1px)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.liste{background:var(--carte);border:1px solid var(--trait);border-radius:4px;margin-top:12px}
+.row{padding:13px 16px}
+.row+.row{border-top:1px solid var(--clair)}
+.row:hover{background:#F7F9FB}
+.pastille{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setup{border-left:3px solid var(--ocre);margin-top:20px}
+.setup code{font-family:var(--mono);font-size:12.5px;background:var(--clair);padding:1px 5px;border-radius:2px}
+.setup ol{margin:10px 0 0;padding-left:20px;font-size:14px;line-height:1.65}
+@media (max-width:620px){.grille-cats{grid-template-columns:repeat(3,1fr)}.form{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ==================================================================
+   ⬇⬇⬇  COLLEZ ICI L'URL DE VOTRE DÉPLOIEMENT APPS SCRIPT  ⬇⬇⬇
+   Elle se termine par /exec. Tant qu'elle est vide, l'application
+   fonctionne en local sans synchronisation.
+   ================================================================== */
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8-f6_Z3f1-3Ic0h2UBgvWyz1CezaGBwyIr8egGnZa5HpT_dPyJGwvNsY1ttnoKCeNtw/exec";
+
+/*  Exemple :
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+   ================================================================== */
+
+
+/* ------------------------------------------------------------------ */
+/* Catégories — seuils issus du relevé sept. 2025 → août 2026          */
+/* ------------------------------------------------------------------ */
+
+const CATS = [
+  { id:"courses",  nom:"Courses alimentaires", court:"Courses", p1:175, p2:145, couleur:"#2E7D5B",
+    aide:"1 course/semaine (~33 €), 3 dépannages max",
+    ic:'<path d="M4 7h16l-1.5 11.2a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8z"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/>' },
+  { id:"ru", nom:"RU / déjeuners campus", court:"RU", p1:55, p2:60, couleur:"#4E7A3A",
+    aide:"≈ 11 repas — le seul poste qui monte",
+    ic:'<path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M3 19h18"/><path d="M12 8V4.5"/>' },
+  { id:"resto", nom:"Restos & fast-food", court:"Restos", p1:60, p2:40, couleur:"#7C3F58",
+    aide:"4 sorties à 10 €",
+    ic:'<path d="M6 3v7a2 2 0 0 0 4 0V3"/><path d="M8 10v11"/><path d="M17.5 3c-1.4 2-2 4-2 6s.6 3 2 3 2-1 2-3-.6-4-2-6z"/><path d="M17.5 12v9"/>' },
+  { id:"vie", nom:"Cadeaux / soirées / vie étudiante", court:"Vie étud.", p1:80, p2:70, couleur:"#7A4CB0",
+    aide:"2 soirées asso + 1 sortie",
+    ic:'<rect x="3.5" y="10" width="17" height="10.5" rx="1.2"/><path d="M3.5 14h17"/><path d="M12 10v10.5"/><path d="M12 10c-2 0-5-.6-5-2.6A2.4 2.4 0 0 1 12 6.8a2.4 2.4 0 0 1 5 .6c0 2-3 2.6-5 2.6z"/>' },
+  { id:"transport", nom:"Transports", court:"Transport", p1:55, p2:45, couleur:"#2C6E9E",
+    aide:"Keolis + trajets SNCF réservés tôt",
+    ic:'<rect x="4" y="3.5" width="16" height="12.5" rx="2.2"/><path d="M4 10.5h16"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/>' },
+  { id:"shopping", nom:"Shopping & équipement", court:"Shopping", p1:60, p2:35, couleur:"#C08A2E",
+    aide:"Rien au-dessus de 35 € ici",
+    ic:'<path d="M5 8h14l1.2 12.2H3.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>' },
+  { id:"etudes", nom:"Études & fournitures", court:"Études", p1:20, p2:15, couleur:"#3F4E8C",
+    aide:"Hors inscription annuelle",
+    ic:'<path d="M4.5 5.2A2.2 2.2 0 0 1 6.7 3H19.5v18H6.7a2.2 2.2 0 0 1-2.2-2.2z"/><path d="M4.5 17.2h15"/>' },
+  { id:"sante", nom:"Santé", court:"Santé", p1:25, p2:20, couleur:"#B5493F",
+    aide:"Moyenne, pas plafond",
+    ic:'<path d="M20.6 6.9a4.8 4.8 0 0 0-8.6-1.6A4.8 4.8 0 0 0 3.4 6.9c-1 3.1 1.6 5.9 8.6 11.7 7-5.8 9.6-8.6 8.6-11.7z"/>' },
+  { id:"fixes", nom:"Fixes (box, mobile, abos, dons)", court:"Fixes", p1:65, p2:60, couleur:"#4A5A6B",
+    aide:"Box ~27 € + mobile 10 € + 1 abo + dons",
+    ic:'<path d="M2.5 9.2a13.5 13.5 0 0 1 19 0"/><path d="M5.5 12.6a9 9 0 0 1 13 0"/><path d="M8.6 16a4.6 4.6 0 0 1 6.8 0"/><circle cx="12" cy="19.4" r=".9" fill="currentColor" stroke="none"/>' },
+  { id:"imprevus", nom:"Imprévus / non classé", court:"Imprévus", p1:5, p2:10, couleur:"#7A8492",
+    aide:"À garder proche de zéro",
+    ic:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.3 2.4c-.6.3-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.9" r=".7" fill="currentColor" stroke="none"/>' },
+];
+
+const PALIERS = {
+  p1:{ nom:"Palier 1", total:600, mi:300, sous:"3 premiers mois — équilibre le compte" },
+  p2:{ nom:"Objectif", total:500, mi:250, sous:"Cible finale — dégage ~1 200 €/an" },
+};
+
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const KEY = "suivi-budget-v3";
+
+/* ------------------------------------------------------------------ */
+/* Utilitaires                                                         */
+/* ------------------------------------------------------------------ */
+
+const eur  = n => n.toLocaleString("fr-FR",{maximumFractionDigits:0}) + " €";
+const eur2 = n => n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €";
+const ym   = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
+const iso  = () => new Date().toISOString().slice(0,10);
+const catDe = id => CATS.find(c => c.id === id) || CATS[CATS.length-1];
+const esc  = s => String(s).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const svg  = (c,t=17) => `<svg width="${t}" height="${t}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${c.ic}</svg>`;
+
+/* Stockage : localStorage si autorisé, sinon mémoire de session */
+let memoire = null;
+const store = {
+  load(){
+    try { const b = localStorage.getItem(KEY); if (b) return JSON.parse(b); } catch(e){}
+    return memoire;
+  },
+  save(o){
+    memoire = o;
+    try { localStorage.setItem(KEY, JSON.stringify(o)); return true; } catch(e){ return false; }
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/* État                                                                */
+/* ------------------------------------------------------------------ */
+
+const S = {
+  depenses: [], supprimes: [], palier: "p1", budgets: null,
+  dernierSync: null, mois: ym(new Date()),
+  cat: "courses", demi: false, montant: "", libelle: "", date: iso(),
+  flash: null, etatSync: null, enCours: false, confirmReset: false,
+};
+
+const relie = !!APPS_SCRIPT_URL && /^https:\/\/script\.google\.com\/.+\/exec$/.test(APPS_SCRIPT_URL.trim());
+
+function sauver(){
+  const ok = store.save({
+    depenses:S.depenses, supprimes:S.supprimes, palier:S.palier,
+    budgets:S.budgets, dernierSync:S.dernierSync
+  });
+  if (!ok && !relie) S.etatSync = { t:"err", m:"Impossible d'enregistrer localement. Gardez la synchronisation active." };
+}
+
+const budgetDe = id => (S.budgets && S.budgets[id] != null)
+  ? S.budgets[id]
+  : (S.palier === "p1" ? catDe(id).p1 : catDe(id).p2);
+
+/* ------------------------------------------------------------------ */
+/* Synchronisation Apps Script                                         */
+/* ------------------------------------------------------------------ */
+
+async function synchroniser(silencieux){
+  if (!relie) return;
+  S.enCours = true;
+  if (!silencieux) { S.etatSync = { t:"info", m:"Synchronisation en cours…" }; rendre(); }
+  try {
+    const r = await fetch(APPS_SCRIPT_URL.trim(), {
+      method:"POST",
+      // text/plain : requête « simple », pas de préflight CORS (non géré par Apps Script)
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      redirect:"follow",
+      body: JSON.stringify({
+        action:"sync", depenses:S.depenses, supprimes:S.supprimes,
+        reglages:{ palier:S.palier, budgets:S.budgets }
+      })
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.erreur || "Réponse inattendue du script.");
+
+    S.depenses = (data.depenses || []).map(d => ({
+      id:String(d.id), date:String(d.date).slice(0,10),
+      cat: CATS.some(c => c.id === d.cat) ? d.cat : "imprevus",
+      libelle: d.libelle || "", montant: Number(d.montant) || 0, divise: !!d.divise
+    }));
+    S.supprimes = [];
+    S.dernierSync = new Date().toISOString();
+    if (data.reglages && data.reglages.budgets) S.budgets = data.reglages.budgets;
+    S.etatSync = { t:"ok", m:S.depenses.length + " dépenses synchronisées avec le Sheet." };
+    sauver();
+  } catch(e){
+    S.etatSync = { t:"err", m:"Échec : " + e.message +
+      " — vérifiez que le déploiement est accessible à « Tout le monde » et qu'il a été redéployé après modification." };
+  } finally {
+    S.enCours = false;
+    rendre();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Actions                                                             */
+/* ------------------------------------------------------------------ */
+
+function montantFinal(){
+  const v = parseFloat(String(S.montant).replace(",", "."));
+  if (isNaN(v) || v <= 0) return null;
+  return Math.round((S.demi ? v/2 : v) * 100) / 100;
+}
+
+function signaler(t,m,ms=2800){
+  S.flash = {t,m}; rendre();
+  setTimeout(() => { S.flash = null; rendre(); }, ms);
+}
+
+function ajouter(){
+  const v = montantFinal();
+  if (v == null) return signaler("err","Entrez un montant valide.");
+  S.depenses.unshift({
+    id: Date.now() + "-" + Math.random().toString(36).slice(2,7),
+    date: S.date, cat: S.cat, montant: v,
+    libelle: (S.libelle || "").trim() || catDe(S.cat).court,
+    divise: S.demi
+  });
+  const label = catDe(S.cat).court, moitie = S.demi;
+  S.montant = ""; S.libelle = ""; S.demi = false;
+  sauver();
+  signaler("ok", eur2(v) + " en " + label + (moitie ? " (moitié)" : "") + ".");
+  if (relie) synchroniser(true);
+}
+
+function supprimer(id){
+  S.depenses = S.depenses.filter(d => d.id !== id);
+  S.supprimes.push(id);
+  sauver(); rendre();
+  if (relie) synchroniser(true);
+}
+
+function changerPalier(p){ S.palier = p; S.budgets = null; sauver(); rendre(); }
+
+function modifierBudget(id,val){
+  const v = parseFloat(String(val).replace(",", "."));
+  const base = {};
+  CATS.forEach(c => base[c.id] = budgetDe(c.id));
+  base[id] = isNaN(v) ? 0 : Math.round(v);
+  S.budgets = base; sauver(); rendre();
+}
+
+function decalerMois(n){
+  const [a,m] = S.mois.split("-").map(Number);
+  S.mois = ym(new Date(a, m-1+n, 1));
+  rendre();
+}
+
+function exporter(){
+  const l = [["id","date","categorie","libelle","montant","divise"].join(";")];
+  [...S.depenses].sort((a,b) => a.date.localeCompare(b.date)).forEach(d => {
+    l.push([d.id, d.date, d.cat, '"' + d.libelle.replace(/"/g,"'") + '"',
+      String(d.montant).replace(".", ","), d.divise ? "oui" : ""].join(";"));
+  });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\uFEFF" + l.join("\r\n")], {type:"text/csv;charset=utf-8"}));
+  a.download = "depenses_" + ym(new Date()) + ".csv";
+  a.click();
+}
+
+async function importer(fichier){
+  const texte = (await fichier.text()).replace(/^\uFEFF/, "");
+  const lignes = texte.split(/\r?\n/).filter(x => x.trim());
+  if (!lignes.length) return signaler("err","Fichier vide.");
+  const sep = (lignes[0].match(/;/g) || []).length >= 3 ? ";" : ",";
+  const connus = new Set(S.depenses.map(d => d.id));
+  let n = 0;
+  lignes.slice(1).forEach(l => {
+    const c = l.split(sep).map(x => x.replace(/^"|"$/g,"").trim());
+    if (c.length < 5) return;
+    const [id, dt, nomCat, lib, mnt, div] = c;
+    const v = parseFloat(String(mnt).replace(/\s/g,"").replace(",", "."));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dt) || isNaN(v)) return;
+    const t = CATS.find(x => x.id === nomCat) ||
+              CATS.find(x => x.nom.toLowerCase() === (nomCat||"").toLowerCase());
+    const nid = id || "imp-" + Math.random().toString(36).slice(2,9);
+    if (connus.has(nid)) return;
+    S.depenses.unshift({ id:nid, date:dt, cat:t ? t.id : "imprevus",
+      libelle: lib || "Import", montant: Math.round(v*100)/100,
+      divise: (div||"").toLowerCase() === "oui" });
+    n++;
+  });
+  if (!n) return signaler("err","Aucune ligne exploitable.");
+  sauver(); signaler("ok", n + " dépenses importées.");
+  if (relie) synchroniser(true);
+}
+
+function toutEffacer(){
+  S.supprimes.push(...S.depenses.map(d => d.id));
+  S.depenses = []; S.budgets = null; S.confirmReset = false;
+  sauver(); rendre();
+  if (relie) synchroniser(true);
+}
+
+/* ------------------------------------------------------------------ */
+/* Rendu                                                               */
+/* ------------------------------------------------------------------ */
+
+function rendre(){
+  const [an, mo] = S.mois.split("-").map(Number);
+  const duMois = S.depenses.filter(d => d.date.slice(0,7) === S.mois);
+  const parCat = {}; CATS.forEach(c => parCat[c.id] = 0);
+  duMois.forEach(d => parCat[d.cat] = (parCat[d.cat] || 0) + d.montant);
+
+  const totalMois = duMois.reduce((s,d) => s + d.montant, 0);
+  const totalBudget = CATS.reduce((s,c) => s + budgetDe(c.id), 0);
+  const nbJours = new Date(an, mo, 0).getDate();
+  const auj = new Date();
+  const moisCourant = ym(auj) === S.mois;
+  const jour = moisCourant ? auj.getDate() : nbJours;
+  const au15 = duMois.filter(d => +d.date.slice(8,10) <= 15).reduce((s,d) => s + d.montant, 0);
+  const seuilMi = PALIERS[S.palier].mi;
+  const reste = totalBudget - totalMois;
+  const rythme = jour > 0 ? (totalMois / jour) * nbJours : 0;
+  const parJour = moisCourant && jour < nbJours ? reste / (nbJours - jour) : null;
+  const coulTot = totalMois > totalBudget ? "var(--alerte)"
+                : totalMois > totalBudget * .85 ? "var(--ocre)" : "var(--entree)";
+  const active = catDe(S.cat);
+  const mf = montantFinal();
+
+  document.getElementById("app").innerHTML = `
+  <header>
+    <p class="eyebrow">Suivi de budget · enveloppe parentale</p>
+    <h1>${MOIS[mo-1]} ${an}</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btnS" data-act="mois" data-v="-1">←</button>
+      <button class="btnS" data-act="mois-auj">Aujourd'hui</button>
+      <button class="btnS" data-act="mois" data-v="1">→</button>
+      <span style="flex:1"></span>
+      ${Object.entries(PALIERS).map(([k,p]) => `
+        <button class="btnS" data-act="palier" data-v="${k}"
+          style="border-color:var(--encre);background:${S.palier===k?"var(--encre)":"#fff"};
+                 color:${S.palier===k?"#fff":"var(--encre)"}">${p.nom} · ${p.total} €</button>`).join("")}
+    </div>
+  </header>
+
+  ${!relie ? `
+  <div class="carte setup">
+    <b>La synchronisation n'est pas encore branchée.</b>
+    <ol>
+      <li>Ouvrez ce fichier dans un éditeur de texte et cherchez <code>APPS_SCRIPT_URL</code>, tout en haut du script.</li>
+      <li>Collez entre les guillemets l'URL de votre déploiement Apps Script — elle finit par <code>/exec</code>.</li>
+      <li>Enregistrez et rechargez la page.</li>
+    </ol>
+    <p style="font-size:13.5px;color:var(--doux);margin-top:11px;line-height:1.6">
+      En attendant, tout fonctionne&nbsp;: les dépenses sont conservées dans le navigateur et l'export CSV reste disponible.
+    </p>
+  </div>` : ""}
+
+  <div class="carte" style="margin-top:20px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <div>
+        <span class="mono" style="font-size:34px;font-weight:600;letter-spacing:-.02em;color:${coulTot}">${eur(totalMois)}</span>
+        <span class="mono" style="font-size:15px;color:var(--doux)"> / ${eur(totalBudget)}</span>
+      </div>
+      <span class="mono" style="font-size:14px;font-weight:600;color:${reste>=0?"var(--entree)":"var(--alerte)"}">
+        ${reste>=0 ? eur(reste)+" restants" : eur(-reste)+" au-dessus"}</span>
+    </div>
+    <div class="bar" style="margin-top:12px">
+      <div class="fill" style="width:${Math.min(100,(totalMois/totalBudget)*100)}%;background:${coulTot}"></div>
+    </div>
+    <p style="font-size:13.5px;color:var(--doux);margin-top:11px;line-height:1.55">
+      ${PALIERS[S.palier].sous}. ${duMois.length} dépense${duMois.length>1?"s":""} ce mois-ci.
+      ${moisCourant && parJour !== null ? ` À ce rythme le mois finirait à <b class="mono">${eur(rythme)}</b> —
+        il reste <b class="mono">${eur2(Math.max(0,parJour))}</b> par jour sur ${nbJours-jour} jour${nbJours-jour>1?"s":""}.` : ""}
+    </p>
+    <div style="margin-top:13px;padding-top:11px;border-top:1px dashed var(--trait);
+                display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="mono" style="font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--doux)">Contrôle du 15</span>
+      <span class="mono" style="font-size:14px;font-weight:600;color:${au15>seuilMi?"var(--alerte)":"var(--entree)"}">
+        ${eur(au15)} / ${eur(seuilMi)}</span>
+      <span style="font-size:13px;color:var(--doux)">
+        ${au15>seuilMi ? "Dépassé — deuxième quinzaine en mode RU + courses." : (jour>=15 ? "Tenu." : "En cours.")}</span>
+    </div>
+  </div>
+
+  <div class="carte" style="margin-top:16px">
+    <h2 style="margin-top:0">Ajouter une dépense</h2>
+    <div class="grille-cats">
+      ${CATS.map(c => {
+        const a = c.id === S.cat;
+        return `<button class="catbtn" data-act="cat" data-v="${c.id}" aria-pressed="${a}" title="${esc(c.nom)}"
+          style="background:${a?c.couleur:"#fff"};color:${a?"#fff":c.couleur};
+                 border-color:${a?c.couleur:"var(--trait)"};box-shadow:${a?"0 2px 8px "+c.couleur+"44":"none"}">
+          ${svg(c,19)}<span style="color:${a?"#fff":"var(--encre)"}">${c.court}</span></button>`;
+      }).join("")}
+    </div>
+
+    <div class="form">
+      <div>
+        <label class="lab" for="montant">Montant payé</label>
+        <div style="display:flex;gap:8px">
+          <input id="montant" inputmode="decimal" placeholder="0,00" value="${esc(S.montant)}">
+          <button class="btnS" data-act="demi" aria-pressed="${S.demi}" title="Diviser le montant par deux"
+            style="min-width:54px;font-weight:700;font-size:15px;
+                   background:${S.demi?"var(--ocre)":"#fff"};color:${S.demi?"#fff":"var(--encre)"};
+                   border-color:${S.demi?"var(--ocre)":"var(--trait)"}">÷2</button>
+        </div>
+        <p class="mono" style="font-size:12.5px;min-height:18px;margin-top:7px;color:${S.demi?"var(--ocre)":"var(--doux)"}">
+          ${S.demi ? (mf !== null ? "Compté " + eur2(mf) + " — l'autre moitié sera remboursée" : "Moitié seulement comptée") : "&nbsp;"}
+        </p>
+      </div>
+      <div>
+        <label class="lab" for="date">Date</label>
+        <input id="date" type="date" value="${S.date}">
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="lab" for="libelle">Libellé (facultatif)</label>
+        <input id="libelle" placeholder="ex. ${esc(active.court === "Courses" ? "Lidl" : active.court)}" value="${esc(S.libelle)}">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap">
+      <button class="btnP" data-act="ajouter" style="background:${active.couleur}">
+        ${svg(active,16)} Enregistrer en ${active.court}</button>
+      ${S.flash ? `<span class="mono" style="font-size:13px;color:${S.flash.t==="ok"?"var(--entree)":"var(--alerte)"}">${esc(S.flash.m)}</span>` : ""}
+    </div>
+  </div>
+
+  <h2>Vos enveloppes</h2>
+  <p style="font-size:13.5px;color:var(--doux);margin:4px 0 12px">Cliquez sur un budget pour l'ajuster.</p>
+  <div class="liste" style="margin-top:0">
+    ${CATS.map(c => {
+      const b = budgetDe(c.id), v = parCat[c.id] || 0;
+      const dep = v > b, coul = dep ? "var(--alerte)" : c.couleur;
+      return `<div class="row">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <span style="display:flex;align-items:center;gap:9px;font-weight:600;font-size:14.5px;min-width:0">
+            <span style="color:${c.couleur};display:flex">${svg(c)}</span>
+            <span class="ell">${esc(c.nom)}</span></span>
+          <span class="mono" style="font-size:13.5px;white-space:nowrap">
+            <b style="color:${coul}">${eur(v)}</b><span style="color:var(--doux)"> / </span>
+            <input class="mono" data-act="budget" data-v="${c.id}" value="${b}" aria-label="Budget ${esc(c.nom)}"
+              style="width:50px;padding:1px 3px;font-size:13.5px;text-align:right;border:none;
+                     border-bottom:1px dotted var(--doux);border-radius:0;background:transparent;display:inline-block">
+            <span style="color:var(--doux)"> €</span></span>
+        </div>
+        <div class="bar" style="margin:8px 0 6px">
+          <div class="fill" style="width:${b>0?Math.min(100,(v/b)*100):0}%;background:${coul}"></div></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--doux)">
+          <span class="ell">${esc(c.aide)}</span>
+          <span class="mono" style="white-space:nowrap;color:${dep?"var(--alerte)":"var(--doux)"}">
+            ${dep ? "+" + eur(v-b) : eur(b-v) + " restants"}</span>
+        </div></div>`;
+    }).join("")}
+  </div>
+
+  <h2>Le détail du mois</h2>
+  ${duMois.length === 0
+    ? `<div class="carte" style="margin-top:12px;color:var(--doux);font-size:14.5px">Rien pour l'instant.</div>`
+    : `<div class="liste">${[...duMois].sort((a,b) => b.date.localeCompare(a.date)).map(d => {
+        const c = catDe(d.cat);
+        return `<div class="row" style="display:flex;align-items:center;gap:11px;padding:10px 14px;font-size:14.5px">
+          <span class="pastille" style="background:${c.couleur}1F;color:${c.couleur}">${svg(c,16)}</span>
+          <span class="mono" style="font-size:12.5px;color:var(--doux);min-width:40px">${d.date.slice(8,10)}/${d.date.slice(5,7)}</span>
+          <span class="ell" style="flex:1;min-width:0">${esc(d.libelle)}
+            ${d.divise ? '<span class="mono" style="color:var(--ocre);font-size:11px;margin-left:7px">÷2</span>' : ""}</span>
+          <span class="mono" style="font-weight:600;white-space:nowrap">${eur2(d.montant)}</span>
+          <button data-act="suppr" data-v="${d.id}" title="Supprimer"
+            style="color:var(--doux);font-size:18px;line-height:1;padding:0 3px">×</button></div>`;
+      }).join("")}</div>`}
+
+  <h2>Google Sheet</h2>
+  <div class="carte" style="margin-top:12px">
+    ${relie ? `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btnP" data-act="sync" ${S.enCours?"disabled":""}
+          style="${S.enCours?"opacity:.6;cursor:wait":""}">${S.enCours?"Synchronisation…":"Synchroniser maintenant"}</button>
+        ${S.dernierSync ? `<span class="mono" style="font-size:12px;color:var(--doux)">Dernière fois :
+          ${new Date(S.dernierSync).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}</span>` : ""}
+      </div>
+      <p style="font-size:13.5px;color:var(--doux);margin-top:12px;line-height:1.6">
+        La synchronisation part aussi toute seule à l'ouverture et après chaque ajout ou suppression.
+        Trois onglets côté Sheet&nbsp;: <b>Depenses</b>, <b>Reglages</b> et <b>Recap</b> (tableau mois × catégorie).</p>`
+    : `<p style="font-size:14.5px;line-height:1.6;margin:0">
+        Renseignez <code style="font-family:var(--mono);font-size:12.5px;background:var(--clair);padding:1px 5px;border-radius:2px">APPS_SCRIPT_URL</code>
+        en haut du fichier pour activer la synchronisation.</p>`}
+    ${S.etatSync ? `<p style="font-size:13.5px;margin-top:12px;line-height:1.55;
+      color:${S.etatSync.t==="ok"?"var(--entree)":S.etatSync.t==="err"?"var(--alerte)":"var(--doux)"}">${esc(S.etatSync.m)}</p>` : ""}
+  </div>
+
+  <div class="carte" style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:13.5px;color:var(--doux);flex:1;min-width:180px">Sauvegarde de secours, sans Google.</span>
+    <button class="btnS" data-act="export">Exporter CSV (${S.depenses.length})</button>
+    <button class="btnS" data-act="import">Importer CSV</button>
+    <button class="btnS" data-act="reset" style="color:var(--alerte)">Tout effacer</button>
+    <input type="file" id="fichier" accept=".csv,text/csv" style="display:none">
+  </div>
+  ${S.confirmReset ? `
+    <div class="carte" style="margin-top:10px;border-left:3px solid var(--alerte)">
+      <p style="font-size:14px;margin-bottom:10px">Supprimer les ${S.depenses.length} dépenses et les budgets
+        personnalisés&nbsp;? ${relie ? "La synchronisation les retirera aussi du Sheet." : ""}</p>
+      <button class="btnP" data-act="reset-ok" style="background:var(--alerte)">Oui, tout effacer</button>
+      <button class="btnS" data-act="reset-non" style="margin-left:8px">Annuler</button>
+    </div>` : ""}
+
+  <p style="font-size:12.5px;color:var(--doux);margin-top:26px;line-height:1.6">
+    Les données restent dans ce navigateur d'une session à l'autre.
+    ${relie ? "Le Sheet fait référence dès qu'il est joignable." : "Exportez le CSV de temps en temps."}
+  </p>`;
+
+  brancher();
+}
+
+/* ------------------------------------------------------------------ */
+/* Événements                                                          */
+/* ------------------------------------------------------------------ */
+
+function brancher(){
+  const app = document.getElementById("app");
+
+  app.querySelectorAll("[data-act]").forEach(el => {
+    const a = el.dataset.act, v = el.dataset.v;
+    if (a === "budget") {
+      el.addEventListener("change", () => modifierBudget(v, el.value));
+      return;
+    }
+    el.addEventListener("click", () => {
+      switch(a){
+        case "mois":      decalerMois(+v); break;
+        case "mois-auj":  S.mois = ym(new Date()); rendre(); break;
+        case "palier":    changerPalier(v); break;
+        case "cat":       S.cat = v; rendre(); document.getElementById("montant").focus(); break;
+        case "demi":      S.demi = !S.demi; rendre(); document.getElementById("montant").focus(); break;
+        case "ajouter":   ajouter(); break;
+        case "suppr":     supprimer(v); break;
+        case "sync":      synchroniser(false); break;
+        case "export":    exporter(); break;
+        case "import":    document.getElementById("fichier").click(); break;
+        case "reset":     S.confirmReset = !S.confirmReset; rendre(); break;
+        case "reset-ok":  toutEffacer(); break;
+        case "reset-non": S.confirmReset = false; rendre(); break;
+      }
+    });
+  });
+
+  const lier = (id, champ) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      S[champ] = el.value;
+      if (champ === "montant" && S.demi) {
+        const p = el.parentElement.parentElement.querySelector("p");
+        const mf = montantFinal();
+        p.textContent = mf !== null ? "Compté " + eur2(mf) + " — l'autre moitié sera remboursée" : "Moitié seulement comptée";
+      }
+    });
+    el.addEventListener("keydown", e => { if (e.key === "Enter") ajouter(); });
+  };
+  lier("montant","montant"); lier("libelle","libelle");
+
+  const dt = document.getElementById("date");
+  if (dt) dt.addEventListener("change", () => S.date = dt.value);
+
+  const f = document.getElementById("fichier");
+  if (f) f.addEventListener("change", e => {
+    const fic = e.target.files && e.target.files[0];
+    if (fic) importer(fic);
+    e.target.value = "";
+  });
+}
+
+(function init(){
+  const d = store.load();
+  if (d) {
+    S.depenses = d.depenses || [];
+    S.supprimes = d.supprimes || [];
+    S.palier = d.palier || "p1";
+    S.budgets = d.budgets || null;
+    S.dernierSync = d.dernierSync || null;
+  }
+  rendre();
+  if (relie) synchroniser(true);
+})();
+</script>
+</body>
+</html>
