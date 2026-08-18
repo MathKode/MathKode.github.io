@@ -1,0 +1,375 @@
+/* ============================================================
+     TOKENS — palette "carnet d'amour" : noir prune profond,
+     rose signature, or discret pour les étincelles.
+     ============================================================ */
+  :root{
+    --void:#0d0509;
+    --void-2:#170a10;
+    --surface:#241019;
+    --surface-2:#2d131c;
+    --rose:#ff5478;
+    --rose-deep:#c62655;
+    --gold:#f0c369;
+    --cream:#fbf3ee;
+    --cream-dim:rgba(251,243,238,.62);
+    --cream-dimmer:rgba(251,243,238,.36);
+    --ff-display:'Dancing Script', cursive;
+    --ff-body:'Manrope', sans-serif;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0; height:100%; background:var(--void); color:var(--cream);
+    font-family:var(--ff-body); overflow:hidden; overscroll-behavior:none;
+  }
+  ::selection{ background:var(--rose); color:var(--void); }
+
+  /* ============================================================
+     LOADER — un cœur dessiné à la main, comme une signature,
+     qui se remplit puis laisse place au feed.
+     ============================================================ */
+  #loader{
+    position:fixed; inset:0; z-index:100;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:radial-gradient(120% 120% at 50% 40%, var(--void-2) 0%, var(--void) 70%);
+    transition:opacity .7s ease;
+  }
+  #loader.fade-out{ opacity:0; pointer-events:none; }
+  #loader svg{ width:38vw; max-width:190px; overflow:visible; }
+  #heartPath{
+    fill:none;
+    stroke:var(--rose-deep);
+    stroke-width:1.2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 0 5px rgba(198,38,85,.35));
+  }
+  #loader.fill #heartPath{
+    fill:url(#heartGradient);
+    stroke:var(--rose-deep);
+    transition:fill .7s ease;
+  }
+  .loader-text{
+    margin-top:22px;
+    font-family:var(--ff-display);
+    font-weight:700;
+    font-size:clamp(28px,7vw,40px);
+    letter-spacing:.5px;
+    color:var(--cream);
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .8s ease, transform .8s ease;
+  }
+  #loader.fill .loader-text{ opacity:1; transform:translateY(0); }
+  .loader-sub{
+    margin-top:8px;
+    font-size:11.5px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--cream-dimmer);
+    opacity:0;
+    transition:opacity .8s ease .15s;
+  }
+  #loader.fill .loader-sub{ opacity:1; }
+
+  /* ============================================================
+     APP SHELL
+     ============================================================ */
+  #app{ position:fixed; inset:0; opacity:0; transition:opacity .6s ease; }
+  #app.visible{ opacity:1; }
+
+  .top-label{
+    position:absolute; top:calc(16px + var(--safe-t)); left:0; right:0;
+    display:flex; justify-content:center; z-index:20; pointer-events:none;
+  }
+  .top-label span{
+    font-family:var(--ff-body); font-weight:700; font-size:12.5px;
+    letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--cream); background:rgba(13,5,9,.32);
+    padding:7px 16px; border-radius:100px; backdrop-filter:blur(6px);
+    border:1px solid rgba(251,243,238,.14);
+  }
+
+  /* -------- bouton son (global, persiste au-dessus du feed) -------- */
+  .sound-toggle{
+    position:absolute; top:calc(16px + var(--safe-t)); left:16px; z-index:22;
+    width:40px; height:40px; border-radius:50%; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(13,5,9,.42); backdrop-filter:blur(6px);
+    border:1px solid rgba(251,243,238,.16);
+    cursor:pointer; pointer-events:auto;
+    transition:background .2s ease, border-color .2s ease, transform .15s ease;
+  }
+  .sound-toggle:active{ transform:scale(.9); }
+  .sound-toggle svg{ width:19px; height:19px; position:relative; z-index:1; }
+  .sound-toggle.on{ background:rgba(255,84,120,.24); border-color:rgba(255,84,120,.42); }
+  .sound-toggle-pulse{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.5px solid var(--rose);
+    animation:soundPulse 1.8s ease-out infinite;
+  }
+  .sound-toggle.on .sound-toggle-pulse{ display:none; }
+  @keyframes soundPulse{
+    0%{ transform:scale(1); opacity:.75; }
+    100%{ transform:scale(1.7); opacity:0; }
+  }
+
+  #feed{
+    position:absolute; inset:0;
+    overflow-y:scroll; overflow-x:hidden;
+    scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+  }
+  #feed::-webkit-scrollbar{ display:none; }
+
+  .video-section{
+    position:relative;
+    height:100vh; height:100dvh;
+    width:100%;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+    background:var(--void);
+  }
+
+  /* -------- cadre vidéo : contient le fond + le grain + le voile --------
+     Par défaut (mode TikTok) : rectangle vertical centré, coins arrondis,
+     la vidéo entière est visible, jamais recadrée.
+     En mode plein écran : le cadre occupe tout l'espace, bord à bord. */
+  .video-frame{
+    position:absolute;
+    overflow:hidden;
+    background:#050203;
+    transition:width .4s cubic-bezier(.2,.8,.3,1), height .4s cubic-bezier(.2,.8,.3,1),
+               border-radius .35s ease, box-shadow .35s ease;
+  }
+
+  #app.mode-fill .video-frame{
+    inset:0; top:0; left:0; right:0; bottom:0; transform:none;
+    width:100%; height:100%;
+    border-radius:0;
+    box-shadow:none;
+  }
+
+  #app:not(.mode-fill) .video-frame{
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:min(100%, calc(100dvh * 9 / 16));
+    height:min(100dvh, calc(100vw * 16 / 9));
+    border-radius:22px;
+    box-shadow:0 26px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(251,243,238,.09);
+  }
+
+  .video-bg{
+    position:absolute; inset:-4%;
+    width:108%; height:108%;
+    object-fit:cover; object-position:center;
+    background-size:cover; background-position:center;
+    transform:scale(1.06);
+    transition:transform 9s ease-out;
+  }
+  #app.mode-fill .video-section.active .video-bg{ transform:scale(1.16); }
+
+  /* En mode TikTok, la vidéo n'est jamais recadrée : elle est entièrement
+     visible à l'intérieur du cadre (letterbox si le ratio diffère). */
+  #app:not(.mode-fill) .video-bg{
+    inset:0; width:100%; height:100%;
+    object-fit:contain; background-size:contain;
+    transform:none;
+  }
+
+  .video-grain{
+    position:absolute; inset:0; opacity:.5; mix-blend-mode:overlay;
+    background-image:radial-gradient(rgba(255,255,255,.5) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+
+  .video-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(9,3,6,.92) 0%, rgba(9,3,6,.55) 28%, transparent 58%),
+               linear-gradient(to bottom, rgba(9,3,6,.5) 0%, transparent 22%);
+  }
+
+  .video-watermark{
+    position:absolute; top:calc(18px + var(--safe-t)); right:16px;
+    display:flex; align-items:center; gap:5px;
+    opacity:.5; font-family:var(--ff-display); font-weight:700; font-size:16px;
+  }
+  .video-watermark svg{ width:16px; height:16px; }
+
+  /* -------- contenu bas de carte -------- */
+  .video-info{
+    position:relative; z-index:5;
+    padding:0 84px 28px 18px;
+    padding-bottom:calc(28px + var(--safe-b));
+    width:100%;
+  }
+  .video-user{
+    display:flex; align-items:center; gap:8px; margin-bottom:8px;
+  }
+  .video-user .avatar{
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--ff-display); font-weight:700; font-size:14px;
+    color:var(--void); flex-shrink:0;
+    background:linear-gradient(135deg, var(--gold), var(--rose));
+    border:1.5px solid rgba(251,243,238,.55);
+  }
+  .video-user .handle{
+    font-family:var(--ff-display); font-weight:700; font-size:19px; color:var(--cream);
+  }
+  .video-caption{
+    font-size:14.5px; line-height:1.45; color:var(--cream);
+    font-weight:500; max-width:78vw;
+    text-shadow:0 1px 6px rgba(0,0,0,.4);
+  }
+
+  /* -------- rail d'actions droite -------- */
+  .action-rail{
+    position:absolute; right:10px; bottom:calc(28px + var(--safe-b));
+    z-index:6; display:flex; flex-direction:column; align-items:center; gap:22px;
+  }
+  .action-btn{
+    background:none; border:none; padding:0; margin:0;
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    color:var(--cream); cursor:pointer; -webkit-user-select:none; user-select:none;
+  }
+  .action-btn .icon-wrap{
+    width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(13,5,9,.34); backdrop-filter:blur(6px);
+    border:1px solid rgba(251,243,238,.14);
+    transition:transform .15s ease, background .2s ease;
+  }
+  .action-btn svg{ width:24px; height:24px; }
+  .action-btn .count{
+    font-size:11.5px; font-weight:700; color:var(--cream-dim);
+    text-shadow:0 1px 4px rgba(0,0,0,.5);
+  }
+  .like-btn.liked .icon-wrap{ background:rgba(255,84,120,.22); }
+  .like-btn .heart-outline{ fill:none; stroke:var(--cream); stroke-width:1.8; }
+  .like-btn .heart-fill{ fill:var(--rose); opacity:0; transform-origin:center; }
+  .like-btn.liked .heart-outline{ opacity:0; }
+  .like-btn.liked .heart-fill{ opacity:1; animation:pop .38s cubic-bezier(.17,.89,.32,1.49); }
+  @keyframes pop{ 0%{ transform:scale(.3); } 60%{ transform:scale(1.25); } 100%{ transform:scale(1); } }
+  .action-btn:active .icon-wrap{ transform:scale(.88); }
+
+  /* double-tap coeur central */
+  .center-heart{
+    position:absolute; top:50%; left:50%; z-index:7; pointer-events:none;
+    transform:translate(-50%,-50%) scale(0); opacity:0;
+  }
+  .center-heart.pop{ animation:centerPop .75s cubic-bezier(.17,.89,.32,1.49) forwards; }
+  @keyframes centerPop{
+    0%{ transform:translate(-50%,-50%) scale(0); opacity:0; }
+    28%{ transform:translate(-50%,-50%) scale(1.1); opacity:1; }
+    45%{ transform:translate(-50%,-50%) scale(.95); opacity:1; }
+    100%{ transform:translate(-50%,-50%) scale(1); opacity:0; }
+  }
+  .center-heart svg{ width:92px; height:92px; fill:var(--rose); filter:drop-shadow(0 4px 18px rgba(255,84,120,.6)); }
+
+  /* ============================================================
+     BURST "E+M" — la pluie de messages au like
+     ============================================================ */
+  .burst-container{ position:fixed; inset:0; z-index:40; pointer-events:none; overflow:hidden; }
+  .burst-em{
+    position:absolute; bottom:-60px;
+    font-family:var(--ff-display); font-weight:700;
+    color:var(--rose);
+    opacity:0;
+    animation-name:floatUp; animation-timing-function:cubic-bezier(.22,.61,.36,1); animation-fill-mode:forwards;
+    text-shadow:0 2px 10px rgba(255,84,120,.5);
+    will-change:transform, opacity;
+  }
+  .burst-em.gold{ color:var(--gold); text-shadow:0 2px 10px rgba(240,195,105,.5); }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) rotate(var(--rot)) scale(.4); opacity:0; }
+    12%{ opacity:1; }
+    100%{ transform:translateY(-115vh) rotate(var(--rot)) scale(1.15); opacity:0; }
+  }
+
+  /* ============================================================
+     COMMENTAIRES — bottom sheet
+     ============================================================ */
+  #overlay{
+    position:fixed; inset:0; z-index:30; background:rgba(9,3,6,.55);
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+    backdrop-filter:blur(2px);
+  }
+  #overlay.visible{ opacity:1; pointer-events:auto; }
+
+  #commentSheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:31;
+    max-width:560px; margin:0 auto;
+    background:var(--surface);
+    border-radius:26px 26px 0 0;
+    border:1px solid rgba(251,243,238,.1); border-bottom:none;
+    height:68vh; max-height:640px;
+    display:flex; flex-direction:column;
+    transform:translateY(105%);
+    transition:transform .38s cubic-bezier(.2,.85,.32,1);
+    padding-bottom:var(--safe-b);
+  }
+  #commentSheet.open{ transform:translateY(0); }
+
+  .sheet-handle{ width:38px; height:4px; border-radius:4px; background:rgba(251,243,238,.25); margin:12px auto 6px; }
+  .sheet-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 18px 14px; border-bottom:1px solid rgba(251,243,238,.08);
+  }
+  .sheet-header h3{ margin:0; font-size:15px; font-weight:800; letter-spacing:.3px; }
+  .sheet-close{
+    background:rgba(251,243,238,.08); border:none; color:var(--cream);
+    width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .comment-list{ flex:1; overflow-y:auto; padding:6px 18px 18px; }
+  .comment-item{ display:flex; gap:11px; padding:12px 0; border-bottom:1px solid rgba(251,243,238,.05); }
+  .comment-avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:13px; color:var(--void);
+  }
+  .comment-user{ font-size:12.5px; font-weight:800; color:var(--cream-dim); display:block; margin-bottom:3px; }
+  .comment-text{ margin:0; font-size:14px; line-height:1.4; color:var(--cream); }
+
+  .comment-input-row{
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    border-top:1px solid rgba(251,243,238,.08);
+  }
+  .comment-input-row input{
+    flex:1; background:rgba(251,243,238,.07); border:1px solid rgba(251,243,238,.12);
+    border-radius:100px; padding:11px 16px; color:var(--cream); font-family:var(--ff-body); font-size:13.5px; outline:none;
+  }
+  .comment-input-row input::placeholder{ color:var(--cream-dimmer); }
+  .comment-send{
+    background:var(--rose); border:none; color:var(--void); font-weight:800; font-size:13px;
+    padding:11px 16px; border-radius:100px; cursor:pointer;
+  }
+
+  /* ============================================================
+     TOAST (partage)
+     ============================================================ */
+  #toast{
+    position:fixed; left:50%; bottom:calc(40px + var(--safe-b)); z-index:60;
+    transform:translate(-50%,20px); opacity:0; transition:all .3s ease;
+    background:var(--surface); border:1px solid rgba(251,243,238,.14);
+    color:var(--cream); font-size:13px; font-weight:600;
+    padding:11px 20px; border-radius:100px; pointer-events:none;
+    box-shadow:0 8px 30px rgba(0,0,0,.4);
+  }
+  #toast.show{ transform:translate(-50%,0); opacity:1; }
+
+  @media (prefers-reduced-motion: reduce){
+    .video-bg, .video-section.active .video-bg{ transition:none; transform:none; }
+    #app:not(.mode-fill) .video-bg{ transform:none; }
+    .video-frame{ transition:none; }
+    .burst-em{ animation-duration:1.2s !important; }
+    .sound-toggle-pulse{ animation:none; opacity:0; }
+  }
