@@ -9,8 +9,20 @@
   // vidéo (ex: 'videos/1.mp4') pour l'utiliser à la place du fond
   // animé. Sinon, le dégradé "gradient" sert de visuel.
   const VIDEOS_DATA = [
-    { id:1, videoSrc:"video/1.mov", gradient:'radial-gradient(120% 100% at 30% 20%, #c62655 0%, #2d131c 60%, #0d0509 100%)', caption:'Notre premier café, celui qui a tout changé ☕️💕', likes:1240, comments:38 },
-    { id:2, videoSrc:"video/2.mov", gradient:'radial-gradient(120% 100% at 70% 15%, #f0c369 0%, #7a2a3c 55%, #170a10 100%)', caption:'Coucher de soleil, mains dans la main 🌅', likes:2310, comments:64 },
+    { id:1, videoSrc:"video/1.mov", caption:'Je t\'aime ma mimi 💕' },
+    { id:2, videoSrc:"video/2.mov", caption:'On est tellement beau ensemble, mains dans la main 🌅'},
+    { id:3, videoSrc:"video/3.mov", caption:'Des bisous de reines 👑' },
+    { id:4, videoSrc:"video/4.mov", caption:'I love you in every universe 💗' },
+    { id:5, videoSrc:"video/5.mov", caption:'Forever together ma mimi 💌' },
+    { id:6, videoSrc:"video/6.mov", caption:'Les 4 lettres préférées de mon clavier 😘' },
+    { id:7, videoSrc:"video/7.mov", caption:'Je suis tellement heureux qu\'on se soit trouver 🌍' },
+    { id:8, videoSrc:"video/8.mov", caption:'Ma raison de vivre... 🌅' },
+    { id:9, videoSrc:"video/9.mov", caption:'Chaque jour avec toi est un jour de bonheur 🫶' },
+    { id:10, videoSrc:"video/10.mov", caption:'Elinou et Mathou en rando ⛰️' },
+    { id:11, videoSrc:"video/11.mov", caption:'Je t\'aimeeeeeee E+M forever 😻' },
+    { id:12, videoSrc:"video/12.mov", caption:'Netflix and chill 🍿' },
+    { id:13, videoSrc:"video/13.mov", caption:'Les meilleures vacances de ma vie 💝' },
+    { id:14, videoSrc:"video/14.mov", caption:'Random Footage of love 🎥' },
   ];
 
   const HANDLE = '@elinou.et.mathou';
@@ -30,8 +42,18 @@
     { user:'@osmoz', text:'Vivement la suite de votre histoire' },
     { user:'@calisson', text:'Ce sourire à la fin... on craque' },
     { user:'@soon', text:'Postez-en plus svp c\u2019est trop beau' },
-    { user:'@', text:'Ça réchauffe le cœur direct' },
-    { user:'@', text:'Le meilleur couple d\u2019internet, aucun débat' }
+    { user:'@boubouille', text:'Ça réchauffe le cœur direct' },
+    { user:'@agent_miaou', text:'Le meilleur couple d\u2019internet, aucun débat' },
+    { user:'@agent_miaou', text:'Miaouuuu miaouuuu miaouuuu' },
+    { user:'@3_novembre', text:'J\u2019ai regardé cette vidéo genre 3 mille fois' },
+    { user:'@coinpétrant', text:'Vous formez un couple trop attachant' },
+    { user:'@', text:'J\u2019ai les larmes de bonheur aux yeux, sérieux' },
+    { user:'@', text:'Vous êtes des exemples pour tout le monde' },
+    { user:'@', text:'C\u2019est officiel, vous êtes mon couple préféré' },
+    { user:'@', text:'Il y a tellement de tendresse dans cette vidéo' },
+    { user:'@', text:'Je repasse juste pour la revoir encore une fois' },
+    { user:'@', text:'Un pur bonheur à regarder, merci pour ce partage' },
+    { user:'@', text:'Le monde a besoin de plus de moments comme ça' }
   ];
 
   /* ============================================================
@@ -185,7 +207,7 @@
 
     const bgHtml = data.videoSrc
       ? `<video class="video-bg" src="${data.videoSrc}" autoplay muted loop playsinline></video>`
-      : `<div class="video-bg" style="background-image:${data.gradient};"></div>`;
+      : `<div class="video-bg" style="background-image:radial-gradient(120% 100% at 30% 20%, #c62655 0%, #2d131c 60%, #0d0509 100%);"></div>`;
 
     section.innerHTML = `
       <div class="video-frame">
@@ -212,7 +234,7 @@
           <span class="icon-wrap">
             <svg viewBox="0 0 24 24">${HEART_OUTLINE}${HEART_FILL}</svg>
           </span>
-          <span class="count like-count">${formatCount(data.likes)}</span>
+          <span class="count like-count">${formatCount(Math.floor(Math.random()*10000) + 1)}</span>
         </button>
         <button class="action-btn comment-btn" aria-label="Commentaires">
           <span class="icon-wrap">
@@ -220,7 +242,7 @@
               <path d="M4 12a8 8 0 1 1 3.2 6.4L4 20l1.1-3.4A7.96 7.96 0 0 1 4 12Z" stroke-linejoin="round"/>
             </svg>
           </span>
-          <span class="count comment-count">${formatCount(data.comments)}</span>
+          <span class="count comment-count">${formatCount(Math.floor(Math.random()*100) + 1)}</span>
         </button>
         <button class="action-btn mode-btn" aria-label="Changer de format d'affichage">
           <span class="icon-wrap">
