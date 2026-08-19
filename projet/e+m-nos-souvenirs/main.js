@@ -20,6 +20,11 @@
     { id:12, videoSrc:"video/12.mp4", caption:'Netflix and chill 🍿' },
     { id:13, videoSrc:"video/13.mp4", caption:'Les meilleures vacances de ma vie 💝' },
     { id:14, videoSrc:"video/14.mp4", caption:'Random Footage of love 🎥' },
+    { id:15, videoSrc:"video/15.mp4", caption:'Elinou et Mathou en noir et blanc 🤍🖤' },
+    { id:16, videoSrc:"video/16.mp4", caption:'New duo forever 🧎‍♂️‍➡️👩' },
+    { id:17, videoSrc:"video/17.mp4", caption:'Notre vie est un film romantique 🍿' },
+    { id:18, videoSrc:"video/18.mp4", caption:'Just us <3' },
+    { id:19, videoSrc:"video/19.mp4", caption:'Bisous à la place Stan 💋' },
   ];
 
   const HANDLE = '@elinou.et.mathou';
