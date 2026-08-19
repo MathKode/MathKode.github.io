@@ -9,20 +9,20 @@
   // vidéo (ex: 'videos/1.mp4') pour l'utiliser à la place du fond
   // animé. Sinon, le dégradé "gradient" sert de visuel.
   const VIDEOS_DATA = [
-    { id:1, videoSrc:"video/1.mov", caption:'Je t\'aime ma mimi 💕' },
-    { id:2, videoSrc:"video/2.mov", caption:'On est tellement beau ensemble, mains dans la main 🌅'},
-    { id:3, videoSrc:"video/3.mov", caption:'Des bisous de reines 👑' },
-    { id:4, videoSrc:"video/4.mov", caption:'I love you in every universe 💗' },
-    { id:5, videoSrc:"video/5.mov", caption:'Forever together ma mimi 💌' },
-    { id:6, videoSrc:"video/6.mov", caption:'Les 4 lettres préférées de mon clavier 😘' },
-    { id:7, videoSrc:"video/7.mov", caption:'Je suis tellement heureux qu\'on se soit trouver 🌍' },
-    { id:8, videoSrc:"video/8.mov", caption:'Ma raison de vivre... 🌅' },
-    { id:9, videoSrc:"video/9.mov", caption:'Chaque jour avec toi est un jour de bonheur 🫶' },
-    { id:10, videoSrc:"video/10.mov", caption:'Elinou et Mathou en rando ⛰️' },
-    { id:11, videoSrc:"video/11.mov", caption:'Je t\'aimeeeeeee E+M forever 😻' },
-    { id:12, videoSrc:"video/12.mov", caption:'Netflix and chill 🍿' },
-    { id:13, videoSrc:"video/13.mov", caption:'Les meilleures vacances de ma vie 💝' },
-    { id:14, videoSrc:"video/14.mov", caption:'Random Footage of love 🎥' },
+    { id:1, videoSrc:"video/1.mp4", caption:'Je t\'aime ma mimi 💕' },
+    { id:2, videoSrc:"video/2.mp4", caption:'On est tellement beau ensemble, mains dans la main 🌅'},
+    { id:3, videoSrc:"video/3.mp4", caption:'Des bisous de reines 👑' },
+    { id:4, videoSrc:"video/4.mp4", caption:'I love you in every universe 💗' },
+    { id:5, videoSrc:"video/5.mp4", caption:'Forever together ma mimi 💌' },
+    { id:6, videoSrc:"video/6.mp4", caption:'Les 4 lettres préférées de mon clavier 😘' },
+    { id:7, videoSrc:"video/7.mp4", caption:'Je suis tellement heureux qu\'on se soit trouver 🌍' },
+    { id:8, videoSrc:"video/8.mp4", caption:'Ma raison de vivre... 🌅' },
+    { id:9, videoSrc:"video/9.mp4", caption:'Chaque jour avec toi est un jour de bonheur 🫶' },
+    { id:10, videoSrc:"video/10.mp4", caption:'Elinou et Mathou en rando ⛰️' },
+    { id:11, videoSrc:"video/11.mp4", caption:'Je t\'aimeeeeeee E+M forever 😻' },
+    { id:12, videoSrc:"video/12.mp4", caption:'Netflix and chill 🍿' },
+    { id:13, videoSrc:"video/13.mp4", caption:'Les meilleures vacances de ma vie 💝' },
+    { id:14, videoSrc:"video/14.mp4", caption:'Random Footage of love 🎥' },
   ];
 
   const HANDLE = '@elinou.et.mathou';
@@ -206,7 +206,7 @@
     section.dataset.liked = '0';
 
     const bgHtml = data.videoSrc
-      ? `<video class="video-bg" src="${data.videoSrc}" autoplay muted loop playsinline></video>`
+      ? `<video class="video-bg" data-src="${data.videoSrc}" preload="none" muted loop playsinline webkit-playsinline></video>`
       : `<div class="video-bg" style="background-image:radial-gradient(120% 100% at 30% 20%, #c62655 0%, #2d131c 60%, #0d0509 100%);"></div>`;
 
     section.innerHTML = `
@@ -425,11 +425,14 @@
         const video = entry.target.querySelector('video.video-bg');
         if(!video) return;
         if(isActive){
+          if(!video.src) video.src = video.dataset.src;
           video.muted = !soundOn;
           video.play().catch(()=>{});
         } else {
-          video.muted = true;
           video.pause();
+          video.muted = true;
+          video.removeAttribute('src');
+          video.load();          // libère le décodeur iOS
         }
       });
     }, { root: feedEl, threshold: 0.6 });
