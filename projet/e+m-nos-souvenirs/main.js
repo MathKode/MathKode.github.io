@@ -492,11 +492,14 @@
 
   function openComments(section){
     commentList.innerHTML = '';
-    let n = parseInt(section.querySelector('.comment-count').textContent, 10);
-    if(!isFinite(n) || n < 1) n = 6 + Math.floor(Math.random()*10);
-    n = Math.min(n, RANDOM_COMMENTS.length);
-    const chosen = shuffle(RANDOM_COMMENTS).slice(0, n);
-
+    const n = Number(section.getElementsByClassName("comment-count")[0].textContent)
+    const m = RANDOM_COMMENTS.length
+    const m2 = 10**String(m).length
+    const chosen = []
+    for (i=0; i<n; i++) {
+      chosen.push(RANDOM_COMMENTS[Math.floor(Math.random()*100%m)])
+      console.log(i)
+    }
     document.getElementById('commentCountLabel').textContent = `${chosen.length} commentaires`;
     chosen.forEach(c=>{
       const item = document.createElement('div');
