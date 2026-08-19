@@ -40,15 +40,14 @@
   #loader svg{ width:38vw; max-width:190px; overflow:visible; }
   #heartPath{
     fill:none;
-    stroke:var(--rose-deep);
-    stroke-width:1.2;
+    stroke:var(--rose);
+    stroke-width:1.4;
     stroke-linecap:round;
     stroke-linejoin:round;
-    filter:drop-shadow(0 0 5px rgba(198,38,85,.35));
+    filter:drop-shadow(0 0 10px rgba(255,84,120,.55));
   }
   #loader.fill #heartPath{
     fill:url(#heartGradient);
-    stroke:var(--rose-deep);
     transition:fill .7s ease;
   }
   .loader-text{
@@ -365,6 +364,24 @@
     box-shadow:0 8px 30px rgba(0,0,0,.4);
   }
   #toast.show{ transform:translate(-50%,0); opacity:1; }
+
+  /* ============================================================
+     BOUTON DE LECTURE DE SECOURS — affiché uniquement si le
+     navigateur a refusé la lecture automatique (mode économie
+     d'énergie iOS, réglage « données réduites », etc.)
+     ============================================================ */
+  .tap-play{
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    z-index:8; width:74px; height:74px; border-radius:50%;
+    display:none; align-items:center; justify-content:center;
+    padding:0; border:none; cursor:pointer;
+    background:var(--rose);
+    box-shadow:0 10px 34px rgba(255,84,120,.45);
+  }
+  .video-section.needs-tap .tap-play{ display:flex; }
+  .tap-play svg{ width:32px; height:32px; margin-left:4px; }
+  .tap-play:active{ transform:translate(-50%,-50%) scale(.88); }
 
   @media (prefers-reduced-motion: reduce){
     .video-bg, .video-section.active .video-bg{ transition:none; transform:none; }

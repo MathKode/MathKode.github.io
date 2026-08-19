@@ -5,9 +5,6 @@
      Modifiez ces tableaux pour adapter le site à votre histoire.
      ============================================================ */
 
-  // Chaque "vidéo" : remplacez videoSrc par le chemin d'une vraie
-  // vidéo (ex: 'videos/1.mp4') pour l'utiliser à la place du fond
-  // animé. Sinon, le dégradé "gradient" sert de visuel.
   const VIDEOS_DATA = [
     { id:1, videoSrc:"video/1.mp4", caption:'Je t\'aime ma mimi 💕' },
     { id:2, videoSrc:"video/2.mp4", caption:'On est tellement beau ensemble, mains dans la main 🌅'},
@@ -27,7 +24,6 @@
 
   const HANDLE = '@elinou.et.mathou';
 
-  // Liste de commentaires piochés aléatoirement à l'ouverture du volet.
   const RANDOM_COMMENTS = [
     { user:'@gros-pinpin', text:'Trop mignon 😍 j\u2019adore ce moment' },
     { user:'@gougou', text:'Vous êtes le couple le plus chou que je connaisse' },
@@ -57,6 +53,18 @@
   ];
 
   /* ============================================================
+     ⚙️ RÉGLAGES DE LECTURE (déterminants sur mobile)
+     - PRELOAD_NEIGHBORS : nombre de cartes préchargées avant/après
+       la carte active (1 = la précédente et la suivante sont prêtes).
+     - MAX_SECTIONS / KEEP_BEHIND : le flux infini est élagué pour ne
+       jamais laisser des dizaines d'éléments <video> vivants dans la
+       page (iOS limite le nombre de décodeurs vidéo simultanés).
+     ============================================================ */
+  const PRELOAD_NEIGHBORS = 1;
+  const MAX_SECTIONS = 40;
+  const KEEP_BEHIND = 6;
+
+  /* ============================================================
      UTILITAIRES
      ============================================================ */
   function shuffle(arr){
@@ -69,6 +77,7 @@
   }
 
   function formatCount(n){
+    n = Number(n) || 0;
     if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','')+'M';
     if(n >= 1000) return (n/1000).toFixed(1).replace('.0','')+'k';
     return String(n);
@@ -77,7 +86,6 @@
   function hueFromString(str){
     let hash = 0;
     for(let i=0;i<str.length;i++) hash = str.charCodeAt(i) + ((hash<<5)-hash);
-    // reste dans la famille rose / or / prune du site
     return 330 + Math.abs(hash) % 70;
   }
   function colorFromString(str){
@@ -89,14 +97,11 @@
   const HEART_FILL = `<path class="heart-fill" d="${HEART_D}"/>`;
   function heartIcon(fillColor){ return `<path d="${HEART_D}" fill="${fillColor}"/>`; }
 
-  // Icônes du bouton de changement de mode (style cohérent avec les autres
-  // icônes du rail : trait seul, sans remplissage).
   const ICON_MAXIMIZE = '<path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" stroke-linecap="round" stroke-linejoin="round"/>';
   const ICON_MINIMIZE = '<path d="M9 4v4a1 1 0 0 1-1 1H4M20 9h-4a1 1 0 0 1-1-1V4M15 20v-4a1 1 0 0 1 1-1h4M4 15h4a1 1 0 0 1 1 1v4" stroke-linecap="round" stroke-linejoin="round"/>';
 
   /* ============================================================
-     MODE D'AFFICHAGE — "tiktok" (vidéo entière, cadre vertical
-     arrondi) par défaut, ou "plein écran" (recadrée, bord à bord).
+     MODE D'AFFICHAGE
      ============================================================ */
   let fillMode = false;
   try{ fillMode = localStorage.getItem('em_display_mode') === 'fill'; }catch(e){}
@@ -122,53 +127,77 @@
   }
 
   /* ============================================================
-     SON — seule la vidéo active (celle affichée à l'écran) joue
-     avec le son ; les autres restent muettes. Comme les navigateurs
-     exigent un geste explicite et fiable pour autoriser l'autoplay
-     avec son, un bouton dédié et bien visible (avec pulsation)
-     s'en charge — bien plus fiable qu'une détection "silencieuse"
-     de clic n'importe où sur la page.
+     SON
+     Règle d'or des navigateurs mobiles : une vidéo ne démarre
+     automatiquement QUE si elle est muette. On lance donc toujours
+     la lecture en muet, puis on rétablit le son une fois la lecture
+     réellement démarrée. Si le navigateur refuse le son, on retombe
+     en muet plutôt que de laisser un écran noir.
      ============================================================ */
   let soundOn = false;
+  let hasUserGesture = false;
   const soundBtn = document.getElementById('soundToggle');
   const ICON_SOUND_ON = '<path d="M4 9v6h4l5 4V5L8 9H4Z" fill="#fbf3ee" stroke="none"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke-linecap="round"/><path d="M19.5 6a9 9 0 0 1 0 12" stroke-linecap="round"/>';
   const ICON_SOUND_OFF = '<path d="M4 9v6h4l5 4V5L8 9H4Z" fill="#fbf3ee" stroke="none"/><path d="M16 9l5 6M21 9l-5 6" stroke-linecap="round"/>';
 
+  const feedEl = document.getElementById('feed');
+
   function currentActiveVideo(){
-    return document.querySelector('.video-section.active video.video-bg');
+    const sec = feedEl.querySelector('.video-section.active');
+    return sec ? sec.querySelector('video.video-bg') : null;
+  }
+
+  function refreshSoundButton(){
+    if(!soundBtn) return;
+    soundBtn.classList.toggle('on', soundOn);
+    soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+    soundBtn.setAttribute('aria-label', soundOn ? 'Couper le son' : 'Activer le son');
+    soundBtn.querySelector('svg').innerHTML = soundOn ? ICON_SOUND_ON : ICON_SOUND_OFF;
+  }
+
+  // Applique l'état du son à UNE vidéo, sans jamais casser sa lecture.
+  function applySoundTo(video){
+    if(!video) return;
+    if(!soundOn || !hasUserGesture){ video.muted = true; return; }
+    video.muted = false;
+    const p = video.play();
+    if(p && p.catch){
+      p.catch(()=>{
+        // Le navigateur refuse le son sur cette vidéo : on garde
+        // l'image plutôt que de tout bloquer.
+        video.muted = true;
+        video.play().catch(()=>{});
+      });
+    }
   }
 
   function setSound(on){
     soundOn = on;
-    if(soundBtn){
-      soundBtn.classList.toggle('on', soundOn);
-      soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
-      soundBtn.setAttribute('aria-label', soundOn ? 'Couper le son' : 'Activer le son');
-      soundBtn.querySelector('svg').innerHTML = soundOn ? ICON_SOUND_ON : ICON_SOUND_OFF;
-    }
-    const video = currentActiveVideo();
-    if(video){
-      video.muted = !soundOn;
-      if(soundOn) video.play().catch(()=>{});
-    }
+    refreshSoundButton();
+    applySoundTo(currentActiveVideo());
   }
 
   if(soundBtn){
     soundBtn.addEventListener('click', (e)=>{
       e.stopPropagation();
+      hasUserGesture = true;
       setSound(!soundOn);
       showToast(soundOn ? 'Son activé 🔊' : 'Son coupé 🔇');
     });
   }
 
-  // Filet de sécurité : la toute première interaction ailleurs sur la
-  // page active aussi le son (le bouton reste utilisable pour couper).
+  // Premier geste utilisateur : on mémorise qu'il a eu lieu et on tente
+  // le son. Contrairement à avant, cela ne peut plus empêcher les vidéos
+  // suivantes de démarrer.
   ['pointerdown','touchstart','keydown'].forEach(evt=>{
-    document.addEventListener(evt, ()=>{ if(!soundOn) setSound(true); }, { once:true, passive:true });
+    document.addEventListener(evt, ()=>{
+      hasUserGesture = true;
+      if(!soundOn) setSound(true);
+    }, { once:true, passive:true });
   });
 
   /* ============================================================
-     LOADER — dessin du cœur puis remplissage
+     LOADER
      ============================================================ */
   function runLoader(){
     const path = document.getElementById('heartPath');
@@ -176,7 +205,7 @@
     const len = path.getTotalLength();
     path.style.strokeDasharray = len;
     path.style.strokeDashoffset = len;
-    path.getBoundingClientRect(); // force reflow
+    path.getBoundingClientRect();
     requestAnimationFrame(()=>{
       path.style.transition = 'stroke-dashoffset 1.35s cubic-bezier(.5,0,.2,1)';
       path.style.strokeDashoffset = '0';
@@ -191,22 +220,18 @@
   }
 
   /* ============================================================
-     FEED — construction des cartes + scroll infini
+     CONSTRUCTION DES CARTES
      ============================================================ */
-  const feedEl = document.getElementById('feed');
-  let sectionCount = 0;
-  let observerEnd = null;
-  let observerActive = null;
+  let activeIndex = -1;
 
   function buildSection(data){
-    sectionCount += 1;
     const section = document.createElement('div');
     section.className = 'video-section';
     section.dataset.likes = Math.floor(Math.random()*10000) + 1;
     section.dataset.liked = '0';
 
     const bgHtml = data.videoSrc
-      ? `<video class="video-bg" data-src="${data.videoSrc}" preload="none" muted loop playsinline webkit-playsinline></video>`
+      ? `<video class="video-bg" data-src="${data.videoSrc}" preload="none" muted loop playsinline webkit-playsinline disableremoteplayback x5-playsinline></video>`
       : `<div class="video-bg" style="background-image:radial-gradient(120% 100% at 30% 20%, #c62655 0%, #2d131c 60%, #0d0509 100%);"></div>`;
 
     section.innerHTML = `
@@ -220,6 +245,9 @@
         E+M
       </div>
       <div class="center-heart"><svg viewBox="0 0 24 24">${heartIcon('#ff5478')}</svg></div>
+      <button class="tap-play" type="button" aria-label="Lire la vidéo">
+        <svg viewBox="0 0 24 24"><path d="M8 5.4v13.2L19 12 8 5.4Z" fill="#0d0509"/></svg>
+      </button>
 
       <div class="video-info">
         <div class="video-user">
@@ -253,17 +281,29 @@
       </div>
     `;
 
-    // interactions
     const likeBtn = section.querySelector('.like-btn');
     likeBtn.addEventListener('click', ()=> toggleLike(section, likeBtn, true));
-
     section.querySelector('.comment-btn').addEventListener('click', ()=> openComments(section));
-
     section.querySelector('.mode-btn').addEventListener('click', toggleDisplayMode);
+
+    // Bouton de secours affiché si le navigateur refuse la lecture auto
+    // (mode économie d'énergie iOS, réglage « données réduites »…).
+    section.querySelector('.tap-play').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      hasUserGesture = true;
+      const video = section.querySelector('video.video-bg');
+      if(!video) return;
+      section.classList.remove('needs-tap');
+      attachSource(video, 'auto');
+      video.muted = true;
+      const p = video.play();
+      if(p && p.then) p.then(()=> applySoundTo(video)).catch(()=>{});
+      else applySoundTo(video);
+    });
 
     let lastTap = 0;
     section.addEventListener('click', (e)=>{
-      if(e.target.closest('.action-rail') || e.target.closest('.video-info')) return;
+      if(e.target.closest('.action-rail') || e.target.closest('.video-info') || e.target.closest('.tap-play')) return;
       const now = Date.now();
       if(now - lastTap < 300){
         if(section.dataset.liked !== '1') toggleLike(section, likeBtn, true);
@@ -276,6 +316,137 @@
     return section;
   }
 
+  /* ============================================================
+     GESTION DES SOURCES VIDÉO
+     ============================================================ */
+  function attachSource(video, preloadLevel){
+    video.preload = preloadLevel || 'metadata';
+    if(!video.getAttribute('src')){
+      video.setAttribute('src', video.dataset.src);
+      video.load();
+    }
+  }
+
+  function releaseSource(video){
+    if(!video.getAttribute('src')) return;   // rien à libérer : pas de load() à vide
+    try{ video.pause(); }catch(e){}
+    video.muted = true;
+    video.removeAttribute('src');
+    video.load();                            // libère le décodeur (iOS)
+  }
+
+  function playActive(video, section){
+    attachSource(video, 'auto');
+    // TOUJOURS démarrer en muet : c'est la seule lecture automatique
+    // autorisée sur mobile. Le son est rétabli juste après.
+    video.muted = true;
+    const p = video.play();
+    if(p && p.then){
+      p.then(()=>{
+        section.classList.remove('needs-tap');
+        applySoundTo(video);
+      }).catch(()=>{
+        section.classList.add('needs-tap');   // on propose un bouton lecture
+      });
+    } else {
+      applySoundTo(video);
+    }
+  }
+
+  /* ============================================================
+     CARTE ACTIVE — calculée depuis la position de scroll plutôt
+     qu'avec un IntersectionObserver à seuil fixe : sur mobile la
+     hauteur du viewport change quand la barre d'URL apparaît ou
+     disparaît, et le seuil de 0.6 pouvait n'être atteint par aucune
+     carte — donc aucune vidéo activée.
+     ============================================================ */
+  function currentIndex(){
+    const kids = feedEl.children;
+    if(!kids.length) return -1;
+    const h = feedEl.clientHeight || 1;
+    const center = feedEl.scrollTop + h/2;
+    let idx = Math.floor(center / (kids[0].offsetHeight || h));
+    idx = Math.max(0, Math.min(kids.length-1, idx));
+    while(idx > 0 && kids[idx].offsetTop > center) idx--;
+    while(idx < kids.length-1 && kids[idx].offsetTop + kids[idx].offsetHeight <= center) idx++;
+    return idx;
+  }
+
+  function applyActive(idx){
+    const kids = feedEl.children;
+    for(let i=0;i<kids.length;i++){
+      const section = kids[i];
+      const isActive = (i === idx);
+      section.classList.toggle('active', isActive);
+      const video = section.querySelector('video.video-bg');
+      if(!video) continue;
+
+      if(isActive){
+        playActive(video, section);
+      } else if(Math.abs(i - idx) <= PRELOAD_NEIGHBORS){
+        // Voisines : source prête pour un affichage instantané.
+        section.classList.remove('needs-tap');
+        attachSource(video, 'metadata');
+        video.muted = true;
+        try{ video.pause(); }catch(e){}
+      } else {
+        section.classList.remove('needs-tap');
+        releaseSource(video);
+      }
+    }
+    activeIndex = idx;
+  }
+
+  let rafPending = false;
+  function onScroll(){
+    if(rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(()=>{
+      rafPending = false;
+      update();
+    });
+  }
+
+  function update(){
+    const idx = currentIndex();
+    if(idx < 0) return;
+    if(idx >= feedEl.children.length - 3) appendBatch();   // flux infini
+    if(idx !== activeIndex) applyActive(idx);
+  }
+
+  /* ---- élagage du DOM (seulement quand le doigt a quitté l'écran) ---- */
+  let touching = false;
+  let idleTimer = null;
+
+  function prune(){
+    if(touching) return;
+    const kids = feedEl.children;
+    if(kids.length <= MAX_SECTIONS) return;
+    const idx = currentIndex();
+    const toRemove = Math.min(idx - KEEP_BEHIND, kids.length - MAX_SECTIONS + 8);
+    if(toRemove <= 0) return;
+
+    let removedH = 0;
+    for(let i=0;i<toRemove;i++) removedH += kids[i].offsetHeight;
+
+    const prevBehavior = feedEl.style.scrollBehavior;
+    const prevTop = feedEl.scrollTop;
+    feedEl.style.scrollBehavior = 'auto';
+    for(let i=0;i<toRemove;i++){
+      const sec = feedEl.firstElementChild;
+      const v = sec.querySelector('video.video-bg');
+      if(v) releaseSource(v);
+      sec.remove();
+    }
+    feedEl.scrollTop = prevTop - removedH;
+    feedEl.style.scrollBehavior = prevBehavior;
+    activeIndex = -1;
+    update();
+  }
+
+  /* ============================================================
+     LIKES / BURST
+     ============================================================ */
   function toggleLike(section, btn, spawnBurst){
     const wasLiked = section.dataset.liked === '1';
     const liked = !wasLiked;
@@ -312,31 +483,25 @@
     setTimeout(()=> container.remove(), 5200);
   }
 
-  /* ---- commentaires ---- */
+  /* ============================================================
+     COMMENTAIRES
+     ============================================================ */
   const overlay = document.getElementById('overlay');
   const sheet = document.getElementById('commentSheet');
   const commentList = document.getElementById('commentList');
 
   function openComments(section){
     commentList.innerHTML = '';
-    /*
-    const n = 6 + Math.floor(Math.random()*10);
+    let n = parseInt(section.querySelector('.comment-count').textContent, 10);
+    if(!isFinite(n) || n < 1) n = 6 + Math.floor(Math.random()*10);
+    n = Math.min(n, RANDOM_COMMENTS.length);
     const chosen = shuffle(RANDOM_COMMENTS).slice(0, n);
-    */
-    const n = Number(section.getElementsByClassName("comment-count")[0].textContent)
-    const m = RANDOM_COMMENTS.length
-    const m2 = 10**String(m).length
-    const chosen = []
-    for (i=0; i<n; i++) {
-      chosen.push(RANDOM_COMMENTS[Math.floor(Math.random()*100%m)])
-      console.log(i)
-    }
-    console.log("n",n)
+
     document.getElementById('commentCountLabel').textContent = `${chosen.length} commentaires`;
     chosen.forEach(c=>{
       const item = document.createElement('div');
       item.className = 'comment-item';
-      const initial = c.user.replace('@','').charAt(0).toUpperCase();
+      const initial = c.user.replace('@','').charAt(0).toUpperCase() || '♥';
       item.innerHTML = `
         <div class="comment-avatar" style="background:${colorFromString(c.user)}">${initial}</div>
         <div>
@@ -381,64 +546,46 @@
   }
 
   /* ============================================================
-     SCROLL INFINI — à la dernière carte, un nouvel ordre
-     aléatoire est généré et ajouté au flux.
+     FLUX INFINI + INITIALISATION
      ============================================================ */
   function appendBatch(){
     const order = shuffle(VIDEOS_DATA);
     const frag = document.createDocumentFragment();
-    let firstNew = null;
-    order.forEach(data=>{
-      const section = buildSection(data);
-      if(!firstNew) firstNew = section;
-      frag.appendChild(section);
-    });
-    // on retire l'ancienne cible de fin d'observation
-    if(observerEnd){
-      const prevLast = feedEl.querySelector('.video-section:last-child');
-      if(prevLast) observerEnd.unobserve(prevLast);
-    }
+    order.forEach(data=> frag.appendChild(buildSection(data)));
     feedEl.appendChild(frag);
-    const newLast = feedEl.querySelector('.video-section:last-child');
-    observerEnd.observe(newLast);
-
-    // observation "carte active" pour l'effet de zoom ambiant
-    feedEl.querySelectorAll('.video-section').forEach(sec=>{
-      if(!sec.dataset.observed){
-        sec.dataset.observed = '1';
-        observerActive.observe(sec);
-      }
-    });
   }
 
   function initFeed(){
-    observerEnd = new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting) appendBatch();
-      });
-    }, { root: feedEl, threshold: 0.6 });
-
-    observerActive = new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        const isActive = entry.isIntersecting;
-        entry.target.classList.toggle('active', isActive);
-        const video = entry.target.querySelector('video.video-bg');
-        if(!video) return;
-        if(isActive){
-          if(!video.src) video.src = video.dataset.src;
-          video.muted = !soundOn;
-          video.play().catch(()=>{});
-        } else {
-          video.pause();
-          video.muted = true;
-          video.removeAttribute('src');
-          video.load();          // libère le décodeur iOS
-        }
-      });
-    }, { root: feedEl, threshold: 0.6 });
-
     applyModeToApp();
     appendBatch();
+
+    feedEl.addEventListener('scroll', onScroll, { passive:true });
+    feedEl.addEventListener('touchstart', ()=>{ touching = true; }, { passive:true });
+    feedEl.addEventListener('touchend', ()=>{
+      touching = false;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(prune, 600);
+    }, { passive:true });
+    feedEl.addEventListener('scrollend', ()=>{
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(prune, 400);
+    });
+
+    // La barre d'URL mobile fait varier la hauteur : on recalcule.
+    window.addEventListener('resize', ()=>{ activeIndex = -1; onScroll(); });
+    window.addEventListener('orientationchange', ()=>{ activeIndex = -1; setTimeout(onScroll, 250); });
+
+    // Retour sur l'onglet / sortie de veille : on relance la carte active.
+    document.addEventListener('visibilitychange', ()=>{
+      const video = currentActiveVideo();
+      if(!video) return;
+      if(document.hidden){ try{ video.pause(); }catch(e){} }
+      else playActive(video, video.closest('.video-section'));
+    });
+
+    applyActive(0);
+    // Seconde passe une fois les hauteurs définitives calculées.
+    requestAnimationFrame(()=>{ activeIndex = -1; update(); });
   }
 
   runLoader();
