@@ -1,0 +1,3373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Borne — ma liste de courses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vert:#14342B;
+  --vert-clair:#1D4A3C;
+  --moutarde:#E8B33C;
+  --tomate:#C8452F;
+  --papier:#F4F3ED;
+  --carte:#FFFFFF;
+  --encre:#16180F;
+  --gris:#6E7268;
+  --trait:#DCDACE;
+  --ticket:#FBFAF4;
+  --r:14px;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --mono:"Courier Prime",ui-monospace,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);
+  background:var(--papier);
+  color:var(--encre);
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:96px;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+:focus-visible{outline:3px solid var(--moutarde);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- Bandeau ---------- */
+.bandeau{position:sticky;top:0;z-index:40;background:var(--vert);color:#F4F3ED}
+.bandeau-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.logo{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.02em;line-height:1;display:flex;align-items:center;gap:9px}
+.logo span{display:block;background:var(--moutarde);color:var(--vert);border-radius:8px;padding:5px 7px;font-size:15px}
+.logo small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.62;margin-top:3px}
+.bandeau-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+.pers{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.1);border-radius:999px;padding:4px}
+.pers b{font-family:var(--display);font-size:15px;min-width:58px;text-align:center;font-weight:700}
+.pers b i{font-style:normal;font-weight:500;font-size:11px;opacity:.7}
+.rond{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:17px;font-weight:600;line-height:1}
+.rond:hover{background:var(--moutarde);color:var(--vert)}
+
+
+/* ---------- Recherche ---------- */
+.zone{max-width:1180px;margin:0 auto;padding:0 16px}
+.chercher{position:relative;margin:22px 0 14px}
+.chercher input{
+  width:100%;font:500 17px/1 var(--body);padding:16px 16px 16px 48px;
+  border:2px solid var(--trait);border-radius:var(--r);background:var(--carte);color:var(--encre);
+}
+.chercher input::-webkit-search-decoration,
+.chercher input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.chercher input::placeholder{color:var(--gris)}
+.chercher input:focus{border-color:var(--vert);outline:none}
+.chercher svg{position:absolute;left:17px;top:50%;transform:translateY(-50%);color:var(--gris)}
+.effacer{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;color:var(--gris);font-size:18px}
+.effacer:hover{background:var(--trait)}
+
+.onglets{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.onglets::-webkit-scrollbar{display:none}
+.onglet{white-space:nowrap;padding:9px 15px;border-radius:999px;border:2px solid var(--trait);background:var(--carte);font-weight:600;font-size:14px;color:var(--gris)}
+.onglet[aria-selected="true"]{background:var(--vert);border-color:var(--vert);color:#fff}
+
+/* ---------- Grille de plats ---------- */
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;padding-bottom:32px}
+.plat{
+  background:var(--carte);border:2px solid var(--trait);border-radius:var(--r);
+  padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:132px;
+  transition:transform .12s ease,border-color .12s ease;
+}
+.plat:hover{border-color:var(--vert);transform:translateY(-2px)}
+.plat .emo{font-size:30px;line-height:1}
+.plat .nom{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.18;letter-spacing:-.01em}
+.plat .meta{margin-top:auto;font-size:12px;color:var(--gris);display:flex;align-items:center;gap:6px}
+.pastille{background:var(--vert);color:#fff;border-radius:999px;width:22px;height:22px;display:grid;place-items:center;font-size:12px;font-weight:700;font-family:var(--display)}
+.vide{padding:48px 8px;text-align:center;color:var(--gris)}
+.vide b{display:block;font-family:var(--display);font-size:19px;color:var(--encre);margin-bottom:6px}
+
+.titre-section{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin:6px 0 12px;grid-column:1/-1;display:flex;align-items:center;gap:8px}
+.titre-section span{font-size:11px;letter-spacing:0;background:var(--trait);color:var(--gris);border-radius:999px;padding:2px 8px}
+.plat .emo{position:relative}
+.eclair{position:absolute;left:24px;top:-2px;font-size:13px;font-style:normal;line-height:1}
+
+/* ---------- Barre panier ---------- */
+.barre{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--papier) 62%,transparent)}
+.barre-in{max-width:1180px;margin:0 auto;display:flex;gap:10px}
+.barre button{flex:1;border-radius:999px;padding:15px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px}
+.b-panier{background:var(--carte);border:2px solid var(--vert);color:var(--vert)}
+.b-liste{background:var(--vert);color:#fff;box-shadow:0 6px 18px rgba(20,52,43,.25)}
+.b-liste:disabled,.b-panier:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+
+/* ---------- Feuille modale ---------- */
+.voile{position:fixed;inset:0;background:rgba(22,24,15,.5);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.voile[hidden]{display:none}
+.feuille{
+  background:var(--papier);width:100%;max-width:620px;max-height:92vh;
+  border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;
+  animation:monte .22s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes monte{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.feuille-tete{padding:18px 18px 12px;border-bottom:2px solid var(--trait);display:flex;gap:14px;align-items:flex-start;background:var(--carte)}
+.feuille-tete .emo{font-size:34px;line-height:1}
+.feuille-tete h2{font-family:var(--display);font-weight:800;font-size:23px;margin:0;letter-spacing:-.02em;line-height:1.1}
+.feuille-tete p{margin:4px 0 0;font-size:13px;color:var(--gris)}
+.liens{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px}
+.marmiton{display:inline-block;font-size:12.5px;font-weight:600;color:var(--vert);text-decoration:underline;text-underline-offset:3px}
+.marmiton:hover{color:var(--tomate)}
+.marmiton.exacte{
+  background:var(--moutarde);color:var(--vert);text-decoration:none;
+  border-radius:999px;padding:5px 11px;font-weight:700;
+}
+.marmiton.exacte:hover{background:var(--tomate);color:#fff}
+.marmiton.floue{color:var(--gris);font-weight:500}
+.marmiton.floue:hover{color:var(--tomate)}
+.avec{color:var(--vert);font-weight:600}
+.fermer{margin-left:auto;width:36px;height:36px;border-radius:50%;background:var(--papier);font-size:20px;display:grid;place-items:center;flex:none}
+.feuille-corps{overflow-y:auto;padding:18px;-webkit-overflow-scrolling:touch}
+.feuille-pied{padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:2px solid var(--trait);background:var(--carte);display:flex;gap:10px}
+.feuille-pied button{flex:1;border-radius:999px;padding:15px;font-weight:600;font-size:15px}
+.b-valider{background:var(--vert);color:#fff}
+.b-retirer{background:var(--carte);border:2px solid var(--tomate);color:var(--tomate);flex:0 0 auto!important;padding:15px 20px!important}
+
+/* portions */
+.portions{background:var(--carte);border:2px solid var(--trait);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.portions .lab{font-weight:600;font-size:15px}
+.portions .lab i{display:block;font-style:normal;font-size:12px;color:var(--gris);font-weight:400;margin-top:2px}
+.portions .cmd{margin-left:auto;display:flex;align-items:center;gap:4px}
+.portions .cmd button{width:38px;height:38px;border-radius:50%;background:var(--papier);border:2px solid var(--trait);font-size:19px;font-weight:600;display:grid;place-items:center}
+.portions .cmd button:hover{border-color:var(--vert)}
+.portions .cmd b{font-family:var(--display);font-size:19px;min-width:38px;text-align:center}
+
+.legende{font-size:13px;color:var(--gris);margin:0 0 10px;line-height:1.45}
+.ingr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ingr li{background:var(--carte);border:2px solid var(--trait);border-radius:12px;padding:10px 10px 10px 14px;display:flex;align-items:center;gap:10px}
+.ingr li.off{opacity:.45;border-style:dashed}
+.ingr .nm{font-weight:500;font-size:14.5px;line-height:1.25}
+.ingr li.off .nm{text-decoration:line-through}
+.ingr .nm i{display:block;font-style:normal;font-size:11.5px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;text-decoration:none}
+.ingr .cmd{margin-left:auto;display:flex;align-items:center;gap:3px;flex:none}
+.ingr .cmd button{width:32px;height:32px;border-radius:50%;background:var(--papier);font-size:17px;font-weight:700;display:grid;place-items:center;color:var(--vert)}
+.ingr .cmd button:hover{background:var(--moutarde)}
+.ingr .cmd b{font-family:var(--mono);font-weight:700;font-size:13.5px;min-width:64px;text-align:center}
+.ingr li.off .cmd b{color:var(--gris)}
+.ingr .jeter{width:32px;height:32px;border-radius:50%;margin-left:7px;display:grid;place-items:center;color:var(--gris);flex:none}
+.ingr .jeter:hover{background:var(--tomate);color:#fff}
+.ingr li.off .jeter{color:var(--vert)}
+.ingr li.off .jeter:hover{background:var(--vert);color:#fff}
+
+/* suggestions */
+.sugg h3{font-family:var(--display);font-weight:800;font-size:20px;margin:0 0 4px;letter-spacing:-.01em}
+.sugg-titre{display:flex;align-items:center;gap:8px;font-size:15px!important;margin:0 0 10px!important}
+.sugg-titre span{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:0;background:var(--trait);color:var(--gris);border-radius:999px;padding:2px 8px}
+.sugg-titre.suivant{margin-top:22px!important;padding-top:18px;border-top:2px dashed var(--trait)}
+.sugg-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:0}
+
+/* ---------- Panier ---------- */
+.panier{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.panier li{background:var(--carte);border:2px solid var(--trait);border-radius:12px;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px}
+.panier .emo{font-size:24px}
+.panier .nm{font-weight:600;font-size:15px}
+.panier .nm i{display:block;font-style:normal;font-weight:400;font-size:12.5px;color:var(--gris);margin-top:2px}
+.panier .modif{margin-left:auto;font-size:13px;font-weight:600;color:var(--vert);text-decoration:underline;text-underline-offset:3px;padding:6px}
+.panier .sup{width:34px;height:34px;border-radius:50%;background:var(--papier);color:var(--tomate);font-size:17px;display:grid;place-items:center;flex:none}
+
+/* ---------- Ticket ---------- */
+.ecran{position:fixed;inset:0;z-index:70;background:var(--vert);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ecran[hidden]{display:none}
+.ecran-tete{position:sticky;top:0;z-index:2;background:var(--vert);display:flex;align-items:center;gap:10px;padding:14px 16px;max-width:760px;margin:0 auto;color:#fff}
+.ecran-tete h2{font-family:var(--display);font-weight:800;font-size:19px;margin:0;letter-spacing:-.01em}
+.ecran-tete .fermer{background:rgba(255,255,255,.14);color:#fff}
+.outils{margin-left:auto;display:flex;gap:8px}
+.outils button{background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:600}
+.outils button:hover{background:var(--moutarde);color:var(--vert)}
+
+.papier-wrap{max-width:560px;margin:0 auto;padding:4px 16px 64px;filter:drop-shadow(0 14px 30px rgba(0,0,0,.3))}
+.papier{
+  --s:16px;
+  background:var(--ticket);padding:38px 26px 44px;
+  font-family:var(--mono);font-size:14px;line-height:1.55;color:#22241a;
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/var(--s) calc(var(--s)/2) repeat-x,
+    conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/var(--s) calc(var(--s)/2) repeat-x,
+    linear-gradient(#000,#000) center/100% calc(100% - var(--s)) no-repeat;
+  mask:
+    conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/var(--s) calc(var(--s)/2) repeat-x,
+    conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/var(--s) calc(var(--s)/2) repeat-x,
+    linear-gradient(#000,#000) center/100% calc(100% - var(--s)) no-repeat;
+}
+.t-tete{text-align:center;margin-bottom:20px}
+.t-tete h1{font-family:var(--mono);font-weight:700;font-size:19px;letter-spacing:.22em;margin:0 0 6px}
+.t-tete p{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.sep{border-top:1px dashed #9a9a86;margin:16px 0}
+.sep-forte{border-top:2px solid #22241a;margin:16px 0}
+.t-titre{font-weight:700;letter-spacing:.16em;font-size:12px;text-transform:uppercase;margin:0 0 8px}
+.t-plat{margin:0 0 16px}
+.t-plat-nom{font-weight:700;display:flex;gap:8px;align-items:baseline;text-transform:uppercase;letter-spacing:.04em}
+.t-plat-nom .pf{margin-left:auto;font-weight:400;font-size:12px;white-space:nowrap}
+.lg{display:flex;align-items:baseline;gap:6px;font-size:13px}
+.lg .p{flex:none}
+.lg .fil{flex:1;border-bottom:1px dotted #a9a996;transform:translateY(-3px)}
+.lg .q{flex:none;white-space:nowrap}
+.t-plat .lg{padding-left:12px}
+.rayon{font-weight:700;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin:14px 0 6px;color:#5d6152}
+.rayon:first-child{margin-top:0}
+.case{display:flex;align-items:baseline;gap:6px;font-size:13.5px;padding:2px 0}
+.case input{appearance:none;width:14px;height:14px;border:1.5px solid #22241a;flex:none;position:relative;top:2px;cursor:pointer;background:transparent}
+.case input:checked{background:#22241a}
+.case input:checked+.p{text-decoration:line-through;opacity:.45}
+.case input:checked~.fil,.case input:checked~.q{opacity:.45}
+.reste{font-size:12.5px;padding:3px 0;display:flex;gap:6px;align-items:baseline}
+.reste .q{margin-left:auto;white-space:nowrap;font-weight:700}
+.t-pied{text-align:center;margin-top:22px;font-size:12px;letter-spacing:.05em}
+.codebarres{height:38px;margin:14px auto 8px;max-width:220px;background:repeating-linear-gradient(90deg,#22241a 0 2px,transparent 2px 4px,#22241a 4px 5px,transparent 5px 9px,#22241a 9px 12px,transparent 12px 14px)}
+
+@media (min-width:700px){
+  .voile{align-items:center;padding:24px}
+  .feuille{border-radius:20px;max-height:86vh}
+  body{padding-bottom:110px}
+  .plat{min-height:146px}
+}
+@media print{
+  body>*:not(.ecran){display:none!important}
+  .ecran{position:static;background:#fff;overflow:visible}
+  .ecran-tete{display:none!important}
+  .papier-wrap{filter:none;max-width:none;padding:0}
+  .papier{-webkit-mask:none;mask:none;background:#fff;padding:0}
+  .case input{-webkit-print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="bandeau">
+  <div class="bandeau-in">
+    <div class="logo"><span>🛒</span><div>La Borne<small>liste de courses signée E+M</small></div></div>
+    <div class="bandeau-actions">
+      <div class="pers" role="group" aria-label="Nombre de personnes">
+        <button class="rond" id="pers-moins" aria-label="Une personne de moins">−</button>
+        <b id="pers-nb">4<i>pers.</i></b>
+        <button class="rond" id="pers-plus" aria-label="Une personne de plus">+</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="zone">
+  <div class="chercher">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="recherche" type="search" placeholder="Un plat, ou des ingrédients : poulet crème…" autocomplete="off" aria-label="Rechercher un plat">
+    <button class="effacer" id="effacer" hidden aria-label="Effacer la recherche">✕</button>
+  </div>
+  <div class="onglets" id="onglets" role="tablist"></div>
+  <div class="grille" id="grille"></div>
+</main>
+
+<div class="barre">
+  <div class="barre-in">
+    <button class="b-panier" id="ouvrir-panier" disabled>Mes plats <span class="pastille" id="nb-plats">0</span></button>
+    <button class="b-liste" id="ouvrir-ticket" disabled>🧾 Voir ma liste</button>
+  </div>
+</div>
+
+<div class="voile" id="voile" hidden></div>
+<div class="ecran" id="ecran" hidden></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   MODE D'EMPLOI
+
+   AJOUTER UNE RECETTE  → repérer la bonne famille dans RECETTES (plus bas),
+     copier un bloc existant, changer les valeurs. Les quantités sont TOUJOURS
+     pour UNE personne : le site multiplie par le nombre de convives.
+
+   AJOUTER UN PRODUIT   → une ligne dans PRODUITS. Un produit utilisé dans une
+     recette mais absent d'ici est simplement rangé au rayon "Divers".
+
+   ÉPINGLER UNE RECETTE MARMITON → ajouter  mm:"https://www.marmiton.org/…"
+     dans le bloc de la recette. Un bouton jaune "La recette Marmiton" apparaît
+     alors dans la fiche du plat. Sans ce champ, seul le lien de recherche
+     s'affiche : rien à faire, rien ne casse.
+
+   DÉPLACER UNE RECETTE → couper le bloc, le coller dans une autre famille.
+     La famille est déclarée une seule fois, en tête de liste : rien à corriger.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────── PRODUITS ───────────────────────────────
+   rayon     : regroupe la liste de courses en magasin
+   unite     : g · ml · L · tranche · pièce · pot · rouleau · feuille · sachet ·
+               cube · pincée · botte · pain · gousse
+   lot       : taille du conditionnement vendu. C'est lui qui calcule les RESTES.
+               null = vrac, donc aucun reste.
+   contenant : nom de l'article en rayon → "2 barquettes de 200 g"
+   alOeil    : condiment affiché « au goût » au lieu d'un poids
+   stock     : produit d'armoire, son reliquat n'est pas listé dans les restes
+   ──────────────────────────────────────────────────────────────────────── */
+const RAYONS = ["Fruits & légumes","Boucherie","Charcuterie","Poissonnerie","Crèmerie","Boulangerie","Épicerie salée","Épicerie sucrée","Surgelés","Traiteur","Boissons","Divers"];
+
+const PRODUITS = {
+  /* Fruits & légumes */
+  "Oignon":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Oignon rouge":         { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Échalote":             { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Ail":                  { rayon:"Fruits & légumes", unite:"gousse", lot:null },
+  "Tomate":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Tomates cerises":      { rayon:"Fruits & légumes", unite:"g", lot:250, contenant:"barquette" },
+  "Pomme de terre":       { rayon:"Fruits & légumes", unite:"g", lot:null },
+  "Patate douce":         { rayon:"Fruits & légumes", unite:"g", lot:null },
+  "Carotte":              { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Poireau":              { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Navet":                { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Poivron":              { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Courgette":            { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Aubergine":            { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Champignons de Paris": { rayon:"Fruits & légumes", unite:"g", lot:250, contenant:"barquette" },
+  "Chou-fleur":           { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Brocoli":              { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Endive":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Céleri branche":       { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Betterave cuite":      { rayon:"Fruits & légumes", unite:"g", lot:500, contenant:"barquette" },
+  "Concombre":            { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Radis":                { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Salade verte":         { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Salade iceberg":       { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Roquette":             { rayon:"Fruits & légumes", unite:"g", lot:125, contenant:"sachet" },
+  "Mâche":                { rayon:"Fruits & légumes", unite:"g", lot:125, contenant:"sachet" },
+  "Épinards frais":       { rayon:"Fruits & légumes", unite:"g", lot:300, contenant:"sachet" },
+  "Avocat":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Citron":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Citron vert":          { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Orange":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Pomme":                { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Poire":                { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Banane":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Kiwi":                 { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Fraises":              { rayon:"Fruits & légumes", unite:"g", lot:250, contenant:"barquette" },
+  "Framboises":           { rayon:"Fruits & légumes", unite:"g", lot:125, contenant:"barquette" },
+  "Myrtilles":            { rayon:"Fruits & légumes", unite:"g", lot:125, contenant:"barquette" },
+  "Cerises":              { rayon:"Fruits & légumes", unite:"g", lot:null },
+  "Raisin":               { rayon:"Fruits & légumes", unite:"g", lot:null },
+  "Pêche":                { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Ananas":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Mangue":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Melon":                { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+  "Ciboule":              { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Persil":               { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Coriandre":            { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Basilic":              { rayon:"Fruits & légumes", unite:"pot", lot:1, contenant:"pot" },
+  "Menthe":               { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Aneth":                { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Thym":                 { rayon:"Fruits & légumes", unite:"botte", lot:1, contenant:"botte" },
+  "Gingembre frais":      { rayon:"Fruits & légumes", unite:"g", lot:null },
+  "Piment":               { rayon:"Fruits & légumes", unite:"pièce", lot:null },
+
+  /* Boucherie */
+  "Steak haché":              { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"boîte" },
+  "Viande hachée de bœuf":    { rayon:"Boucherie", unite:"g", lot:500, contenant:"barquette" },
+  "Bœuf à bourguignon":       { rayon:"Boucherie", unite:"g", lot:600, contenant:"barquette" },
+  "Bœuf à pot-au-feu":        { rayon:"Boucherie", unite:"g", lot:800, contenant:"barquette" },
+  "Veau à blanquette":        { rayon:"Boucherie", unite:"g", lot:600, contenant:"barquette" },
+  "Steak de bœuf":            { rayon:"Boucherie", unite:"pièce", lot:2, contenant:"barquette" },
+  "Rôti de porc":             { rayon:"Boucherie", unite:"g", lot:900, contenant:"rôti" },
+  "Côte de porc":             { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Filet mignon de porc":     { rayon:"Boucherie", unite:"g", lot:500, contenant:"barquette" },
+  "Poulet entier":            { rayon:"Boucherie", unite:"pièce", lot:1, contenant:"poulet" },
+  "Cuisse de poulet":         { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Filet de poulet":          { rayon:"Boucherie", unite:"g", lot:450, contenant:"barquette" },
+  "Escalope de dinde":        { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Escalope de poulet panée": { rayon:"Boucherie", unite:"pièce", lot:6, contenant:"paquet" },
+  "Cordon bleu":              { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"paquet" },
+  "Nuggets de poulet":        { rayon:"Boucherie", unite:"g", lot:400, contenant:"sachet" },
+  "Confit de canard":         { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"boîte" },
+  "Saucisse de Toulouse":     { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Saucisse de Morteau":      { rayon:"Boucherie", unite:"pièce", lot:1, contenant:"pièce" },
+  "Chipolatas":               { rayon:"Boucherie", unite:"pièce", lot:6, contenant:"barquette" },
+  "Merguez":                  { rayon:"Boucherie", unite:"pièce", lot:6, contenant:"barquette" },
+  "Boudin noir":              { rayon:"Boucherie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Chair à saucisse":         { rayon:"Boucherie", unite:"g", lot:400, contenant:"barquette" },
+
+  /* Charcuterie */
+  "Jambon blanc":        { rayon:"Charcuterie", unite:"tranche", lot:4, contenant:"paquet" },
+  "Jambon cru":          { rayon:"Charcuterie", unite:"tranche", lot:6, contenant:"paquet" },
+  "Lardons fumés":       { rayon:"Charcuterie", unite:"g", lot:200, contenant:"barquette" },
+  "Bacon":               { rayon:"Charcuterie", unite:"tranche", lot:10, contenant:"paquet" },
+  "Knacks":              { rayon:"Charcuterie", unite:"pièce", lot:6, contenant:"paquet" },
+  "Chorizo":             { rayon:"Charcuterie", unite:"g", lot:200, contenant:"paquet" },
+  "Saucisson sec":       { rayon:"Charcuterie", unite:"g", lot:200, contenant:"pièce" },
+  "Terrine de campagne": { rayon:"Charcuterie", unite:"g", lot:180, contenant:"barquette" },
+
+  /* Poissonnerie */
+  "Filet de saumon":          { rayon:"Poissonnerie", unite:"pièce", lot:2, contenant:"barquette" },
+  "Dos de cabillaud":         { rayon:"Poissonnerie", unite:"pièce", lot:2, contenant:"barquette" },
+  "Filet de colin":           { rayon:"Poissonnerie", unite:"pièce", lot:4, contenant:"barquette" },
+  "Saumon ou truite fumé(e)": { rayon:"Poissonnerie", unite:"g", lot:120, contenant:"paquet" },
+  "Fruits de mer":            { rayon:"Poissonnerie", unite:"g", lot:400, contenant:"sachet" },
+  "Moules":                   { rayon:"Poissonnerie", unite:"g", lot:1000, contenant:"filet" },
+  "Crevettes":                { rayon:"Poissonnerie", unite:"g", lot:250, contenant:"barquette" },
+  "Surimi":                   { rayon:"Poissonnerie", unite:"pièce", lot:16, contenant:"paquet" },
+
+  /* Crèmerie */
+  "Crème fraîche épaisse": { rayon:"Crèmerie", unite:"g", lot:200, contenant:"pot" },
+  "Crème fraîche liquide": { rayon:"Crèmerie", unite:"ml", lot:200, contenant:"brique" },
+  "Beurre":                { rayon:"Crèmerie", unite:"g", lot:250, contenant:"plaquette" },
+  "Lait":                  { rayon:"Crèmerie", unite:"ml", lot:1000, contenant:"brique" },
+  "Œufs":                  { rayon:"Crèmerie", unite:"pièce", lot:6, contenant:"boîte" },
+  "Cheddar en tranches":   { rayon:"Crèmerie", unite:"tranche", lot:10, contenant:"paquet" },
+  "Emmental râpé":         { rayon:"Crèmerie", unite:"g", lot:200, contenant:"sachet" },
+  "Gruyère râpé":          { rayon:"Crèmerie", unite:"g", lot:200, contenant:"sachet" },
+  "Parmesan râpé":         { rayon:"Crèmerie", unite:"g", lot:100, contenant:"sachet" },
+  "Mozzarella":            { rayon:"Crèmerie", unite:"g", lot:125, contenant:"boule" },
+  "Comté":                 { rayon:"Crèmerie", unite:"g", lot:200, contenant:"morceau" },
+  "Reblochon":             { rayon:"Crèmerie", unite:"g", lot:450, contenant:"pièce" },
+  "Fromage à raclette":    { rayon:"Crèmerie", unite:"g", lot:400, contenant:"barquette" },
+  "Mélange à fondue":      { rayon:"Crèmerie", unite:"g", lot:400, contenant:"sachet" },
+  "Mont d'Or":             { rayon:"Crèmerie", unite:"g", lot:480, contenant:"boîte" },
+  "Fromage frais nature":  { rayon:"Crèmerie", unite:"g", lot:150, contenant:"pot" },
+  "Bûche de chèvre":       { rayon:"Crèmerie", unite:"g", lot:180, contenant:"bûche" },
+  "Roquefort":             { rayon:"Crèmerie", unite:"g", lot:100, contenant:"morceau" },
+  "Feta":                  { rayon:"Crèmerie", unite:"g", lot:200, contenant:"barquette" },
+  "Ricotta":               { rayon:"Crèmerie", unite:"g", lot:250, contenant:"pot" },
+  "Mascarpone":            { rayon:"Crèmerie", unite:"g", lot:250, contenant:"pot" },
+  "Fromage blanc":         { rayon:"Crèmerie", unite:"g", lot:500, contenant:"pot" },
+  "Skyr":                  { rayon:"Crèmerie", unite:"g", lot:450, contenant:"pot" },
+  "Yaourt nature":         { rayon:"Crèmerie", unite:"pot", lot:8, contenant:"pack" },
+  "Yaourt aux fruits":     { rayon:"Crèmerie", unite:"pot", lot:12, contenant:"pack" },
+  "Crème dessert":         { rayon:"Crèmerie", unite:"pot", lot:4, contenant:"pack" },
+  "Pâte feuilletée":       { rayon:"Crèmerie", unite:"rouleau", lot:1, contenant:"rouleau" },
+  "Pâte brisée":           { rayon:"Crèmerie", unite:"rouleau", lot:1, contenant:"rouleau" },
+  "Pâte sablée":           { rayon:"Crèmerie", unite:"rouleau", lot:1, contenant:"rouleau" },
+  "Pâte à pizza":          { rayon:"Crèmerie", unite:"rouleau", lot:1, contenant:"rouleau" },
+  "Pâte à flammekueche":   { rayon:"Crèmerie", unite:"rouleau", lot:1, contenant:"rouleau" },
+  "Gnocchi":               { rayon:"Crèmerie", unite:"g", lot:500, contenant:"sachet" },
+  "Ravioles":              { rayon:"Crèmerie", unite:"g", lot:180, contenant:"barquette" },
+  "Tortellini frais":      { rayon:"Crèmerie", unite:"g", lot:250, contenant:"sachet" },
+  "Tagliatelles fraîches": { rayon:"Crèmerie", unite:"g", lot:250, contenant:"sachet" },
+  "Tofu fumé":             { rayon:"Crèmerie", unite:"g", lot:200, contenant:"bloc" },
+  "Tofu nature":           { rayon:"Crèmerie", unite:"g", lot:200, contenant:"bloc" },
+  "Rösti (galettes)":      { rayon:"Crèmerie", unite:"pièce", lot:4, contenant:"paquet" },
+
+  /* Boulangerie */
+  "Pain de mie Harrys":     { rayon:"Boulangerie", unite:"tranche", lot:20, contenant:"paquet" },
+  "Pain de mie complet":    { rayon:"Boulangerie", unite:"tranche", lot:20, contenant:"paquet" },
+  "Pain à burger":          { rayon:"Boulangerie", unite:"pain", lot:4, contenant:"paquet" },
+  "Pain à hot-dog":         { rayon:"Boulangerie", unite:"pain", lot:6, contenant:"paquet" },
+  "Mauricette":             { rayon:"Boulangerie", unite:"pièce", lot:4, contenant:"paquet" },
+  "Baguette":               { rayon:"Boulangerie", unite:"pièce", lot:1, contenant:"baguette" },
+  "Pain de campagne":       { rayon:"Boulangerie", unite:"g", lot:500, contenant:"pain" },
+  "Brioche tranchée":       { rayon:"Boulangerie", unite:"tranche", lot:16, contenant:"paquet" },
+  "Croissant":              { rayon:"Boulangerie", unite:"pièce", lot:4, contenant:"paquet" },
+  "Blinis":                 { rayon:"Boulangerie", unite:"pièce", lot:12, contenant:"paquet" },
+  "Croûtons":               { rayon:"Boulangerie", unite:"g", lot:140, contenant:"sachet" },
+  "Tortillas (wraps)":      { rayon:"Boulangerie", unite:"pièce", lot:8, contenant:"paquet" },
+  "Pain pita":              { rayon:"Boulangerie", unite:"pièce", lot:6, contenant:"paquet" },
+  "Biscuits à la cuillère": { rayon:"Boulangerie", unite:"pièce", lot:24, contenant:"paquet" },
+
+  /* Épicerie salée */
+  "Spaghetti":                  { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Pâtes (penne, fusilli…)":    { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Coquillettes":               { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Feuilles de lasagne":        { rayon:"Épicerie salée", unite:"feuille", lot:16, contenant:"paquet" },
+  "Riz long grain":             { rayon:"Épicerie salée", unite:"g", lot:1000 },
+  "Riz basmati":                { rayon:"Épicerie salée", unite:"g", lot:1000 },
+  "Riz rond spécial paella":    { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Riz rond dessert":           { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Ébly ou perles Tipiak":      { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Semoule à couscous":         { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Boulgour":                   { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Quinoa":                     { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Polenta":                    { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Lentilles vertes":           { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Lentilles corail":           { rayon:"Épicerie salée", unite:"g", lot:500 },
+  "Nouilles ramen":             { rayon:"Épicerie salée", unite:"g", lot:250 },
+  "Nouilles chinoises":         { rayon:"Épicerie salée", unite:"g", lot:250 },
+  "Nouilles de riz":            { rayon:"Épicerie salée", unite:"g", lot:250 },
+  "Sauce bolognaise":           { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"bocal" },
+  "Sauce tomate":               { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"bocal" },
+  "Tomates concassées":         { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Concentré de tomate":        { rayon:"Épicerie salée", unite:"g", lot:140, contenant:"tube" },
+  "Pesto vert":                 { rayon:"Épicerie salée", unite:"g", lot:190, contenant:"pot" },
+  "Pesto rouge":                { rayon:"Épicerie salée", unite:"g", lot:190, contenant:"pot" },
+  "Sauce César":                { rayon:"Épicerie salée", unite:"g", lot:250, contenant:"flacon" },
+  "Béchamel":                   { rayon:"Épicerie salée", unite:"ml", lot:500, contenant:"brique" },
+  "Mayonnaise":                 { rayon:"Épicerie salée", unite:"g", lot:235, contenant:"pot", alOeil:true, stock:true },
+  "Ketchup":                    { rayon:"Épicerie salée", unite:"g", lot:340, contenant:"flacon", alOeil:true, stock:true },
+  "Moutarde":                   { rayon:"Épicerie salée", unite:"g", lot:370, contenant:"pot", alOeil:true, stock:true },
+  "Sauce barbecue":             { rayon:"Épicerie salée", unite:"g", lot:300, contenant:"flacon", alOeil:true, stock:true },
+  "Sauce soja":                 { rayon:"Épicerie salée", unite:"ml", lot:250, contenant:"bouteille", alOeil:true, stock:true },
+  "Vinaigrette":                { rayon:"Épicerie salée", unite:"ml", lot:500, contenant:"bouteille", alOeil:true, stock:true },
+  "Huile d'olive":              { rayon:"Épicerie salée", unite:"ml", lot:750, contenant:"bouteille", alOeil:true, stock:true },
+  "Huile neutre":               { rayon:"Épicerie salée", unite:"ml", lot:1000, contenant:"bouteille", alOeil:true, stock:true },
+  "Vinaigre balsamique":        { rayon:"Épicerie salée", unite:"ml", lot:500, contenant:"bouteille", alOeil:true, stock:true },
+  "Maïs en boîte":              { rayon:"Épicerie salée", unite:"g", lot:285, contenant:"boîte" },
+  "Haricots verts":             { rayon:"Épicerie salée", unite:"g", lot:440, contenant:"boîte" },
+  "Petits pois":                { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Flageolets":                 { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Haricots rouges":            { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Haricots blancs":            { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Pois chiches":               { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Cœurs d'artichaut":          { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"bocal" },
+  "Champignons en boîte":       { rayon:"Épicerie salée", unite:"g", lot:230, contenant:"boîte" },
+  "Macédoine de légumes":       { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte" },
+  "Ratatouille":                { rayon:"Épicerie salée", unite:"g", lot:660, contenant:"boîte" },
+  "Thon en boîte":              { rayon:"Épicerie salée", unite:"g", lot:140, contenant:"boîte" },
+  "Sardines en boîte":          { rayon:"Épicerie salée", unite:"g", lot:120, contenant:"boîte" },
+  "Cassoulet en boîte":         { rayon:"Épicerie salée", unite:"g", lot:840, contenant:"boîte" },
+  "Raviolis en boîte":          { rayon:"Épicerie salée", unite:"g", lot:800, contenant:"boîte" },
+  "Choucroute garnie":          { rayon:"Épicerie salée", unite:"g", lot:800, contenant:"boîte" },
+  "Soupe en brique":            { rayon:"Épicerie salée", unite:"ml", lot:1000, contenant:"brique" },
+  "Purée Mousseline (flocons)": { rayon:"Épicerie salée", unite:"g", lot:500, contenant:"boîte" },
+  "Bouillon cube volaille":     { rayon:"Épicerie salée", unite:"cube", lot:8, contenant:"boîte", stock:true },
+  "Bouillon cube légumes":      { rayon:"Épicerie salée", unite:"cube", lot:8, contenant:"boîte", stock:true },
+  "Lait de coco":               { rayon:"Épicerie salée", unite:"ml", lot:400, contenant:"brique" },
+  "Curry en poudre":            { rayon:"Épicerie salée", unite:"g", lot:45, contenant:"pot", alOeil:true, stock:true },
+  "Épices chili":               { rayon:"Épicerie salée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Épices à paella":            { rayon:"Épicerie salée", unite:"sachet", lot:4, contenant:"boîte", alOeil:true, stock:true },
+  "Ras el hanout":              { rayon:"Épicerie salée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Paprika":                    { rayon:"Épicerie salée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Cumin":                      { rayon:"Épicerie salée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Curcuma":                    { rayon:"Épicerie salée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Muscade":                    { rayon:"Épicerie salée", unite:"g", lot:30, contenant:"pot", alOeil:true, stock:true },
+  "Herbes de Provence":         { rayon:"Épicerie salée", unite:"g", lot:20, contenant:"pot", alOeil:true, stock:true },
+  "Origan":                     { rayon:"Épicerie salée", unite:"g", lot:20, contenant:"pot", alOeil:true, stock:true },
+  "Laurier":                    { rayon:"Épicerie salée", unite:"g", lot:10, contenant:"pot", alOeil:true, stock:true },
+  "Oignons frits":              { rayon:"Épicerie salée", unite:"g", lot:100, contenant:"boîte" },
+  "Cornichons":                 { rayon:"Épicerie salée", unite:"g", lot:350, contenant:"bocal" },
+  "Olives":                     { rayon:"Épicerie salée", unite:"g", lot:200, contenant:"bocal" },
+  "Tapenade":                   { rayon:"Épicerie salée", unite:"g", lot:90, contenant:"pot" },
+  "Chapelure":                  { rayon:"Épicerie salée", unite:"g", lot:250, contenant:"boîte", stock:true },
+  "Raisins secs":               { rayon:"Épicerie salée", unite:"g", lot:250, contenant:"sachet" },
+  "Pignons de pin":             { rayon:"Épicerie salée", unite:"g", lot:100, contenant:"sachet" },
+  "Noix":                       { rayon:"Épicerie salée", unite:"g", lot:200, contenant:"sachet" },
+  "Cacahuètes":                 { rayon:"Épicerie salée", unite:"g", lot:200, contenant:"sachet" },
+  "Amandes effilées":           { rayon:"Épicerie salée", unite:"g", lot:125, contenant:"sachet" },
+  "Graines de sésame":          { rayon:"Épicerie salée", unite:"g", lot:100, contenant:"sachet", alOeil:true, stock:true },
+  "Chips":                      { rayon:"Épicerie salée", unite:"g", lot:150, contenant:"paquet" },
+  "Biscuits apéritifs":         { rayon:"Épicerie salée", unite:"g", lot:100, contenant:"paquet" },
+  "Farine":                     { rayon:"Épicerie salée", unite:"g", lot:1000, contenant:"paquet", stock:true },
+  "Maïzena":                    { rayon:"Épicerie salée", unite:"g", lot:400, contenant:"boîte", stock:true },
+  "Levure boulangère":          { rayon:"Épicerie salée", unite:"sachet", lot:3, contenant:"boîte", stock:true },
+  "Levure chimique":            { rayon:"Épicerie salée", unite:"sachet", lot:5, contenant:"boîte", stock:true },
+  "Sel":                        { rayon:"Épicerie salée", unite:"pincée", lot:null, alOeil:true, stock:true },
+  "Poivre":                     { rayon:"Épicerie salée", unite:"pincée", lot:null, alOeil:true, stock:true },
+
+  /* Épicerie sucrée */
+  "Sucre":                         { rayon:"Épicerie sucrée", unite:"g", lot:1000, contenant:"paquet", stock:true },
+  "Cassonade":                     { rayon:"Épicerie sucrée", unite:"g", lot:750, contenant:"paquet", stock:true },
+  "Sucre glace":                   { rayon:"Épicerie sucrée", unite:"g", lot:250, contenant:"sachet", stock:true },
+  "Sucre vanillé":                 { rayon:"Épicerie sucrée", unite:"sachet", lot:8, contenant:"boîte", stock:true },
+  "Sucre perlé":                   { rayon:"Épicerie sucrée", unite:"g", lot:125, contenant:"sachet", stock:true },
+  "Chocolat noir pâtissier":       { rayon:"Épicerie sucrée", unite:"g", lot:200, contenant:"tablette" },
+  "Chocolat au lait":              { rayon:"Épicerie sucrée", unite:"g", lot:200, contenant:"tablette" },
+  "Pépites de chocolat":           { rayon:"Épicerie sucrée", unite:"g", lot:100, contenant:"sachet" },
+  "Cacao en poudre":               { rayon:"Épicerie sucrée", unite:"g", lot:250, contenant:"boîte", stock:true },
+  "Chocolat en poudre":            { rayon:"Épicerie sucrée", unite:"g", lot:800, contenant:"boîte", stock:true },
+  "Pâte à tartiner":               { rayon:"Épicerie sucrée", unite:"g", lot:400, contenant:"pot" },
+  "Confiture":                     { rayon:"Épicerie sucrée", unite:"g", lot:370, contenant:"pot" },
+  "Miel":                          { rayon:"Épicerie sucrée", unite:"g", lot:250, contenant:"pot", stock:true },
+  "Sirop d'érable":                { rayon:"Épicerie sucrée", unite:"ml", lot:250, contenant:"bouteille", stock:true },
+  "Céréales":                      { rayon:"Épicerie sucrée", unite:"g", lot:500, contenant:"paquet" },
+  "Muesli":                        { rayon:"Épicerie sucrée", unite:"g", lot:750, contenant:"paquet" },
+  "Granola":                       { rayon:"Épicerie sucrée", unite:"g", lot:500, contenant:"paquet" },
+  "Flocons d'avoine":              { rayon:"Épicerie sucrée", unite:"g", lot:500, contenant:"paquet" },
+  "Poudre d'amandes":              { rayon:"Épicerie sucrée", unite:"g", lot:125, contenant:"sachet" },
+  "Noix de coco râpée":            { rayon:"Épicerie sucrée", unite:"g", lot:125, contenant:"sachet" },
+  "Vanille liquide":               { rayon:"Épicerie sucrée", unite:"ml", lot:60, contenant:"flacon", alOeil:true, stock:true },
+  "Cannelle":                      { rayon:"Épicerie sucrée", unite:"g", lot:40, contenant:"pot", alOeil:true, stock:true },
+  "Gélatine":                      { rayon:"Épicerie sucrée", unite:"feuille", lot:6, contenant:"sachet", stock:true },
+  "Spéculoos":                     { rayon:"Épicerie sucrée", unite:"g", lot:250, contenant:"paquet" },
+  "Petits-beurre":                 { rayon:"Épicerie sucrée", unite:"g", lot:200, contenant:"paquet" },
+  "Gâteaux moelleux (type Envia)": { rayon:"Épicerie sucrée", unite:"pièce", lot:8, contenant:"boîte" },
+  "Compote":                       { rayon:"Épicerie sucrée", unite:"pot", lot:4, contenant:"pack" },
+
+  /* Surgelés */
+  "Poisson pané":           { rayon:"Surgelés", unite:"pièce", lot:10, contenant:"boîte" },
+  "Frites":                 { rayon:"Surgelés", unite:"g", lot:1000, contenant:"sachet" },
+  "Pommes noisettes":       { rayon:"Surgelés", unite:"g", lot:750, contenant:"sachet" },
+  "Épinards hachés":        { rayon:"Surgelés", unite:"g", lot:750, contenant:"sachet" },
+  "Poêlée de légumes":      { rayon:"Surgelés", unite:"g", lot:750, contenant:"sachet" },
+  "Fruits rouges surgelés": { rayon:"Surgelés", unite:"g", lot:450, contenant:"sachet" },
+  "Glace":                  { rayon:"Surgelés", unite:"L", lot:1, contenant:"bac" },
+  "Pizza surgelée":         { rayon:"Surgelés", unite:"pièce", lot:1, contenant:"pizza" },
+
+  /* Traiteur */
+  "Taboulé":              { rayon:"Traiteur", unite:"g", lot:500, contenant:"barquette" },
+  "Carottes râpées":      { rayon:"Traiteur", unite:"g", lot:500, contenant:"barquette" },
+  "Coleslaw":             { rayon:"Traiteur", unite:"g", lot:400, contenant:"barquette" },
+  "Salade piémontaise":   { rayon:"Traiteur", unite:"g", lot:500, contenant:"barquette" },
+  "Feuilletés apéritifs": { rayon:"Traiteur", unite:"pièce", lot:12, contenant:"boîte" },
+  "Feuillantine":         { rayon:"Traiteur", unite:"pièce", lot:2, contenant:"boîte" },
+  "Houmous":              { rayon:"Traiteur", unite:"g", lot:200, contenant:"barquette" },
+  "Tzatziki":             { rayon:"Traiteur", unite:"g", lot:200, contenant:"barquette" },
+
+  /* Boissons */
+  "Vin blanc":    { rayon:"Boissons", unite:"ml", lot:750, contenant:"bouteille" },
+  "Vin rouge":    { rayon:"Boissons", unite:"ml", lot:750, contenant:"bouteille" },
+  "Rhum":         { rayon:"Boissons", unite:"ml", lot:700, contenant:"bouteille", stock:true },
+  "Café moulu":   { rayon:"Boissons", unite:"g", lot:250, contenant:"paquet", stock:true },
+  "Thé":          { rayon:"Boissons", unite:"sachet", lot:25, contenant:"boîte", stock:true },
+  "Jus d'orange": { rayon:"Boissons", unite:"ml", lot:1000, contenant:"brique" },
+};
+
+
+/* ─────────────────────────────── RECETTES ───────────────────────────────
+   id      : identifiant unique, sans espace ni accent
+   cat     : Plats · Accompagnements · Entrées & apéro · Petit-déjeuner ·
+             Desserts · Petits gâteaux   (une nouvelle valeur crée un onglet)
+   ing     : [["Produit", quantité POUR UNE PERSONNE], …]
+   sugg    : catégories proposées après l'ajout, ex. ["Accompagnements"]
+   mm      : (optionnel) URL Marmiton exacte de LA recette que tu veux suivre.
+             Renseignée → bouton direct. Absente → seul le lien de recherche.
+   express : prêt en ~20 min → apparaît dans l'onglet ⚡ Express
+   fixe    : quantités pour un moule / une fournée entière et non par personne.
+             Renseigner alors  unite:"gâteau"  (ou "tarte", "fournée"…)
+   feculent: (accompagnements) contient déjà un féculent → sert à ne pas
+             proposer des frites avec une pizza
+   prio    : 1 ou 2, remonte l'accompagnement dans les suggestions
+
+   Repères de portion : viande ou poisson 130–150 g · féculents secs 80–120 g ·
+   pommes de terre 250 g · légumes cuits 150–200 g · 2 œufs · fromage 30 g
+   ──────────────────────────────────────────────────────────────────────── */
+
+const famille = (sc, plats) => plats.map(r => ({ sc, ...r }));
+
+const RECETTES = [].concat(
+
+famille("PÂTES, RIZ & GRATINS", [
+  { id:"carbo", nom:"Pâtes carbonara", cat:"Plats", emo:"🍝",
+    note:"La vraie : jaune d'œuf, pas de crème obligatoire", express:true, sugg:["Desserts"],
+    /* Exemple du champ optionnel : décommente et colle l'URL exacte de TA recette.
+       mm:"https://www.marmiton.org/recettes/recette_les-vraies-pates-a-la-carbonara_18215.aspx", */
+    ing:[
+      ["Spaghetti",             120],
+      ["Lardons fumés",         60],
+      ["Crème fraîche épaisse", 40],
+      ["Parmesan râpé",         15],
+      ["Œufs",                  0.5],
+      ["Poivre",                2],
+    ]},
+
+  { id:"bolo", nom:"Pâtes bolognaise (POT)", cat:"Plats", emo:"🍝",
+    note:"Avec un pot de sauce", express:true, sugg:["Desserts"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Sauce bolognaise",        130],
+      ["Gruyère râpé",            20],
+    ]},
+
+  { id:"bolo-maison", nom:"Pâtes bolognaise (maison)", cat:"Plats", emo:"🍝",
+    note:"Mijotée 45 min, bien meilleure", sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Viande hachée de bœuf",   100],
+      ["Tomates concassées",      150],
+      ["Concentré de tomate",     15],
+      ["Oignon",                  0.5],
+      ["Carotte",                 0.5],
+      ["Ail",                     1],
+      ["Origan",                  2],
+      ["Huile d'olive",           10],
+      ["Gruyère râpé",            20],
+    ]},
+
+  { id:"pesto-vert", nom:"Pâtes pesto vert", cat:"Plats", emo:"🍝",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Pesto vert",              35],
+      ["Parmesan râpé",           15],
+      ["Pignons de pin",          10],
+    ]},
+
+  { id:"pesto-rouge", nom:"Pâtes pesto rouge", cat:"Plats", emo:"🍝",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Pesto rouge",             35],
+      ["Parmesan râpé",           15],
+      ["Mozzarella",              30],
+    ]},
+
+  { id:"pates-thon", nom:"Pâtes au thon", cat:"Plats", emo:"🍝",
+    note:"Le classique du placard", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Thon en boîte",           70],
+      ["Sauce tomate",            100],
+      ["Oignon",                  0.3],
+      ["Olives",                  20],
+      ["Huile d'olive",           10],
+    ]},
+
+  { id:"mac-cheese", nom:"Pâtes version Mac and cheese", cat:"Plats", emo:"🍝",
+    note:"Béchamel au cheddar", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Coquillettes",        110],
+      ["Lardons fumés",         60],
+      ["Lait",                150],
+      ["Beurre",              20],
+      ["Farine",              20],
+      ["Cheddar en tranches", 3],
+      ["Muscade",             1],
+    ]},
+
+  { id:"gratin-pates", nom:"Gratin de pâtes", cat:"Plats", emo:"🍝",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 110],
+      ["Jambon blanc",            1],
+      ["Crème fraîche épaisse",   60],
+      ["Lait",                    50],
+      ["Emmental râpé",           50],
+    ]},
+
+  { id:"pates-tofu", nom:"Pâtes au tofu", cat:"Plats", emo:"🍝",
+    note:"Végétarien", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 120],
+      ["Tofu fumé",               75],
+      ["Sauce tomate",   50],
+      ["Pesto rouge",   50],
+      ["Oignon",                  0.5],
+    ]},
+
+  { id:"gnocchi-carbo", nom:"Gnocchi carbonara", cat:"Plats", emo:"🍝",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Gnocchi",               250],
+      ["Lardons fumés",         60],
+      ["Crème fraîche épaisse", 60],
+      ["Parmesan râpé",         20],
+    ]},
+
+  { id:"gnocchi-tomate", nom:"Gnocchi à la tomate", cat:"Plats", emo:"🍝",
+    note:"Gratinés au four 10 min", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Gnocchi",      250],
+      ["Sauce tomate", 120],
+      ["Mozzarella",   40],
+      ["Basilic",      0.2],
+    ]},
+
+  { id:"tortellini", nom:"Tortellini à la crème", cat:"Plats", emo:"🍝",
+    note:"5 min de cuisson", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Tortellini frais",      200],
+      ["Crème fraîche liquide", 60],
+      ["Parmesan râpé",         20],
+      ["Jambon blanc",          1],
+    ]},
+
+  { id:"ravioles", nom:"Pâtes \"ravioles\"", cat:"Plats", emo:"🍝",
+    note:"Ravioles du Dauphiné", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Ravioles",              180],
+      ["Crème fraîche liquide", 80],
+      ["Comté",                 30],
+    ]},
+
+  { id:"lasagne", nom:"Lasagnes bolognaise (ALL)", cat:"Plats", emo:"🍝",
+    note:"Tous les ingrédients possibles sont notés, à toi de choisir lequel prendre", sugg:["Accompagnements"],
+    ing:[
+      ["Feuilles de lasagne", 4],
+      ["Sauce bolognaise",    150],
+      ["Viande hachée de bœuf",   75],
+      ["Sauce tomate",   80],
+      ["Courgette",           0.3],
+      ["Aubergine",           0.3],
+      ["Carotte",           0.5],
+      ["Béchamel",            120],
+      ["Emmental râpé",       40],
+    ]},
+
+  { id:"riz-cantonais", nom:"Riz cantonais", cat:"Plats", emo:"🍚",
+    note:"Idéal avec du riz de la veille", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Riz long grain", 80],
+      ["Œufs",           1],
+      ["Jambon blanc",   1.5],
+      ["Petits pois",    50],
+      ["Sauce soja",     15],
+      ["Oignon",         0.3],
+    ]},
+
+  { id:"risotto", nom:"Risotto", cat:"Plats", emo:"🍚",
+    note:"Au choix : champignon, poulet et chorizo...", sugg:["Accompagnements"],
+    ing:[
+      ["Riz rond spécial paella", 80],
+      ["Champignons de Paris",    100],
+      ["Bouillon cube volaille",  1],
+      ["Filet de poulet",  100],
+      ["Chorizo",  40],
+      ["Poivron",  0.5],
+      ["Petits pois",  40],
+      ["Vin blanc",               50],
+      ["Parmesan râpé",           25],
+      ["Oignon",                  0.5],
+      ["Beurre",                  15],
+    ]},
+
+  { id:"paella", nom:"Paella", cat:"Plats", emo:"🍚",
+    note:"", sugg:["Desserts"],
+    ing:[
+      ["Riz rond spécial paella", 90],
+      ["Fruits de mer",           120],
+      ["Filet de poulet",         100],
+      ["Chorizo",                 30],
+      ["Poivron",                 0.5],
+      ["Petits pois",             40],
+      ["Épices à paella",         0.25],
+    ]},
+
+  { id:"raviolis-boite", nom:"Raviolis en boîte", cat:"Plats", emo:"🍝",
+    note:"Zéro effort assumé", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Raviolis en boîte", 400],
+      ["Gruyère râpé",      20],
+    ]},
+
+]),
+
+famille("PIZZAS, TARTES & QUICHES", [
+  { id:"pizza", nom:"Pizza jambon-fromage", cat:"Plats", emo:"🍕",
+    note:"Sur pâte à pizza ou feuilletée", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pâte à pizza", 0.5],
+      ["Sauce tomate", 70],
+      ["Jambon blanc", 1],
+      ["Gruyère râpé", 50],
+      ["Origan",       1],
+    ]},
+
+  { id:"pizza-4fromages", nom:"Pizza 4 fromages", cat:"Plats", emo:"🍕",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Pâte à pizza",    0.5],
+      ["Sauce tomate",    60],
+      ["Mozzarella",      50],
+      ["Bûche de chèvre", 30],
+      ["Roquefort",       20],
+      ["Gruyère râpé",    30],
+    ]},
+
+  { id:"pate-pizza", nom:"Pâte à pizza maison", cat:"Plats", emo:"🍕",
+    note:"Pétrissage 5 min, repos 1 h", sugg:["Plats"],
+    ing:[
+      ["Farine",            125],
+      ["Levure boulangère", 0.25],
+      ["Huile d'olive",     8],
+      ["Sel",               1],
+    ]},
+
+  { id:"pizza-surgelee", nom:"Pizza surgelée", cat:"Plats", emo:"🍕",
+    note:"On ne juge personne", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pizza surgelée", 0.5],
+      ["Salade verte",   0.3],
+    ]},
+
+  { id:"flamm", nom:"Tarte flambée", cat:"Plats", emo:"🍕",
+    note:"Four très chaud, 12 min", sugg:["Accompagnements"],
+    ing:[
+      ["Pâte à flammekueche",   0.5],
+      ["Crème fraîche épaisse", 60],
+      ["Lardons fumés",         60],
+      ["Oignon",                0.75],
+      ["Gruyère râpé",          40],
+    ]},
+
+  { id:"mauricette", nom:"Mauricette façon flammekueche", cat:"Plats", emo:"🍕",
+    note:"2 mauricettes par personne", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Mauricette",            2],
+      ["Lardons fumés",         50],
+      ["Oignon",                0.5],
+      ["Crème fraîche épaisse", 50],
+      ["Emmental râpé",         40],
+    ]},
+
+  { id:"quiche", nom:"Quiche lorraine", cat:"Plats", emo:"🥧",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Pâte feuilletée",           0.5],
+      ["Œufs",                  1],
+      ["Crème fraîche épaisse", 75],
+      ["Lardons fumés",         60],
+      ["Gruyère râpé",          30],
+    ]},
+
+  { id:"quiche-leg", nom:"Quiche épinards & patate douce", cat:"Plats", emo:"🥧",
+    note:"Végétarien", sugg:["Accompagnements"],
+    ing:[
+      ["Pâte feuilletée",           0.5],
+      ["Œufs",                  1.5],
+      ["Crème fraîche épaisse", 75],
+      ["Épinards hachés",       100],
+      ["Patate douce",          100],
+      ["Gruyère râpé",          30],
+    ]},
+
+  { id:"quiche-thon", nom:"Quiche au thon", cat:"Plats", emo:"🥧",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Pâte brisée",           0.5],
+      ["Thon en boîte",         70],
+      ["Œufs",                  1.5],
+      ["Crème fraîche épaisse", 75],
+      ["Tomate",                0.5],
+      ["Gruyère râpé",          25],
+    ]},
+
+]),
+
+famille("PAIN, BURGERS & SANDWICHS", [
+  { id:"croque", nom:"Croque-monsieur", cat:"Plats", emo:"🥪",
+    note:"2 croques par personne", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain de mie Harrys",    4],
+      ["Jambon blanc",          2],
+      ["Cheddar en tranches",   2],
+      ["Crème fraîche épaisse", 5],
+      ["Beurre",                5],
+    ]},
+
+  { id:"croque-madame", nom:"Croque-madame", cat:"Plats", emo:"🥪",
+    note:"Le croque avec l'œuf sur le dessus", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain de mie Harrys",    4],
+      ["Jambon blanc",          2],
+      ["Cheddar en tranches",   2],
+      ["Œufs",                  1],
+      ["Crème fraîche épaisse", 5],
+      ["Beurre",                8],
+    ]},
+
+  { id:"burger", nom:"Burger maison", cat:"Plats", emo:"🍔",
+    note:"1 gros ou 2 petits par personne", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain à burger",       1.5],
+      ["Steak haché",         1.5],
+      ["Cheddar en tranches", 1.5],
+      ["Mayonnaise",          15],
+      ["Ketchup",             15],
+      ["Oignon",              0.5],
+      ["Vinaigre balsamique", 10],
+      ["Miel", 10],
+      ["Salade verte",        0.15],
+       ["Tomate",        0.15],
+        ["Poivron",        0.15],
+    ]},
+
+  { id:"burger-rosti", nom:"Burger rösti", cat:"Plats", emo:"🥔",
+    note:"Le pain remplacé par 2 rösti", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Rösti (galettes)",    3],
+      ["Steak haché",         1.5],
+      ["Cheddar en tranches", 1.5],
+      ["Mayonnaise",          15],
+      ["Ketchup",             15],
+      ["Oignon",              0.5],
+       ["Vinaigre balsamique", 10],
+       ["Miel", 10],
+      ["Salade verte",        0.15],
+       ["Tomate",        0.15],
+        ["Poivron",        0.15],
+    ]},
+
+  { id:"americain", nom:"Américain", cat:"Plats", emo:"🥖",
+    note:"Frites à l'intérieur, évidemment", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Baguette",     0.5],
+      ["Steak haché",  1.5],
+      ["Mayonnaise",   20],
+      ["Ketchup",      20],
+      ["Frites",       150],
+      ["Salade verte", 0.15],
+    ]},
+
+  { id:"hotdog", nom:"Hot-dog", cat:"Plats", emo:"🌭",
+    note:"2 par personne", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain à hot-dog", 2],
+      ["Knacks",         2],
+      ["Mayonnaise",   20],
+      ["Ketchup",      20],
+      ["Emmental râpé",  20],
+      ["Oignons frits",  10],
+    ]},
+
+  { id:"wrap-poulet", nom:"Wraps au poulet", cat:"Plats", emo:"🌯",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Tortillas (wraps)",   2],
+      ["Filet de poulet",     100],
+      ["Salade verte",        0.15],
+      ["Tomate",              0.5],
+      ["Maïs en boîte",       40],
+      ["Mayonnaise",          20],
+      ["Cheddar en tranches", 1],
+      ["Fromage frais nature", 30],
+    ]},
+
+  { id:"quesadilla", nom:"Quesadillas", cat:"Plats", emo:"🫓",
+    note:"Poêle, 4 min par face", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Tortillas (wraps)",   2],
+      ["Cheddar en tranches", 2],
+      ["Filet de poulet",     80],
+      ["Poivron",             0.3],
+    ]},
+
+  { id:"pizza-toast", nom:"Pizza-toast", cat:"Plats", emo:"🍞",
+    note:"Pain de mie + grill, 5 min", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain de mie Harrys", 2],
+      ["Sauce tomate",       40],
+      ["Jambon blanc",       1],
+      ["Gruyère râpé",       30],
+      ["Origan",             1],
+    ]},
+
+  { id:"tartine-chevre", nom:"Tartines chèvre-miel", cat:"Plats", emo:"🍯",
+    note:"Sous le grill 5 min", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Pain de campagne", 80],
+      ["Bûche de chèvre",  60],
+      ["Miel",             15],
+      ["Noix",             15],
+      ["Salade verte",     0.3],
+    ]},
+
+  { id:"bruschetta", nom:"Bruschetta", cat:"Plats", emo:"🍅",
+    note:"Tomate, mozza, basilic", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Baguette",      0.4],
+      ["Tomate",        1],
+      ["Mozzarella",    40],
+      ["Basilic",       0.2],
+      ["Huile d'olive", 10],
+      ["Ail",           1],
+    ]},
+
+  { id:"blinis", nom:"Blinis au saumon fumé", cat:"Plats", emo:"🥞",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Blinis",                   6],
+      ["Saumon ou truite fumé(e)", 60],
+      ["Crème fraîche épaisse",    40],
+      ["Citron",                   0.25],
+      ["Aneth",                    0.15],
+    ]},
+
+]),
+
+famille("VIANDES & PLATS MIJOTÉS", [
+  { id:"cordon", nom:"Cordon bleu", cat:"Plats", emo:"🍗",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Cordon bleu", 1.5],
+    ]},
+
+  { id:"poulet-pane", nom:"Poulet pané", cat:"Plats", emo:"🍚",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Escalope de poulet panée", 2],
+      ["Ébly ou perles Tipiak",    80],
+      ["Beurre",                   10],
+    ]},
+
+  { id:"nuggets", nom:"Nuggets & frites", cat:"Plats", emo:"🍟",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Nuggets de poulet", 150],
+      ["Frites",            150],
+      ["Ketchup",           20],
+    ]},
+
+  { id:"escalope-milanaise", nom:"Escalope milanaise", cat:"Plats", emo:"🍖",
+    note:"Panée maison, spaghetti tomate", sugg:["Accompagnements"],
+    ing:[
+      ["Escalope de dinde", 1],
+      ["Chapelure",         30],
+      ["Œufs",              0.5],
+      ["Farine",            15],
+      ["Spaghetti",         100],
+      ["Sauce tomate",      80],
+      ["Parmesan râpé",     15],
+    ]},
+
+  { id:"poulet-curry", nom:"Poulet curry & riz", cat:"Plats", emo:"🍛",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Riz long grain",  80],
+      ["Filet de poulet", 150],
+      ["Curry en poudre", 5],
+      ["Lait de coco",    60],
+      ["Crème fraîche liquide", 60],
+      ["Oignon",          0.5],
+    ]},
+
+  { id:"poulet-creme", nom:"Poulet à la crème & champignons", cat:"Plats", emo:"🍄",
+    note:"25 min, une seule poêle", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Filet de poulet",       150],
+      ["Champignons de Paris",  100],
+      ["Crème fraîche liquide", 80],
+      ["Échalote",              1],
+      ["Vin blanc",             40],
+      ["Beurre",                10],
+      ["Persil",                0.1],
+    ]},
+
+  { id:"poulet-roti", nom:"Poulet rôti & pommes de terre", cat:"Plats", emo:"🍗",
+    note:"1 h 15 au four, le dimanche", sugg:["Accompagnements"],
+    ing:[
+      ["Poulet entier",  0.25],
+      ["Pomme de terre", 250],
+      ["Beurre",         15],
+      ["Thym",           0.1],
+      ["Ail",            1],
+    ]},
+
+  { id:"poulet-basquaise", nom:"Poulet basquaise", cat:"Plats", emo:"🫑",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Cuisse de poulet",   1],
+      ["Poivron",            0.75],
+      ["Tomates concassées", 150],
+      ["Oignon",             0.5],
+      ["Riz long grain",     70],
+      ["Ail",                1],
+      ["Paprika",            2],
+    ]},
+
+  { id:"bourguignon", nom:"Bœuf bourguignon", cat:"Plats", emo:"🍷",
+    note:"3 h de cuisson douce", sugg:["Accompagnements"],
+    ing:[
+      ["Bœuf à bourguignon",     150],
+      ["Vin rouge",              125],
+      ["Lardons fumés",          35],
+      ["Carotte",                1],
+      ["Oignon",                 0.5],
+      ["Champignons de Paris",   60],
+      ["Farine",                 8],
+      ["Bouillon cube volaille", 0.5],
+      ["Thym",                   0.1],
+    ]},
+
+  { id:"pot-au-feu", nom:"Pot-au-feu", cat:"Plats", emo:"🍲",
+    note:"Il en reste toujours pour le lendemain", sugg:["Accompagnements"],
+    ing:[
+      ["Bœuf à pot-au-feu",     180],
+      ["Carotte",               1.5],
+      ["Poireau",               0.5],
+      ["Navet",                 0.75],
+      ["Pomme de terre",        200],
+      ["Oignon",                0.5],
+      ["Bouillon cube légumes", 1],
+      ["Moutarde",              10],
+    ]},
+
+  { id:"roti-porc", nom:"Rôti de porc", cat:"Plats", emo:"🍖",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Rôti de porc",   150],
+      ["Pomme de terre", 250],
+      ["Oignon",         0.5],
+      ["Thym",           0.1],
+      ["Moutarde",       10],
+    ]},
+
+  { id:"cote-porc", nom:"Côte de porc", cat:"Plats", emo:"🥩",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Côte de porc", 1],
+      ["Moutarde",     10],
+      ["Beurre",       10],
+    ]},
+
+  { id:"steak-frites", nom:"Steak frites", cat:"Plats", emo:"🥩",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Steak de bœuf", 1],
+      ["Frites",        150],
+      ["Beurre",        10],
+    ]},
+
+  { id:"steak-leg", nom:"Steak & haricots verts", cat:"Plats", emo:"🫛",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Steak de bœuf",  1],
+      ["Haricots verts", 150],
+      ["Beurre",         10],
+    ]},
+
+  { id:"saucisse-puree", nom:"Saucisse purée", cat:"Plats", emo:"🌭",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Saucisse de Toulouse",       1.5],
+      ["Purée Mousseline (flocons)", 35],
+      ["Lait",                       200],
+      ["Beurre",                     10],
+      ["Moutarde",                   10],
+    ]},
+
+  { id:"lentilles", nom:"Lentilles & saucisse", cat:"Plats", emo:"🫘",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Lentilles vertes",       80],
+      ["Saucisse de Morteau",    0.5],
+      ["Carotte",                1],
+      ["Oignon",                 0.5],
+      ["Lardons fumés",          40],
+      ["Bouillon cube volaille", 0.5],
+    ]},
+
+  { id:"cassoulet", nom:"Cassoulet", cat:"Plats", emo:"🥫",
+    note:"En boîte, ou 4 h de patience", express:true, sugg:["Desserts"],
+    ing:[
+      ["Cassoulet en boîte", 400],
+      ["Baguette",           0.25],
+    ]},
+
+  { id:"choucroute", nom:"Choucroute garnie", cat:"Plats", emo:"🥬",
+    note:"", sugg:["Desserts"],
+    ing:[
+      ["Choucroute garnie", 400],
+      ["Pomme de terre",    200],
+      ["Moutarde",          15],
+    ]},
+
+  { id:"hachis", nom:"Hachis parmentier", cat:"Plats", emo:"🥧",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Pomme de terre",        300],
+      ["Viande hachée de bœuf", 125],
+      ["Oignon",                0.5],
+      ["Lait",                  50],
+      ["Beurre",                15],
+      ["Emmental râpé",         30],
+    ]},
+
+
+  { id:"courgettes-farcies", nom:"Courgettes farcies", cat:"Plats", emo:"🥒",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Courgette",        1],
+      ["Chair à saucisse", 120],
+      ["Oignon",           0.5],
+      ["Riz long grain",   40],
+      ["Gruyère râpé",     25],
+    ]},
+
+  { id:"moussaka", nom:"Moussaka", cat:"Plats", emo:"🍆",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Aubergine",             1],
+      ["Viande hachée de bœuf", 120],
+      ["Tomates concassées",    120],
+      ["Béchamel",              120],
+      ["Oignon",                0.5],
+      ["Emmental râpé",         30],
+      ["Cannelle",              1],
+    ]},
+]),
+
+famille("MONTAGNE & CONVIVIAL", [
+  { id:"tartiflette", nom:"Tartiflette", cat:"Plats", emo:"🫕",
+    note:"Un demi-reblochon pour 4", sugg:["Accompagnements"],
+    ing:[
+      ["Pomme de terre",        300],
+      ["Reblochon",             115],
+      ["Lardons fumés",         75],
+      ["Oignon",                0.5],
+      ["Crème fraîche épaisse", 25],
+      ["Vin blanc",             25],
+    ]},
+
+  { id:"raclette", nom:"Raclette", cat:"Plats", emo:"🧀",
+    note:"200 g de fromage par adulte", sugg:["Accompagnements"],
+    ing:[
+      ["Fromage à raclette", 200],
+      ["Pomme de terre",     300],
+      ["Jambon cru",         2],
+      ["Jambon blanc",       1],
+      ["Cornichons",         30],
+    ]},
+
+  { id:"fondue", nom:"Fondue savoyarde", cat:"Plats", emo:"🫕",
+    note:"200 g de fromage + 150 g de pain", sugg:["Accompagnements"],
+    ing:[
+      ["Mélange à fondue", 200],
+      ["Pain de campagne", 150],
+      ["Vin blanc",        70],
+      ["Ail",              0.5],
+    ]},
+  
+  { id:"mont-dor", nom:"Mont d'Or chaud", cat:"Plats", emo:"🫕",
+    note:"Une boîte de 480 g pour 4 · 25 min au four", sugg:["Accompagnements"],
+    ing:[
+      ["Mont d'Or",      120],
+      ["Pomme de terre", 250],
+      ["Jambon cru",     2],
+      ["Vin blanc",      15],
+      ["Ail",            0.5],
+    ]},
+
+]),
+
+famille("POISSONS & FRUITS DE MER", [
+  { id:"saumon-papi", nom:"Saumon en papillote", cat:"Plats", emo:"🐟",
+    note:"20 min au four", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Filet de saumon",    1],
+      ["Ratatouille",        200],
+      ["Citron",             0.25],
+      ["Huile d'olive",      10],
+      ["Herbes de Provence", 2],
+    ]},
+
+  { id:"cabillaud-four", nom:"Dos de cabillaud au four", cat:"Plats", emo:"🐠",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Dos de cabillaud", 1],
+      ["Tomates cerises",  60],
+      ["Courgette",        0.5],
+      ["Citron",           0.3],
+      ["Huile d'olive",    10],
+      ["Riz long grain",   70],
+    ]},
+
+  { id:"colin-riz", nom:"Filet de colin & riz", cat:"Plats", emo:"🍚",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Filet de colin", 1],
+      ["Riz long grain", 70],
+      ["Beurre",         10],
+      ["Citron",         0.25],
+    ]},
+
+  { id:"poisson-pane", nom:"Poisson pané & purée", cat:"Plats", emo:"🐟",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Poisson pané",               2],
+      ["Purée Mousseline (flocons)", 35],
+      ["Lait",                       200],
+      ["Beurre",                     8],
+      ["Citron",                     0.25],
+    ]},
+]),
+
+famille("ŒUFS & SANS VIANDE", [
+  { id:"omelette", nom:"Omelette", cat:"Plats", emo:"🍳",
+    note:"Peut être agrémenter de pomme de terre, lardon...", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Œufs",         3],
+      ["Lardons fumés",   40],
+      ["Poivron",         0.3],
+      ["Pomme de terre",  80],
+      ["Beurre",       10],
+      ["Gruyère râpé", 25],
+      ["Persil",       0.1],
+    ]},
+
+  { id:"tortilla", nom:"Fajitas (kit tortillas)", cat:"Plats", emo:"🌯",
+    note:"Bœuf ou poulet, au choix", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Tortillas (wraps)", 2.5],
+      ["Filet de poulet",   130],
+      ["Poivron",           0.5],
+      ["Oignon",            0.5],
+      ["Maïs en boîte",     40],
+      ["Avocat",            0.5],
+      ["Salade verte",      0.25],
+      ["Cheddar en tranches", 1],
+    ]},
+
+  { id:"oeufs-bacon", nom:"Œufs au plat & bacon", cat:"Plats", emo:"🥓",
+    note:"", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Œufs",               2],
+      ["Bacon",              2],
+      ["Pain de mie Harrys", 2],
+      ["Beurre",             8],
+    ]},
+
+  { id:"chili-con-carne", nom:"Chili con carne", cat:"Plats", emo:"🌶️",
+    note:"", sugg:["Accompagnements"],
+    ing:[
+      ["Viande hachée de bœuf", 110],
+      ["Haricots rouges",       120],
+      ["Tomates concassées",    150],
+      ["Poivron",               0.5],
+      ["Oignon",                0.5],
+      ["Maïs en boîte",         50],
+      ["Riz long grain",        70],
+      ["Épices chili",          5],
+    ]},
+
+  { id:"chili-sin", nom:"Chili sin carne", cat:"Plats", emo:"🫘",
+    note:"Végétarien", sugg:["Accompagnements"],
+    ing:[
+      ["Haricots rouges",    120],
+      ["Haricots blancs",    80],
+      ["Tomates concassées", 150],
+      ["Poivron",            0.5],
+      ["Oignon",             0.5],
+      ["Maïs en boîte",      50],
+      ["Riz long grain",     70],
+      ["Épices chili",       5],
+    ]},
+
+
+  { id:"curry-legumes", nom:"Curry de légumes", cat:"Plats", emo:"🥥",
+    note:"Végétarien", sugg:["Accompagnements"],
+    ing:[
+      ["Patate douce",    150],
+      ["Courgette",       0.5],
+      ["Pois chiches",    80],
+      ["Lait de coco",    100],
+      ["Curry en poudre", 5],
+      ["Oignon",          0.5],
+      ["Riz basmati",     70],
+    ]},
+
+  { id:"gratin-courgettes", nom:"Gratin de courgettes", cat:"Plats", emo:"🥒",
+    note:"Végétarien", sugg:["Accompagnements"],
+    ing:[
+      ["Courgette",             1.5],
+      ["Riz long grain",        40],
+      ["Crème fraîche épaisse", 60],
+      ["Œufs",                  0.5],
+      ["Gruyère râpé",          40],
+    ]},
+
+  { id:"gratin-chou-fleur", nom:"Gratin de chou-fleur", cat:"Plats", emo:"🥦",
+    note:"Végétarien", sugg:["Accompagnements"],
+    ing:[
+      ["Chou-fleur",   0.5],
+      ["Saucisse de Morteau", 0.4],
+      ["Lait",         150],
+      ["Beurre",       20],
+      ["Farine",       20],
+      ["Gruyère râpé", 40],
+      ["Muscade",      1],
+    ]},
+
+  { id:"soupe-boite", nom:"Soupe en brique", cat:"Plats", emo:"🥣",
+    note:"300 ml par personne", express:true, sugg:["Desserts"],
+    ing:[
+      ["Soupe en brique",       300],
+      ["Croûtons",              15],
+      ["Crème fraîche liquide", 15],
+      ["Baguette",              0.25],
+    ]},
+
+  { id:"soupe-maison", nom:"Soupe poireau-pomme de terre", cat:"Plats", emo:"🍲",
+    note:"", sugg:["Desserts"],
+    ing:[
+      ["Poireau",               1],
+      ["Pomme de terre",        200],
+      ["Carotte",               1],
+      ["Oignon",                0.5],
+      ["Bouillon cube légumes", 0.5],
+      ["Crème fraîche liquide", 20],
+    ]},
+
+]),
+
+famille("CUISINE DU MONDE", [
+  { id:"couscous", nom:"Couscous merguez", cat:"Plats", emo:"🍲",
+    note:"", sugg:["Desserts"],
+    ing:[
+      ["Semoule à couscous", 80],
+      ["Ratatouille",        200],
+      ["Merguez",            2],
+      ["Pois chiches",       60],
+      ["Raisins secs",       15],
+    ]},
+
+  { id:"tajine-poulet", nom:"Tajine poulet-citron", cat:"Plats", emo:"🍋",
+    note:"", sugg:["Desserts"],
+    ing:[
+      ["Cuisse de poulet",   1],
+      ["Citron",             0.3],
+      ["Olives",             25],
+      ["Oignon",             0.5],
+      ["Ras el hanout",      4],
+      ["Semoule à couscous", 70],
+      ["Raisins secs",       15],
+      ["Pois chiches",       50],
+    ]},
+
+  { id:"ramen", nom:"Nouilles sautées au poulet", cat:"Plats", emo:"🍜",
+    note:"Œuf mollet, ciboule", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Nouilles ramen",         100],
+      ["Filet de poulet",        120],
+      ["Œufs",                   1],
+      ["Sauce soja",             20],
+      ["Bouillon cube volaille", 0.5],
+      ["Ciboule",                0.25],
+      ["Gingembre frais",        5],
+      ["Graines de sésame",      5],
+    ]},
+    { id:"ramen-poulet", nom:"Ramen au poulet (soupe)", cat:"Plats", emo:"🍜",
+    note:"Bouillon ail-gingembre-soja, œuf mollet 7 min", sugg:["Desserts"],
+    mm:"",
+    ing:[
+      ["Nouilles ramen",         100],
+      ["Filet de poulet",        130],
+      ["Bouillon cube volaille", 1],
+      ["Œufs",                   1],
+      ["Champignons de Paris",   60],
+      ["Épinards frais",         40],
+      ["Ciboule",                0.25],
+      ["Gingembre frais",        8],
+      ["Ail",                    1],
+      ["Sauce soja",             20],
+      ["Huile neutre",           5],
+      ["Graines de sésame",      3],
+    ]},
+
+  /* Version légumes, calée sur « Ramen facile, option végétarienne au tofu »
+     https://lacerisesurlemaillot.fr/ramen-poulet-facile/ */
+  { id:"ramen-legumes", nom:"Ramen aux légumes & tofu", cat:"Plats", emo:"🍜",
+    note:"Végétarien · le tofu fumé remplace le chashu", sugg:["Desserts"],
+    mm:"",
+    ing:[
+      ["Nouilles ramen",         100],
+      ["Bouillon cube légumes",  1],
+      ["Tofu fumé",              80],
+      ["Champignons de Paris",   70],
+      ["Carotte",                0.5],
+      ["Épinards frais",         50],
+      ["Œufs",                   1],
+      ["Ciboule",                0.25],
+      ["Gingembre frais",        8],
+      ["Ail",                    1],
+      ["Sauce soja",             20],
+      ["Huile neutre",           5],
+      ["Graines de sésame",      3],
+    ]},
+
+  { id:"wok-legumes", nom:"Wok de légumes & nouilles", cat:"Plats", emo:"🥢",
+    note:"Végétarien", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Nouilles chinoises", 100],
+      ["Courgette",          0.5],
+      ["Poivron",            0.5],
+      ["Carotte",            0.5],
+      ["Sauce soja",         20],
+      ["Gingembre frais",    5],
+      ["Graines de sésame",  5],
+    ]},
+
+]),
+
+famille("SALADES REPAS", [
+  { id:"cesar", nom:"Salade César", cat:"Plats", emo:"🥗",
+    note:"", express:true, sugg:["Desserts"],
+    ing:[
+      ["Salade iceberg",           0.5],
+      ["Sauce César",              40],
+      ["Maïs en boîte",            60],
+      ["Tomate",                   1],
+      ["Escalope de poulet panée", 1.5],
+      ["Croûtons",                 20],
+      ["Parmesan râpé",            15],
+    ]},
+
+    { id:"salade-composee", nom:"Salade composée", cat:"Plats", emo:"🥗",
+    note:"Vide-frigo assumé · chaque ligne est une poignée, jette le reste à la corbeille",
+    express:true, sugg:["Desserts"],
+    mm:"",
+    ing:[
+      /* la base verte */
+      ["Salade verte",    0.25],
+      /* le cru croquant */
+      ["Tomates cerises", 60],
+      ["Concombre",       0.25],
+      ["Poivron",         0.25],
+      ["Radis",           0.15],
+      ["Carottes râpées", 40],
+      ["Navet râpées", 40],
+      /* le cuit / bocal */
+      ["Betterave cuite", 40],
+      ["Maïs en boîte",   40],
+      /* le gras et le frais */
+      ["Avocat",          0.5],
+      ["Citron",          0.25],
+      /* les protéines, au choix */
+      ["Œufs",            1],
+      ["Thon en boîte",   40],
+      ["Filet de poulet", 60],
+      ["Lardons fumés",   25],
+      /* le fromage */
+      ["Feta",            30],
+      ["Crème fraiche",            30],
+      ["Morceaux Emmental",            30],
+      ["Mozzarella",      30],
+      /* le croquant et le salé */
+      ["Olives",          15],
+      ["Cornichons",      15],
+      ["Croûtons",        15],
+      ["Noix",            10],
+      /* la finition */
+      ["Persil",          0.1],
+      ["Vinaigrette",     25],
+      ["Sauce César", 40],
+    ]},
+
+  { id:"salade-pates", nom:"Salade de pâtes", cat:"Plats", emo:"🥗",
+    note:"Se prépare la veille", express:true, sugg:["Desserts"],
+    ing:[
+      ["Pâtes (penne, fusilli…)", 100],
+      ["Thon en boîte",           60],
+      ["Maïs en boîte",           50],
+      ["Tomate",                  1],
+      ["Mayonnaise",              25],
+      ["Cornichons",              20],
+    ]},
+
+  { id:"salade-riz", nom:"Salade de riz", cat:"Plats", emo:"🍚",
+    note:"", express:true, sugg:["Desserts"],
+    ing:[
+      ["Riz long grain", 70],
+      ["Thon en boîte",  60],
+      ["Maïs en boîte",  50],
+      ["Œufs",           1],
+      ["Tomate",         1],
+      ["Olives",         20],
+      ["Vinaigrette",    20],
+    ]},
+
+  { id:"feuilletes", nom:"Feuillantine & salade", cat:"Plats", emo:"🥐",
+    note:"Soirée sans cuisine", express:true, sugg:["Accompagnements"],
+    ing:[
+      ["Feuillantine", 1],
+      ["Salade verte",         0.4],
+      ["Vinaigrette",          20],
+    ]},
+
+]),
+
+famille("ACCOMPAGNEMENTS", [
+  { id:"frites", nom:"Frites au four", cat:"Accompagnements", emo:"🍟",
+    note:"Four ou micro-ondes", express:true, feculent:true, prio:1,
+    ing:[
+      ["Frites", 150],
+    ]},
+
+  { id:"pommes-noisettes", nom:"Pommes noisettes", cat:"Accompagnements", emo:"🥔",
+    express:true, feculent:true,
+    ing:[
+      ["Pommes noisettes", 150],
+    ]},
+
+  { id:"puree-mouss", nom:"Purée Mousseline", cat:"Accompagnements", emo:"🥔",
+    express:true, feculent:true,
+    ing:[
+      ["Purée Mousseline (flocons)", 35],
+      ["Lait",                       200],
+      ["Beurre",                     8],
+    ]},
+
+  { id:"puree-maison", nom:"Purée maison", cat:"Accompagnements", emo:"🥔",
+    feculent:true, prio:1, mm:"https://www.marmiton.org/recettes/recette_puree-de-pommes-de-terre-maison_28054.aspx",
+    ing:[
+      ["Pomme de terre", 250],
+      ["Lait",           60],
+      ["Beurre",         15],
+      ["Muscade",        1],
+    ]},
+
+  { id:"puree-patate-douce", nom:"Purée de patate douce", cat:"Accompagnements", emo:"🍠",
+    feculent:true,
+    ing:[
+      ["Patate douce", 250],
+      ["Beurre",       15],
+      ["Lait",         40],
+    ]},
+
+  { id:"gratin-dauphinois", nom:"Gratin dauphinois", cat:"Accompagnements", emo:"🧀",
+    note:"", feculent:true, prio:1, mm:"https://www.marmiton.org/recettes/recette_gratin-dauphinois_13809.aspx",
+    ing:[
+      ["Pomme de terre",        250],
+      ["Crème fraîche liquide", 65],
+      ["Lait",                  30],
+      ["Ail",                   0.5],
+      ["Beurre",                5],
+      ["Gruyère râpé",          15],
+      ["Muscade",               1],
+    ]},
+
+  { id:"pommes-rissolees", nom:"Pommes de terre rissolées", cat:"Accompagnements", emo:"🥔",
+    feculent:true, mm:"https://www.swissmilk.ch/fr/recettes-idees/recettes/SM2022_DIVE_12/pommes-de-terre-rissolees/",
+    ing:[
+      ["Pomme de terre", 250],
+      ["Beurre",         15],
+      ["Ail",            1],
+      ["Persil",         0.1],
+    ]},
+
+  { id:"pommes-four", nom:"Pommes de terre au four", cat:"Accompagnements", emo:"🥔",
+    feculent:true, mm:"https://www.marmiton.org/recettes/recette_pomme-de-terre-au-four_14679.aspx",
+    ing:[
+      ["Pomme de terre",     250],
+      ["Huile d'olive",      10],
+      ["Herbes de Provence", 2],
+    ]},
+
+  { id:"riz", nom:"Riz", cat:"Accompagnements", emo:"🍚",
+    express:true, feculent:true, prio:1,
+    ing:[
+      ["Riz long grain", 70],
+      ["Beurre",         8],
+    ]},
+
+  { id:"ebly", nom:"Ébly / perles", cat:"Accompagnements", emo:"🌾",
+    express:true, feculent:true,
+    ing:[
+      ["Ébly ou perles Tipiak", 70],
+      ["Beurre",                10],
+    ]},
+
+  { id:"semoule", nom:"Semoule", cat:"Accompagnements", emo:"🌾",
+    express:true, feculent:true, prio:1,
+    ing:[
+      ["Semoule à couscous", 70],
+      ["Beurre",             8],
+    ]},
+
+  { id:"boulgour", nom:"Boulgour", cat:"Accompagnements", emo:"🌾",
+    express:true, feculent:true,
+    ing:[
+      ["Boulgour",      70],
+      ["Huile d'olive", 8],
+    ]},
+
+  { id:"quinoa", nom:"Quinoa", cat:"Accompagnements", emo:"🌾",
+    express:true, feculent:true,
+    ing:[
+      ["Quinoa",        70],
+      ["Huile d'olive", 8],
+    ]},
+
+  { id:"polenta", nom:"Polenta crémeuse", cat:"Accompagnements", emo:"🌽",
+    express:true, feculent:true,
+    ing:[
+      ["Polenta",       70],
+      ["Lait",          150],
+      ["Parmesan râpé", 20],
+      ["Beurre",        10],
+    ]},
+
+  { id:"pates-beurre", nom:"Pâtes au beurre", cat:"Accompagnements", emo:"🍝",
+    express:true, feculent:true,
+    ing:[
+      ["Pâtes (penne, fusilli…)", 90],
+      ["Beurre",                  12],
+      ["Gruyère râpé",            20],
+    ]},
+
+  { id:"lentilles-acc", nom:"Lentilles nature", cat:"Accompagnements", emo:"🫘",
+    feculent:true,
+    ing:[
+      ["Lentilles vertes", 70],
+      ["Oignon",           0.3],
+      ["Beurre",           8],
+    ]},
+
+  { id:"flageolets", nom:"Flageolets", cat:"Accompagnements", emo:"🫘",
+    express:true, feculent:true,
+    ing:[
+      ["Flageolets", 130],
+      ["Beurre",     8],
+    ]},
+
+  { id:"haricots", nom:"Haricots verts", cat:"Accompagnements", emo:"🫛",
+    express:true, prio:1,
+    ing:[
+      ["Haricots verts", 150],
+      ["Beurre",         8],
+    ]},
+
+  { id:"petits-pois", nom:"Petits pois", cat:"Accompagnements", emo:"🟢",
+    express:true, prio:1,
+    ing:[
+      ["Petits pois", 150],
+      ["Beurre",      8],
+    ]},
+
+  { id:"mais", nom:"Maïs", cat:"Accompagnements", emo:"🌽",
+    express:true,
+    ing:[
+      ["Maïs en boîte", 70],
+    ]},
+
+  { id:"poelee-legumes", nom:"Poêlée de légumes", cat:"Accompagnements", emo:"🥘",
+    express:true,
+    ing:[
+      ["Poêlée de légumes", 200],
+      ["Beurre",            10],
+    ]},
+
+  { id:"ratatouille", nom:"Ratatouille", cat:"Accompagnements", emo:"🍆",
+    express:true, prio:1,
+    ing:[
+      ["Ratatouille", 200],
+    ]},
+
+  { id:"epinards-creme", nom:"Épinards à la crème", cat:"Accompagnements", emo:"🥬",
+    express:true,
+    ing:[
+      ["Épinards hachés",       200],
+      ["Crème fraîche épaisse", 40],
+      ["Muscade",               1],
+    ]},
+
+  { id:"carottes-vichy", nom:"Carottes Vichy", cat:"Accompagnements", emo:"🥕",
+  mm : "https://www.marmiton.org/recettes/recette_carottes-vichy_17717.aspx",
+    ing:[
+      ["Carotte", 3],
+      ["Beurre",  13],
+      ["Sucre",   4],
+      ["Persil",  0.1],
+    ]},
+
+  { id:"courgettes-poelees", nom:"Courgettes poêlées", cat:"Accompagnements", emo:"🥒",
+    express:true,
+    ing:[
+      ["Courgette",     1],
+      ["Huile d'olive", 10],
+      ["Ail",           1],
+    ]},
+
+  { id:"brocolis", nom:"Brocolis vapeur", cat:"Accompagnements", emo:"🥦",
+    express:true,
+    ing:[
+      ["Brocoli", 0.4],
+      ["Beurre",  8],
+    ]},
+
+  { id:"chou-fleur-vapeur", nom:"Chou-fleur vapeur", cat:"Accompagnements", emo:"🥦",
+    express:true,
+    ing:[
+      ["Chou-fleur", 0.4],
+      ["Beurre",     8],
+    ]},
+
+  { id:"salade-verte", nom:"Salade verte", cat:"Accompagnements", emo:"🥬",
+    express:true, prio:2,
+    ing:[
+      ["Salade verte", 0.4],
+      ["Vinaigrette",  15],
+    ]},
+
+  { id:"salade-tomates", nom:"Salade de tomates", cat:"Accompagnements", emo:"🍅",
+    express:true,
+    ing:[
+      ["Tomate",        1.5],
+      ["Oignon rouge",  0.2],
+      ["Huile d'olive", 10],
+      ["Basilic",       0.1],
+    ]},
+
+  { id:"tomates", nom:"Tomates à croquer", cat:"Accompagnements", emo:"🍅",
+    express:true,
+    ing:[
+      ["Tomate",        1],
+      ["Huile d'olive", 8],
+    ]},
+
+  { id:"concombre", nom:"Concombre à la crème", cat:"Accompagnements", emo:"🥒",
+    express:true, mm:"https://www.marmiton.org/recettes/recette_salade-de-concombres-a-la-creme-fraiche_15097.aspx",
+    ing:[
+      ["Concombre",             0.5],
+      ["Crème fraîche épaisse", 20],
+      ["Vinaigrette",           10],
+    ]},
+
+  { id:"radis", nom:"Radis beurre", cat:"Accompagnements", emo:"🌶️",
+    express:true,
+    ing:[
+      ["Radis",    0.4],
+      ["Beurre",   15],
+      ["Baguette", 0.25],
+    ]},
+
+  { id:"betterave", nom:"Betterave vinaigrette", cat:"Accompagnements", emo:"🟣",
+    express:true,
+    ing:[
+      ["Betterave cuite", 100],
+      ["Vinaigrette",     15],
+      ["Échalote",        0.3],
+    ]},
+
+  { id:"carottes", nom:"Carottes râpées", cat:"Accompagnements", emo:"🥕",
+    express:true, prio:1,
+    ing:[
+      ["Carottes râpées", 125],
+    ]},
+
+  { id:"taboule", nom:"Taboulé (tout prêt)", cat:"Accompagnements", emo:"🥗",
+    express:true, feculent:true,
+    ing:[
+      ["Taboulé", 100],
+    ]},
+
+  { id:"taboule-maison", nom:"Taboulé maison", cat:"Accompagnements", emo:"🌿",
+    note:"Repos 2 h au frais", feculent:true,
+    ing:[
+      ["Semoule à couscous", 60],
+      ["Tomate",             1],
+      ["Concombre",          0.3],
+      ["Menthe",             0.15],
+      ["Citron",             0.5],
+      ["Huile d'olive",      10],
+    ]},
+
+  { id:"coleslaw", nom:"Coleslaw", cat:"Accompagnements", emo:"🥬",
+    express:true,
+    ing:[
+      ["Coleslaw", 100],
+    ]},
+
+  { id:"piemontaise", nom:"Salade piémontaise", cat:"Accompagnements", emo:"🥔",
+    express:true, feculent:true,
+    ing:[
+      ["Salade piémontaise", 150],
+    ]},
+
+  { id:"macedoine", nom:"Macédoine mayonnaise", cat:"Accompagnements", emo:"🥕",
+    express:true,
+    ing:[
+      ["Macédoine de légumes", 120],
+      ["Mayonnaise",           20],
+    ]},
+
+
+  { id:"avocat", nom:"Avocat", cat:"Accompagnements", emo:"🥑",
+    express:true,
+    ing:[
+      ["Avocat",      0.5],
+      ["Citron",      0.25],
+      ["Vinaigrette", 10],
+    ]},
+
+  { id:"pain-ail", nom:"Pain à l'ail", cat:"Accompagnements", emo:"🥖",
+    express:true, feculent:true, mm:"https://www.cuisineactuelle.fr/recettes/pain-a-lail-simple-et-rapide-158870",
+    ing:[
+      ["Baguette", 0.4],
+      ["Beurre",   25],
+      ["Ail",      2],
+      ["Persil",   0.1],
+    ]},
+
+]),
+
+famille("ENTRÉES & APÉRO", [
+  { id:"oeufs-mimosa", nom:"Œufs mimosa", cat:"Entrées & apéro", emo:"🥚",
+    express:true,
+    ing:[
+      ["Œufs",       1.5],
+      ["Mayonnaise", 25],
+      ["Persil",     0.1],
+    ]},
+
+  { id:"melon-jambon", nom:"Melon & jambon cru", cat:"Entrées & apéro", emo:"🍈",
+    express:true,
+    ing:[
+      ["Melon",      0.25],
+      ["Jambon cru", 2],
+    ]},
+
+  { id:"tomate-mozza", nom:"Tomate mozzarella", cat:"Entrées & apéro", emo:"🍅",
+    express:true,
+    ing:[
+      ["Tomate",        1.5],
+      ["Mozzarella",    60],
+      ["Basilic",       0.2],
+      ["Huile d'olive", 10],
+    ]},
+
+  { id:"chevre-chaud", nom:"Salade de chèvre chaud", cat:"Entrées & apéro", emo:"🧀",
+    express:true,
+    ing:[
+      ["Bûche de chèvre",  50],
+      ["Pain de campagne", 50],
+      ["Salade verte",     0.3],
+      ["Miel",             10],
+      ["Noix",             15],
+      ["Vinaigrette",      15],
+    ]},
+
+  { id:"toasts-saumon", nom:"Toasts au saumon fumé", cat:"Entrées & apéro", emo:"🐟",
+    express:true,
+    ing:[
+      ["Blinis",                   4],
+      ["Saumon ou truite fumé(e)", 40],
+      ["Crème fraîche épaisse",    25],
+      ["Aneth",                    0.1],
+    ]},
+
+  { id:"surimi-avocat", nom:"Verrine surimi-avocat", cat:"Entrées & apéro", emo:"🥢",
+    express:true,
+    ing:[
+      ["Surimi",     3],
+      ["Avocat",     0.5],
+      ["Mayonnaise", 20],
+      ["Citron",     0.25],
+    ]},
+
+  { id:"planche", nom:"Planche charcuterie", cat:"Entrées & apéro", emo:"🍖",
+    express:true,
+    ing:[
+      ["Saucisson sec",       40],
+      ["Jambon cru",          2],
+      ["Terrine de campagne", 40],
+      ["Cornichons",          25],
+      ["Baguette",            0.4],
+    ]},
+
+  { id:"apero-chips", nom:"Apéro chips & cacahuètes", cat:"Entrées & apéro", emo:"🥨",
+    express:true,
+    ing:[
+      ["Chips",              40],
+      ["Cacahuètes",         25],
+      ["Biscuits apéritifs", 25],
+      ["Olives",             25],
+    ]},
+
+  { id:"houmous-pita", nom:"Houmous & pita", cat:"Entrées & apéro", emo:"🧆",
+    express:true,
+    ing:[
+      ["Houmous",       60],
+      ["Pain pita",     0.5],
+      ["Huile d'olive", 5],
+    ]},
+
+  { id:"guacamole", nom:"Guacamole & chips", cat:"Entrées & apéro", emo:"🥑",
+    express:true,
+    ing:[
+      ["Avocat",       0.5],
+      ["Citron vert",  0.25],
+      ["Oignon rouge", 0.2],
+      ["Chips",        30],
+      ["Coriandre",    0.1],
+    ]},
+
+  { id:"tzatziki", nom:"Tzatziki & crudités", cat:"Entrées & apéro", emo:"🥒",
+    express:true,
+    ing:[
+      ["Tzatziki",  60],
+      ["Concombre", 0.3],
+      ["Carotte",   1],
+      ["Pain pita", 0.5],
+    ]},
+
+  { id:"feuilletes-apero", nom:"Feuilletés apéritifs", cat:"Entrées & apéro", emo:"🥐",
+    express:true,
+    ing:[
+      ["Feuilletés apéritifs", 6],
+    ]},
+
+  { id:"cake-sale", nom:"Cake olives & jambon", cat:"Entrées & apéro", emo:"🍞",
+    note:"1 cake ≈ 8 tranches", fixe:true, unite:"cake",
+    ing:[
+      ["Farine",          180],
+      ["Œufs",            3],
+      ["Lait",            100],
+      ["Huile neutre",    80],
+      ["Levure chimique", 1],
+      ["Jambon blanc",    4],
+      ["Olives",          100],
+      ["Gruyère râpé",    80],
+    ]},
+
+]),
+
+famille("PETIT-DÉJEUNER", [
+  { id:"pdj-tartines", nom:"Tartines confiture", cat:"Petit-déjeuner", emo:"🍞",
+    express:true,
+    ing:[
+      ["Pain de mie Harrys", 3],
+      ["Confiture",          40],
+      ["Beurre",             12],
+    ]},
+
+  { id:"pdj-nutella", nom:"Tartines pâte à tartiner", cat:"Petit-déjeuner", emo:"🍫",
+    express:true,
+    ing:[
+      ["Pain de mie Harrys", 3],
+      ["Pâte à tartiner",    40],
+    ]},
+
+  { id:"pdj-brioche", nom:"Brioche", cat:"Petit-déjeuner", emo:"🥐",
+    express:true,
+    ing:[
+      ["Brioche tranchée", 2],
+      ["Beurre",           10],
+      ["Confiture",        20],
+    ]},
+
+  { id:"pdj-croissant", nom:"Croissant", cat:"Petit-déjeuner", emo:"🥐",
+    express:true,
+    ing:[
+      ["Croissant", 1],
+      ["Beurre",    10],
+      ["Confiture", 25],
+    ]},
+
+  { id:"pdj-cereales", nom:"Céréales & lait", cat:"Petit-déjeuner", emo:"🥣",
+    express:true,
+    ing:[
+      ["Céréales", 50],
+      ["Lait",     200],
+    ]},
+
+  { id:"pdj-fb", nom:"Fromage blanc & muesli", cat:"Petit-déjeuner", emo:"🥛",
+    express:true,
+    ing:[
+      ["Fromage blanc", 150],
+      ["Muesli",        40],
+      ["Miel",          10],
+    ]},
+
+  { id:"pdj-yaourt", nom:"Yaourt & muesli", cat:"Petit-déjeuner", emo:"🍯",
+    express:true,
+    ing:[
+      ["Yaourt nature", 1],
+      ["Muesli",        40],
+      ["Miel",          10],
+    ]},
+
+  { id:"pdj-granola", nom:"Granola, yaourt & fruits rouges", cat:"Petit-déjeuner", emo:"🍓",
+    express:true,
+    ing:[
+      ["Granola",                50],
+      ["Yaourt nature",          1],
+      ["Fruits rouges surgelés", 60],
+    ]},
+
+  { id:"pdj-skyr", nom:"Bol de skyr & myrtilles", cat:"Petit-déjeuner", emo:"🫐",
+    express:true,
+    ing:[
+      ["Skyr",      150],
+      ["Muesli",    40],
+      ["Myrtilles", 50],
+      ["Miel",      10],
+    ]},
+
+ 
+
+  { id:"pdj-gateau", nom:"Gâteau Envia", cat:"Petit-déjeuner", emo:"🧁",
+    note:"Type Envia", express:true,
+    ing:[
+      ["Gâteaux moelleux (type Envia)", 1],
+    ]},
+
+
+  { id:"pdj-chocolat", nom:"Chocolat chaud", cat:"Petit-déjeuner", emo:"☕",
+    express:true,
+    ing:[
+      ["Lait",               250],
+      ["Chocolat en poudre", 25],
+    ]},
+
+  { id:"pdj-cafe", nom:"Café", cat:"Petit-déjeuner", emo:"☕",
+    express:true,
+    ing:[
+      ["Café moulu", 12],
+      ["Lait",       30],
+    ]},
+
+  { id:"pdj-jus", nom:"Jus de fruit", cat:"Petit-déjeuner", emo:"🍊",
+    express:true,
+    ing:[
+      ["Jus de fruit", 200],
+    ]},
+
+]),
+
+famille("DESSERTS", [
+  { id:"des-yaourt", nom:"Yaourt aux fruits", cat:"Desserts", emo:"🍓",
+    express:true,
+    ing:[
+      ["Yaourt aux fruits", 1],
+    ]},
+
+  { id:"des-creme", nom:"Crème dessert", cat:"Desserts", emo:"🍮",
+    express:true,
+    ing:[
+      ["Crème dessert", 1],
+    ]},
+
+  { id:"des-fb", nom:"Fromage blanc & confiture", cat:"Desserts", emo:"🥛",
+    express:true,
+    ing:[
+      ["Fromage blanc", 150],
+      ["Confiture",     25],
+    ]},
+
+  { id:"des-compote", nom:"Compote", cat:"Desserts", emo:"🍎",
+    express:true,
+    ing:[
+      ["Compote", 1],
+    ]},
+
+  { id:"des-pomme", nom:"Pomme", cat:"Desserts", emo:"🍎",
+    express:true,
+    ing:[
+      ["Pomme", 1],
+    ]},
+
+  { id:"des-banane", nom:"Banane", cat:"Desserts", emo:"🍌",
+    express:true,
+    ing:[
+      ["Banane", 1],
+    ]},
+
+  { id:"des-kiwi", nom:"Kiwi", cat:"Desserts", emo:"🥝",
+    express:true,
+    ing:[
+      ["Kiwi", 1],
+    ]},
+
+  { id:"des-orange", nom:"Orange", cat:"Desserts", emo:"🍊",
+    express:true,
+    ing:[
+      ["Orange", 1],
+    ]},
+
+  { id:"des-ananas", nom:"Ananas frais", cat:"Desserts", emo:"🍍",
+    express:true,
+    ing:[
+      ["Ananas", 0.25],
+    ]},
+
+  { id:"des-fraises", nom:"Fraises au sucre", cat:"Desserts", emo:"🍓",
+    express:true,
+    ing:[
+      ["Fraises", 150],
+      ["Sucre",   15],
+      ["Menthe",  0.1],
+    ]},
+
+  { id:"des-salade-fruits", nom:"Salade de fruits", cat:"Desserts", emo:"🍇",
+    express:true,
+    ing:[
+      ["Pomme",  0.5],
+      ["Banane", 0.5],
+      ["Orange", 0.5],
+      ["Kiwi",   0.5],
+      ["Sucre",  10],
+      ["Citron", 0.25],
+    ]},
+     
+     { id:"fruit", nom:"Des fruits", cat:"Desserts", emo:"🍍",
+    note:"La corbeille · garde ce qui est de saison, jette le reste",
+    express:true,
+    mm:"",
+    ing:[
+      /* agrumes */
+      ["Orange",              0.5],
+      ["Clémentine",          2],
+      ["Pamplemousse",        0.5],
+      /* fruits à pépins */
+      ["Pomme",               0.5],
+      ["Poire",               0.5],
+      ["Raisin",              60],
+      /* fruits à noyau */
+      ["Pêche",               0.5],
+      ["Nectarine",           0.5],
+      ["Abricot",             2],
+      ["Prune",               2],
+      ["Cerises",             60],
+      /* petits fruits rouges */
+      ["Fraises",             60],
+      ["Framboises",          40],
+      ["Myrtilles",           40],
+      ["Mûres",               40],
+      ["Groseilles",          30],
+      ["Grenade",             0.25],
+      /* exotiques à découper */
+      ["Ananas",              0.25],
+      ["Mangue",              0.5],
+      ["Melon",               0.25],
+      ["Pastèque",            0.1],
+      ["Kiwi",                1],
+      ["Banane",              0.5],
+      ["Litchis",             60],
+      ["Fruit de la passion", 0.5],
+      ["Figue",               1],
+      /* fruits secs */
+      ["Dattes",              30],
+      ["Abricots secs",       30],
+      /* la finition */
+      ["Citron vert",         0.15],
+      ["Menthe",              0.1],
+      ["Miel",                8],
+    ]},
+
+  { id:"des-glace", nom:"Glace", cat:"Desserts", emo:"🍨",
+    express:true,
+    ing:[
+      ["Glace", 0.15],
+    ]},
+
+  { id:"des-banana-split", nom:"Banana split", cat:"Desserts", emo:"🍌",
+    express:true,
+    ing:[
+      ["Banane",                  1],
+      ["Glace",                   0.15],
+      ["Chocolat noir pâtissier", 30],
+      ["Crème fraîche liquide",   20],
+    ]},
+
+  { id:"des-poire-choco", nom:"Gateau vrac dessert", cat:"Desserts", emo:"",
+    express:true,
+    ing:[
+      ["Gateau vrac dessert (petit cookie...)",                   1],
+    ]},
+
+  { id:"des-riz-lait", nom:"Riz au lait", cat:"Desserts", emo:"🍚",
+    note:"",
+    ing:[
+      ["Riz au lait", 40],
+    ]},
+
+  { id:"des-semoule", nom:"Semoule au lait", cat:"Desserts", emo:"🥣",
+    express:true,
+    ing:[
+      ["Semoule au lait", 50],
+    ]},
+
+  { id:"des-mousse", nom:"Mousse au chocolat", cat:"Desserts", emo:"🍫",
+    note:"Pour 6 ramequins", fixe:true, unite:"saladier",
+    ing:[
+      ["Chocolat noir pâtissier", 200],
+      ["Œufs",                    6],
+      ["Sucre",                   30],
+    ]},
+
+  { id:"des-tiramisu", nom:"Tiramisu", cat:"Desserts", emo:"☕",
+    note:"Pour 4, une nuit au frais", fixe:true, unite:"plat", mm:"https://www.marmiton.org/recettes/recette_tiramisu-recette-originale_12023.aspx",
+    ing:[
+      ["Mascarpone",             250],
+      ["Œufs",                   3],
+      ["Sucre",                  100],
+      ["Biscuits à la cuillère", 24],
+      ["Café moulu",             40],
+      ["Cacao en poudre",        30],
+    ]},
+
+  { id:"des-tarte-pommes", nom:"Tarte aux pommes", cat:"Desserts", emo:"🥧",
+    note:"1 tarte ≈ 8 parts", fixe:true, unite:"tarte", mm:"https://www.marmiton.org/recettes/recette_tarte-aux-pommes-a-l-alsacienne_11457.aspx",
+    ing:[
+      ["Pâte sablée", 1],
+      ["Pomme",       4],
+      ["Sucre",       100],
+      ["Crème fraîche (en cl)",      25],
+      ["Sachet Sucre vanillé",   1],
+      ["Oeufs",    2],
+    ]},
+
+
+  { id:"des-marbre", nom:"Gâteau marbré", cat:"Desserts", emo:"🍰",
+    note:"1 moule ≈ 8 parts", fixe:true, unite:"gâteau",
+    mm:"https://www.marmiton.org/recettes/recette_gateau-marbre-recette-de-grand-mere_57729.aspx",
+    ing:[
+      ["Farine",          200],
+      ["Sucre",           200],
+      ["Beurre",          125],
+      ["Œufs",            3],
+      ["Cacao en poudre", 25],
+      ["Levure chimique", 1],
+      ["Sucre Vanillé",            1],
+      ["Lait",            50],
+    ]},
+
+  { id:"des-yaourt-cake", nom:"Gâteau au yaourt", cat:"Desserts", emo:"🍰",
+    note:"Le pot de yaourt sert de mesure !", fixe:true, unite:"gâteau",
+    ing:[
+      ["Yaourt nature",   1],
+      ["Farine",          3],
+      ["Sucre semoule",           2],
+      ["Huile neutre (colza)",    0.5],
+      ["Œufs",            2],
+      ["Levure chimique", 1],
+      ["Zeste de citron", 1],
+    ]},
+
+  { id:"des-quatre-quarts", nom:"Quatre-quarts", cat:"Desserts", emo:"🍞",
+    note:"Même poids partout", fixe:true, unite:"gâteau", mm:"https://www.marmiton.org/recettes/recette_quatre-quart-inratable_80780.aspx",
+    ing:[
+      ["Farine",          200],
+      ["Sucre",           200],
+      ["Beurre",          200],
+      ["Œufs",            4],
+      ["Levure chimique", 1],
+    ]},
+
+  { id:"des-fondant", nom:"Fondant au chocolat", cat:"Desserts", emo:"🍫",
+    note:"1 moule ≈ 8 parts", fixe:true, unite:"gâteau",
+    ing:[
+      ["Chocolat noir pâtissier", 200],
+      ["Beurre",                  150],
+      ["Sucre",                   150],
+      ["Œufs",                    4],
+      ["Farine",                  60],
+    ]},
+
+    { id:"des-fondant", nom:"Fondant au chocolat (RAMEQUIN)", cat:"Desserts", emo:"🍫",
+    note:"1 moule ≈ 8 parts", fixe:true, unite:"gâteau",
+    mm:"https://www.marmiton.org/recettes/recette_ramequins-fondants-au-chocolat_15816.aspx",
+    ing:[
+      ["Chocolat noir pâtissier", 180],
+      ["Beurre",                  53],
+      ["Sucre",                   120],
+      ["Œufs",                    4],
+      ["Farine (cas)",                  2],
+    ]},
+
+  { id:"des-citron", nom:"Gâteau au citron", cat:"Desserts", emo:"🍋",
+    note:"1 moule ≈ 8 parts", fixe:true, unite:"gâteau",
+    ing:[
+      ["Farine",          180],
+      ["Sucre",           150],
+      ["Beurre",          120],
+      ["Œufs",            3],
+      ["Citron",          2],
+      ["Levure chimique", 1],
+      ["Yaourt nature",   1],
+    ]},
+
+  { id:"des-brownie", nom:"Brownie", cat:"Desserts", emo:"🍫",
+    note:"1 plaque ≈ 12 carrés", fixe:true, unite:"plaque",
+    ing:[
+      ["Chocolat noir pâtissier", 200],
+      ["Beurre",                  150],
+      ["Sucre",                   150],
+      ["Œufs",                    3],
+      ["Farine",                  80],
+      ["Noix",                    60],
+    ]},
+
+  { id:"des-cheesecake", nom:"Cheesecake", cat:"Desserts", emo:"🍰",
+    note:"Une nuit au frais", fixe:true, unite:"gâteau",
+    ing:[
+      ["Petits-beurre",   200],
+      ["Beurre",          90],
+      ["Mascarpone",      400],
+      ["Fromage blanc",   200],
+      ["Sucre",           120],
+      ["Œufs",            3],
+      ["Vanille liquide", 5],
+    ]},
+
+  { id:"des-crepes", nom:"Crêpes", cat:"Desserts", emo:"🥞",
+    note:"Une pâte ≈ 15 crêpes", fixe:true, unite:"pâte",
+    ing:[
+      ["Farine",        250],
+      ["Œufs",          3],
+      ["Lait",          500],
+      ["Beurre",        30],
+      ["Sucre",         30],
+      ["Sucre vanillé", 1],
+    ]},
+
+  { id:"des-gaufres", nom:"Gaufres", cat:"Desserts", emo:"🧇",
+    note:"Une pâte ≈ 12 gaufres", fixe:true, unite:"pâte",
+    ing:[
+      ["Farine",          250],
+      ["Œufs",            3],
+      ["Lait",            400],
+      ["Beurre",          100],
+      ["Sucre",           50],
+      ["Levure chimique", 1],
+    ]},
+
+]),
+
+famille("PETITS GÂTEAUX", [
+  { id:"pg-cookies", nom:"Cookies aux pépites", cat:"Petits gâteaux", emo:"🍪",
+    note:"≈ 15 cookies, 10 min de four", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",              250],
+      ["Cassonade",           90],
+      ["Sucre vanillé",       1],
+      ["Levure chimique",     0.5],
+      ["Œufs",                1],
+      ["Beurre",              125],
+      ["Pépites de chocolat", 150],
+      ["Miel",                10],
+    ]},
+
+  { id:"pg-sables", nom:"Sablés", cat:"Petits gâteaux", emo:"🍪",
+    note:"≈ 30 sablés", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",        250],
+      ["Beurre",        125],
+      ["Sucre",         100],
+      ["Œufs",          1],
+      ["Sucre vanillé", 1],
+    ]},
+
+  { id:"pg-madeleines", nom:"Madeleines", cat:"Petits gâteaux", emo:"🧁",
+    note:"≈ 20 madeleines", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",          150],
+      ["Sucre",           130],
+      ["Œufs",            3],
+      ["Beurre",          125],
+      ["Levure chimique", 1],
+      ["Citron",          1],
+    ]},
+
+  { id:"pg-muffins-choco", nom:"Muffins au chocolat", cat:"Petits gâteaux", emo:"🧁",
+    note:"≈ 12 muffins", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",              250],
+      ["Sucre",               120],
+      ["Lait",                120],
+      ["Huile neutre",        80],
+      ["Œufs",                2],
+      ["Levure chimique",     1],
+      ["Pépites de chocolat", 100],
+    ]},
+
+  { id:"pg-muffins-myrtilles", nom:"Muffins aux myrtilles", cat:"Petits gâteaux", emo:"🫐",
+    note:"≈ 12 muffins", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",          250],
+      ["Sucre",           120],
+      ["Lait",            120],
+      ["Huile neutre",    80],
+      ["Œufs",            2],
+      ["Levure chimique", 1],
+      ["Myrtilles",       150],
+    ]},
+
+  { id:"pg-moelleux", nom:"Moelleux au chocolat individuels", cat:"Petits gâteaux", emo:"🍫",
+    note:"6 ramequins, cœur coulant", fixe:true, unite:"fournée",
+    ing:[
+      ["Chocolat noir pâtissier", 100],
+      ["Beurre",                  100],
+      ["Sucre",                   80],
+      ["Œufs",                    2],
+      ["Farine",                  40],
+    ]},
+
+  { id:"pg-financiers", nom:"Financiers", cat:"Petits gâteaux", emo:"🍰",
+    note:"≈ 12 financiers", fixe:true, unite:"fournée",
+    ing:[
+      ["Poudre d'amandes", 100],
+      ["Sucre glace",      150],
+      ["Farine",           60],
+      ["Beurre",           120],
+      ["Œufs",             4],
+    ]},
+
+  { id:"pg-cannelas", nom:"Cannelés", cat:"Petits gâteaux", emo:"🟤",
+    note:"≈ 12, pâte reposée 24 h", fixe:true, unite:"fournée",
+    ing:[
+      ["Lait",            500],
+      ["Œufs",            2],
+      ["Sucre",           250],
+      ["Farine",          125],
+      ["Beurre",          50],
+      ["Rhum",            20],
+      ["Vanille liquide", 3],
+    ]},
+
+  { id:"pg-congolais", nom:"Rochers coco", cat:"Petits gâteaux", emo:"🥥",
+    note:"≈ 15 rochers, 3 ingrédients", fixe:true, unite:"fournée",
+    ing:[
+      ["Noix de coco râpée", 200],
+      ["Sucre",              150],
+      ["Œufs",               3],
+    ]},
+
+  { id:"pg-chouquettes", nom:"Chouquettes", cat:"Petits gâteaux", emo:"⚪",
+    note:"≈ 30 chouquettes", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",      150],
+      ["Œufs",        4],
+      ["Beurre",      80],
+      ["Sucre perlé", 60],
+      ["Sel",         2],
+    ]},
+
+  { id:"pg-palmiers", nom:"Palmiers", cat:"Petits gâteaux", emo:"🌴",
+    note:"2 ingrédients, 15 min", fixe:true, unite:"fournée",
+    ing:[
+      ["Pâte feuilletée", 1],
+      ["Sucre",           100],
+    ]},
+
+  { id:"pg-truffes", nom:"Truffes au chocolat", cat:"Petits gâteaux", emo:"🍫",
+    note:"≈ 30 truffes, sans four", fixe:true, unite:"fournée",
+    ing:[
+      ["Chocolat noir pâtissier", 200],
+      ["Crème fraîche liquide",   100],
+      ["Beurre",                  30],
+      ["Cacao en poudre",         40],
+    ]},
+
+  { id:"pg-mendiants", nom:"Mendiants", cat:"Petits gâteaux", emo:"🌰",
+    note:"Sans four", fixe:true, unite:"fournée",
+    ing:[
+      ["Chocolat noir pâtissier", 200],
+      ["Amandes effilées",        40],
+      ["Raisins secs",            40],
+      ["Noix",                    40],
+    ]},
+
+  { id:"pg-scones", nom:"Scones", cat:"Petits gâteaux", emo:"🫓",
+    note:"≈ 8 scones", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",          250],
+      ["Beurre",          60],
+      ["Lait",            120],
+      ["Sucre",           40],
+      ["Levure chimique", 1],
+      ["Raisins secs",    60],
+    ]},
+
+  { id:"pg-avoine", nom:"Biscuits à l'avoine", cat:"Petits gâteaux", emo:"🌾",
+    note:"≈ 20 biscuits", fixe:true, unite:"fournée",
+    ing:[
+      ["Flocons d'avoine", 150],
+      ["Farine",           100],
+      ["Beurre",           100],
+      ["Cassonade",        100],
+      ["Œufs",             1],
+      ["Levure chimique",  0.5],
+    ]},
+
+  { id:"pg-energy", nom:"Energy balls", cat:"Petits gâteaux", emo:"⚫",
+    note:"Sans cuisson, ≈ 20 boules", fixe:true, unite:"fournée",
+    ing:[
+      ["Flocons d'avoine",   100],
+      ["Poudre d'amandes",   80],
+      ["Miel",               60],
+      ["Noix de coco râpée", 40],
+      ["Cacao en poudre",    20],
+    ]},
+
+  { id:"pg-meringues", nom:"Meringues", cat:"Petits gâteaux", emo:"⚪",
+    note:"≈ 20, cuisson 1 h 30 à 100 °C", fixe:true, unite:"fournée",
+    ing:[
+      ["Œufs",        4],
+      ["Sucre",       200],
+      ["Sucre glace", 50],
+    ]},
+
+  { id:"pg-tuiles", nom:"Tuiles aux amandes", cat:"Petits gâteaux", emo:"🥮",
+    note:"≈ 20 tuiles", fixe:true, unite:"fournée",
+    ing:[
+      ["Amandes effilées", 100],
+      ["Sucre",            100],
+      ["Farine",           40],
+      ["Beurre",           40],
+      ["Œufs",             2],
+    ]},
+
+  { id:"pg-pain-epices", nom:"Pain d'épices", cat:"Petits gâteaux", emo:"🍯",
+    note:"1 cake ≈ 12 tranches", fixe:true, unite:"cake",
+    ing:[
+      ["Farine",          250],
+      ["Miel",            250],
+      ["Lait",            100],
+      ["Œufs",            1],
+      ["Levure chimique", 1],
+      ["Cannelle",        5],
+    ]},
+
+  { id:"pg-speculoos", nom:"Spéculoos maison", cat:"Petits gâteaux", emo:"🍪",
+    note:"≈ 25 biscuits", fixe:true, unite:"fournée",
+    ing:[
+      ["Farine",          250],
+      ["Cassonade",       150],
+      ["Beurre",          125],
+      ["Œufs",            1],
+      ["Cannelle",        5],
+      ["Levure chimique", 0.5],
+    ]},
+
+]),
+
+);
+
+/* ==========================================================================
+   3. MOTEUR (pas besoin d'y toucher pour ajouter des plats)
+   ========================================================================== */
+const DENOMBRABLES = ["pièce","tranche","pain","pot","rouleau","feuille","sachet","cube","botte","gousse"];
+const PLURIELS = {"tranche":"tranches","pain":"pains","pot":"pots","rouleau":"rouleaux","feuille":"feuilles",
+  "sachet":"sachets","cube":"cubes","botte":"bottes","gousse":"gousses","pincée":"pincées","pièce":""};
+const CATS = [...new Set(RECETTES.map(r=>r.cat))];
+const CAT_EMO = {"Plats":"🍽️","Accompagnements":"🥗","Entrées & apéro":"🥂","Petit-déjeuner":"☕","Desserts":"🍰","Petits gâteaux":"🍪"};
+
+const etat = { pers:2, panier:[], uid:1 };
+const $ = s => document.querySelector(s);
+// Les ligatures ne sont pas décomposées par NFD : sans ça, taper "oeufs" ne trouve pas "Œufs".
+const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+                  .replace(/œ/gi,"oe").replace(/æ/gi,"ae").toLowerCase();
+const prod = n => PRODUITS[n] || {rayon:"Divers",unite:"pièce",lot:null};
+const denombrable = u => DENOMBRABLES.includes(u);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function nb(x){
+  const r = Math.round(x*100)/100;
+  return String(r).replace(".",",");
+}
+function fmtQte(q,u){
+  if(q<=0) return "0";
+  if(u==="g"||u==="ml"){
+    if(q>=1000){ const g=Math.round(q/100)/10; return nb(g)+(u==="g"?" kg":" L"); }
+    return Math.round(q)+" "+u;
+  }
+  const s = PLURIELS[u]!==undefined ? PLURIELS[u] : u;
+  const arr = Math.round(q*4)/4;
+  if(!s) return nb(arr);
+  return nb(arr)+" "+(arr>1?s:s.replace(/s$/,""));
+}
+function pas(q,u){
+  if(u==="g"||u==="ml") return q<20?5:q<100?10:q<500?25:50;
+  if(u==="pincée") return 1;
+  return q<2?0.5:1;
+}
+
+/* --- Affichage en articles plutôt qu'en grammes --------------------------- */
+const estAlOeil = nom => !!prod(nom).alOeil;
+function pluriel(mot,n){
+  if(n<=1) return mot;
+  if(/al$/.test(mot)) return mot.replace(/al$/,"aux");
+  if(/(eau|eu)$/.test(mot)) return mot+"x";
+  if(/s$/.test(mot)) return mot;
+  return mot+"s";
+}
+/* Contenu d'un lot : "200 g", "20 tranches", "6" pour des pièces. */
+function fmtLot(q,u){
+  if(u==="pièce") return nb(q);
+  return fmtQte(q,u);
+}
+/* Ce qu'on attrape en rayon : "2 barquettes de 200 g", "1 paquet de 20 tranches". */
+function fmtAchat(l){
+  const p = prod(l.nom);
+  const art = p.contenant || "paquet";
+  if(p.alOeil) return l.lot ? "1 "+art : "à vérifier";
+  if(!l.lot) return fmtQte(l.acheter,l.unite);
+  if(l.lot===1) return nb(l.lots)+" "+pluriel(art,l.lots);
+  return nb(l.lots)+" "+pluriel(art,l.lots)+" de "+fmtLot(l.lot,l.unite);
+}
+/* Quantité d'un ingrédient dans une recette : un condiment n'a pas de gramme utile. */
+function fmtIngredient(nom,q){
+  return estAlOeil(nom) ? "au goût" : fmtQte(q,prod(nom).unite);
+}
+/* Lien direct : uniquement si la recette porte un champ mm renseigné à la main.
+   On vérifie que c'est bien une URL Marmiton, pour ne pas ouvrir n'importe quoi. */
+function lienMarmitonExact(r){
+  const u = (r.mm||"").trim();
+  if(!u) return null;
+  try{
+    const url = new URL(u);
+    if(url.protocol!=="https:" && url.protocol!=="http:") return null;
+    if(!/(^|\.)marmiton\.org$/i.test(url.hostname)) return null;
+    return url.href;
+  }catch(e){ return null; }
+}
+/* Lien vers la recherche Marmiton (jamais un lien mort, contrairement à une URL devinée). */
+const MARMITON_TYPE = {"Plats":"platprincipal","Accompagnements":"accompagnement",
+  "Entrées & apéro":"entree","Desserts":"dessert","Petits gâteaux":"dessert"};
+function lienMarmiton(r){
+  const dt = MARMITON_TYPE[r.cat];
+  return "https://www.marmiton.org/recettes/recherche.aspx?aqt="+encodeURIComponent(r.nom)
+       + (dt ? "&dt="+dt : "");
+}
+function achatArrondi(q,u,lot){
+  if(lot){ const n=Math.ceil(q/lot-1e-9); return {acheter:n*lot, lots:n}; }
+  if(u==="g"||u==="ml"){ const a=Math.ceil(q/10-1e-9)*10; return {acheter:a, lots:null}; }
+  return {acheter:Math.ceil(q-1e-9), lots:null};
+}
+
+/* --------------------------- Panier --------------------------- */
+const recette = id => RECETTES.find(r=>r.id===id);
+function multParDefaut(r){ return r.fixe ? 1 : etat.pers; }
+function nouvelItem(r,mult){
+  return { uid:etat.uid++, rid:r.id, mult, qtes:r.ing.map(([,q])=>q*mult), suivi:!r.fixe };
+}
+function majMult(item,nouveau){
+  const r = recette(item.rid), anc = item.mult||1;
+  item.qtes = item.qtes.map((q,i)=> q<=0 ? 0 : (anc? q*nouveau/anc : r.ing[i][1]*nouveau));
+  if(item.avant) Object.keys(item.avant).forEach(k=>{ item.avant[k] = item.avant[k]*nouveau/anc; });
+  item.mult = nouveau;
+}
+function libPortion(item){
+  const r = recette(item.rid);
+  if(r.fixe) return `${nb(item.mult)} ${r.unite||"lot"}${item.mult>1?"s":""}`;
+  return `${nb(item.mult)} pers.`;
+}
+function totalPlats(){ return etat.panier.length; }
+
+/* ------------------------ Liste de courses ------------------------ */
+function agreger(){
+  const m = new Map();
+  etat.panier.forEach(item=>{
+    const r = recette(item.rid);
+    r.ing.forEach(([nom],i)=>{
+      const q = item.qtes[i];
+      if(q<=0) return;
+      m.set(nom,(m.get(nom)||0)+q);
+    });
+  });
+  const lignes=[];
+  m.forEach((besoin,nom)=>{
+    const p = prod(nom);
+    const {acheter,lots} = achatArrondi(besoin,p.unite,p.lot);
+    lignes.push({nom, rayon:p.rayon, unite:p.unite, lot:p.lot, stock:!!p.stock, besoin, acheter, lots, reste:acheter-besoin});
+  });
+  lignes.sort((a,b)=>{
+    const d = RAYONS.indexOf(a.rayon)-RAYONS.indexOf(b.rayon);
+    return d!==0?d:a.nom.localeCompare(b.nom,"fr");
+  });
+  return lignes;
+}
+function resteVisible(l){
+  if(l.stock) return false;            // produit d'armoire : pas un reste à écouler
+  if(l.reste<=0.001) return false;
+  if(l.unite==="g"||l.unite==="ml") return l.reste>=5;
+  if(l.unite==="pincée") return false;
+  return Math.round(l.reste*4)/4>0;
+}
+
+/* ============================== VUES ============================== */
+let catActive = "Tout", requete = "";
+
+function rendreOnglets(){
+  const o = $("#onglets");
+  const libelle = c => c==="Tout" ? "Tout" : c==="Express" ? "⚡ Express" : (CAT_EMO[c]||"")+" "+c;
+  o.innerHTML = ["Tout","Express",...CATS].map(c=>
+    `<button class="onglet" role="tab" data-cat="${esc(c)}" aria-selected="${c===catActive}">${esc(libelle(c))}</button>`).join("");
+}
+function rendreGrille(){
+  const termes = norm(requete).split(/[\s,]+/).filter(Boolean);
+  let liste;
+  if(termes.length){
+    // Recherche par ingrédients : tous les termes doivent être présents.
+    liste = [];
+    RECETTES.forEach(r=>{
+      const nomN = norm(r.nom), autreN = norm(r.cat+" "+(r.sc||"")+" "+(r.note||"")+(r.express?" express rapide etudiant facile":""));
+      const trouves = [];
+      const ok = termes.every(t=>{
+        const ing = r.ing.find(([n])=>norm(n).includes(t));
+        if(ing){ if(!trouves.includes(ing[0])) trouves.push(ing[0]); return true; }
+        return nomN.includes(t) || autreN.includes(t);
+      });
+      if(!ok) return;
+      const dansNom = termes.some(t=>nomN.includes(t));
+      liste.push({r, dansNom, trouves});
+    });
+    // Un plat qui porte le mot dans son nom passe devant ; sinon, le plus d'ingrédients trouvés.
+    liste.sort((a,b)=> (b.dansNom-a.dansNom) || (b.trouves.length-a.trouves.length));
+  } else {
+    liste = RECETTES.filter(r=>{
+      if(catActive==="Express") return !!r.express;
+      if(catActive!=="Tout" && r.cat!==catActive) return false;
+      return true;
+    }).map(r=>({r,dansNom:true,trouves:[]}));
+  }
+  const g = $("#grille");
+  if(!liste.length){
+    g.innerHTML = `<div class="vide"><b>Aucune recette ne correspond</b>Essaie avec un seul ingrédient, ou ajoute la recette dans le fichier&nbsp;: elle apparaîtra ici.</div>`;
+    return;
+  }
+  // Vue d'ensemble : on regroupe par catégorie. Dans une catégorie : par famille.
+  const parFamille = !termes.length && catActive!=="Tout" && catActive!=="Express";
+  const cle = r => parFamille ? (r.sc||r.cat) : r.cat;
+  const ordre = [], groupes = new Map();
+  liste.forEach(o=>{
+    const k = cle(o.r);
+    if(!groupes.has(k)){ groupes.set(k,[]); ordre.push(k); }
+    groupes.get(k).push(o);
+  });
+  const compte = {};
+  etat.panier.forEach(i=>compte[i.rid]=(compte[i.rid]||0)+1);
+  const multi = ordre.length>1;
+  let html = "";
+  ordre.forEach(k=>{
+    if(multi) html += `<h2 class="titre-section">${esc(k)} <span>${groupes.get(k).length}</span></h2>`;
+    html += groupes.get(k).map(({r,dansNom,trouves})=>{
+      let meta;
+      if(compte[r.id]) meta = `<span class="pastille">${compte[r.id]}</span>au menu`;
+      else if(trouves.length && !dansNom) meta = `<span class="avec">avec ${esc(trouves.slice(0,2).join(", ").toLowerCase())}</span>`;
+      else meta = esc(r.note||r.ing.length+" ingrédients");
+      return `
+      <button class="plat" data-id="${esc(r.id)}">
+        <span class="emo">${r.emo||"🍽️"}${r.express?'<i class="eclair" title="Prêt en ~20 min">⚡</i>':""}</span>
+        <span class="nom">${esc(r.nom)}</span>
+        <span class="meta">${meta}</span>
+      </button>`;
+    }).join("");
+  });
+  g.innerHTML = html;
+}
+function rendreBarre(){
+  const n = totalPlats();
+  $("#nb-plats").textContent = n;
+  $("#ouvrir-panier").disabled = n===0;
+  $("#ouvrir-ticket").disabled = n===0;
+  $("#pers-nb").innerHTML = etat.pers+"<i>pers.</i>";
+}
+/* ---------- Mémoire du menu dans l'URL ----------
+   Pas de stockage navigateur : le menu vit dans le # de l'adresse. Il survit à un
+   rafraîchissement, et l'adresse peut se transmettre telle quelle à quelqu'un d'autre. */
+let ecritureHash = false;
+function encoderMenu(){
+  if(!etat.panier.length) return "";
+  return etat.pers+"~"+etat.panier.map(i=>
+    i.rid+"*"+i.mult+"*"+i.qtes.map(q=>Math.round(q*100)/100).join("-")).join("!");
+}
+function decoderMenu(txt){
+  if(!txt) return false;
+  try{
+    const [pers,plats] = txt.split("~");
+    const n = parseInt(pers,10);
+    if(!(n>=1 && n<=30)) return false;
+    const panier = [];
+    (plats||"").split("!").filter(Boolean).forEach(bloc=>{
+      const [rid,mult,qtes] = bloc.split("*");
+      const r = recette(rid);
+      if(!r) return;                                  // recette supprimée du fichier : on l'ignore
+      const q = (qtes||"").split("-").map(Number);   // "-" et non "." : les quantités sont décimales
+      if(q.length!==r.ing.length || q.some(isNaN)) return;
+      panier.push({uid:etat.uid++, rid, mult:Number(mult)||1, qtes:q, suivi:!r.fixe});
+    });
+    etat.pers = n; etat.panier = panier;
+    return true;
+  }catch(e){ return false; }
+}
+function memoriser(){
+  try{
+    ecritureHash = true;
+    const m = encoderMenu();
+    history.replaceState(null,"", m ? "#"+m : location.pathname+location.search);
+  }catch(e){ /* contexte restreint : tant pis, on continue sans mémoire */ }
+  finally{ setTimeout(()=>ecritureHash=false,0); }
+}
+window.addEventListener("hashchange", ()=>{
+  if(ecritureHash) return;
+  if(decoderMenu(decodeURIComponent(location.hash.slice(1)))) rafraichir();
+});
+
+function rafraichir(){ rendreGrille(); rendreBarre(); memoriser(); }
+
+/* ---------------------------- Feuille ---------------------------- */
+const voile = $("#voile");
+function ouvrirFeuille(html){
+  voile.innerHTML = `<div class="feuille" role="dialog" aria-modal="true">${html}</div>`;
+  voile.hidden = false;
+  document.body.style.overflow = "hidden";
+  const f = voile.querySelector(".fermer"); if(f) f.focus();
+}
+function fermerFeuille(){ voile.hidden = true; voile.innerHTML=""; document.body.style.overflow=""; }
+voile.addEventListener("click", e=>{ if(e.target===voile) fermerFeuille(); });
+document.addEventListener("keydown", e=>{
+  if(e.key!=="Escape") return;
+  if(!$("#ecran").hidden) fermerEcran();
+  else if(!voile.hidden) fermerFeuille();
+});
+
+/* --- personnaliser un plat --- */
+let brouillon = null, brouillonEdition = false;
+
+function ouvrirPlat(rid, uid){
+  const r = recette(rid);
+  if(uid!=null){
+    const src = etat.panier.find(i=>i.uid===uid);
+    brouillon = JSON.parse(JSON.stringify(src));
+    brouillonEdition = true;
+  } else {
+    brouillon = nouvelItem(r, multParDefaut(r));
+    brouillonEdition = false;
+  }
+  dessinerPlat();
+}
+/* Le bouton jaune n'apparaît que si mm est renseigné ; sinon on garde
+   simplement la recherche Marmiton, comme avant. */
+function liensRecette(r){
+  const exact = lienMarmitonExact(r);
+  const liens = [];
+  if(exact) liens.push(`<a class="marmiton exacte" href="${esc(exact)}" target="_blank" rel="noopener">La recette Marmiton ↗</a>`);
+  if(r.ing.length>1) liens.push(`<a class="marmiton ${exact?"floue":""}" href="${lienMarmiton(r)}" target="_blank" rel="noopener">${exact?"Autres versions":"Voir la recette sur Marmiton"} ↗</a>`);
+  return liens.length ? `<div class="liens">${liens.join("")}</div>` : "";
+}
+function dessinerPlat(){
+  const r = recette(brouillon.rid);
+  const unitePortion = r.fixe ? (r.unite||"lot") : "personne";
+  ouvrirFeuille(`
+    <div class="feuille-tete">
+      <span class="emo">${r.emo||"🍽️"}</span>
+      <div><h2>${esc(r.nom)}</h2>${r.note?`<p>${esc(r.note)}</p>`:""}${liensRecette(r)}</div>
+      <button class="fermer" data-act="fermer" aria-label="Fermer">✕</button>
+    </div>
+    <div class="feuille-corps">
+      <div class="portions">
+        <div class="lab">${r.fixe?"Combien de "+unitePortion+"s ?":"Pour combien de personnes ?"}<i>${r.fixe?"Les quantités sont pour un "+unitePortion+" entier":"Les quantités s'ajustent toutes seules"}</i></div>
+        <div class="cmd">
+          <button data-act="mult-" aria-label="Moins">−</button>
+          <b data-mult>${nb(brouillon.mult)}</b>
+          <button data-act="mult+" aria-label="Plus">+</button>
+        </div>
+      </div>
+      <p class="legende">Tu as déjà un ingrédient à la maison&nbsp;? Mets-le à la corbeille, il sortira de la liste de courses. La flèche le remet.</p>
+      <ul class="ingr">
+        ${r.ing.map(([nom],i)=>{
+          const p = prod(nom), q = brouillon.qtes[i], oeil = estAlOeil(nom);
+          return `<li data-li="${i}" class="${q<=0?"off":""}">
+            <span class="nm">${esc(nom)}<i>${esc(p.rayon)}</i></span>
+            <span class="cmd">
+              ${oeil ? "" : `<button data-act="q-" data-i="${i}" aria-label="Moins de ${esc(nom)}">−</button>`}
+              <b data-qte="${i}">${q<=0?"—":fmtIngredient(nom,q)}</b>
+              ${oeil ? "" : `<button data-act="q+" data-i="${i}" aria-label="Plus de ${esc(nom)}">+</button>`}
+              <button class="jeter" data-act="jeter" data-i="${i}" title="${q<=0?"Remettre":"J'en ai déjà"}" aria-label="${q<=0?"Remettre":"Retirer"} ${esc(nom)}">${iconeJeter(q<=0)}</button>
+            </span></li>`;
+        }).join("")}
+      </ul>
+    </div>
+    <div class="feuille-pied">
+      ${brouillonEdition?`<button class="b-retirer" data-act="retirer">Retirer</button>`:""}
+      <button class="b-valider" data-act="valider">${brouillonEdition?"Mettre à jour":"Ajouter au menu"}</button>
+    </div>`);
+}
+/* Corbeille quand l'ingrédient est dans la liste, flèche de retour quand il en est sorti. */
+function iconeJeter(sorti){
+  return sorti
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 7V4.8h4V7"/><path d="M6.5 7l.9 12.2h9.2L17.5 7"/></svg>`;
+}
+
+/* Met à jour uniquement les chiffres affichés, sans reconstruire la feuille :
+   le focus, le scroll et l'animation d'ouverture restent intacts. */
+function majLigneIngredient(i){
+  const r = recette(brouillon.rid);
+  const nom = r.ing[i][0];
+  const q = brouillon.qtes[i];
+  const val = voile.querySelector(`[data-qte="${i}"]`);
+  const li  = voile.querySelector(`[data-li="${i}"]`);
+  const jet = voile.querySelector(`.jeter[data-i="${i}"]`);
+  if(val) val.textContent = q<=0 ? "—" : fmtIngredient(nom,q);
+  if(li)  li.classList.toggle("off", q<=0);
+  if(jet){
+    jet.innerHTML = iconeJeter(q<=0);
+    jet.title = q<=0 ? "Remettre" : "J'en ai déjà";
+    jet.setAttribute("aria-label", (q<=0?"Remettre ":"Retirer ")+nom);
+  }
+}
+function majPortions(){
+  const val = voile.querySelector("[data-mult]");
+  if(val) val.textContent = nb(brouillon.mult);
+  recette(brouillon.rid).ing.forEach((_,i)=>majLigneIngredient(i));
+}
+
+/* Un plat qui contient déjà l'un de ces produits est considéré "a déjà son féculent" :
+   inutile de lui proposer un deuxième féculent en accompagnement, mieux vaut un légume. */
+const PRODUITS_FECULENTS = new Set([
+  "Spaghetti","Pâtes (penne, fusilli…)","Coquillettes","Feuilles de lasagne","Riz long grain",
+  "Riz basmati","Riz rond spécial paella","Ébly ou perles Tipiak","Semoule à couscous",
+  "Boulgour","Quinoa","Polenta","Lentilles vertes","Lentilles corail","Nouilles ramen",
+  "Nouilles chinoises","Nouilles de riz","Pomme de terre","Patate douce","Gnocchi","Ravioles",
+  "Tortellini frais","Tagliatelles fraîches","Purée Mousseline (flocons)",
+  "Pain de mie Harrys","Pain à burger","Pain à hot-dog","Mauricette","Baguette",
+  "Pain de campagne","Tortillas (wraps)","Pain pita",
+  "Pâte à pizza","Pâte feuilletée","Pâte brisée","Pâte à flammekueche"
+]);
+function aDejaUnFeculent(r){ return r.ing.some(([nom])=>PRODUITS_FECULENTS.has(nom)); }
+
+function dessinerSuggestions(r){
+  const cats = r.sugg||[];
+  const tous = RECETTES.filter(x=>cats.includes(x.cat) && x.id!==r.id);
+  if(!tous.length){ fermerFeuille(); return; }
+
+  // On propose TOUT, mais rangé : le groupe le plus pertinent d'abord.
+  const parPrio = (a,b)=>(b.prio||0)-(a.prio||0);
+  let sections;
+
+  if(cats.includes("Accompagnements")){
+    const veutLeger = aDejaUnFeculent(r);          // le plat a déjà sa pâte / son riz / son pain
+    const legumes   = tous.filter(x=>!x.feculent).sort(parPrio);
+    const feculents = tous.filter(x=> x.feculent).sort(parPrio);
+    sections = veutLeger
+      ? [{titre:"Léger, pour équilibrer", items:legumes},
+         {titre:"Si tu veux un féculent en plus", items:feculents}]
+      : [{titre:"Pour compléter l'assiette", items:feculents},
+         {titre:"Côté légumes", items:legumes}];
+  } else if(cats.includes("Desserts")){
+    sections = [{titre:"Sans rien préparer", items:tous.filter(x=>!x.fixe)},
+                {titre:"À faire soi-même",   items:tous.filter(x=> x.fixe)}];
+  } else {
+    sections = [{titre:cats.join(" & "), items:tous}];
+  }
+  sections = sections.filter(s=>s.items.length);
+
+  const carte = p=>`<button class="plat" data-sugg="${esc(p.id)}">
+      <span class="emo">${p.emo||"🍽️"}${p.express?'<i class="eclair">⚡</i>':""}</span>
+      <span class="nom">${esc(p.nom)}</span>
+      <span class="meta">${esc(p.note||"")}</span></button>`;
+
+  ouvrirFeuille(`
+    <div class="feuille-tete">
+      <span class="emo">✨</span>
+      <div><h2>Avec ça&nbsp;?</h2><p>${esc(r.nom)} vient d'être ajouté au menu</p></div>
+      <button class="fermer" data-act="fermer" aria-label="Fermer">✕</button>
+    </div>
+    <div class="feuille-corps sugg">
+      <p class="legende">Facultatif — tu peux passer. Tout est là, fais défiler.</p>
+      ${sections.map((s,k)=>`
+        <h3 class="sugg-titre${k?" suivant":""}">${esc(s.titre)} <span>${s.items.length}</span></h3>
+        <div class="sugg-grille">${s.items.map(carte).join("")}</div>`).join("")}
+    </div>
+    <div class="feuille-pied">
+      <button class="b-valider" data-act="fermer">Non merci, c'est tout</button>
+    </div>`);
+}
+
+/* --- panier --- */
+function dessinerPanier(){
+  ouvrirFeuille(`
+    <div class="feuille-tete">
+      <span class="emo">🍽️</span>
+      <div><h2>Mes plats</h2><p>${totalPlats()} plat${totalPlats()>1?"s":""} au menu</p></div>
+      <button class="fermer" data-act="fermer" aria-label="Fermer">✕</button>
+    </div>
+    <div class="feuille-corps">
+      <ul class="panier">
+        ${etat.panier.map(i=>{
+          const r = recette(i.rid);
+          const retires = r.ing.filter((_,k)=>i.qtes[k]<=0).length;
+          return `<li>
+            <span class="emo">${r.emo||"🍽️"}</span>
+            <span class="nm">${esc(r.nom)}<i>${libPortion(i)}${retires?` · ${retires} ingrédient${retires>1?"s":""} retiré${retires>1?"s":""}`:""}</i></span>
+            <button class="modif" data-edit="${i.uid}">Modifier</button>
+            <button class="sup" data-sup="${i.uid}" aria-label="Retirer ${esc(r.nom)}">✕</button>
+          </li>`;
+        }).join("")}
+      </ul>
+    </div>
+    <div class="feuille-pied">
+      <button class="b-retirer" data-act="vider">Tout vider</button>
+      <button class="b-valider" data-act="ticket">🧾 Voir ma liste</button>
+    </div>`);
+}
+
+/* --------------------------- Le ticket --------------------------- */
+const ecran = $("#ecran");
+function fermerEcran(){ ecran.hidden = true; ecran.innerHTML=""; document.body.style.overflow=""; }
+
+function ligneTicket(nomAff, qAff, coche){
+  return `<div class="${coche?"case":"lg"}">${coche?'<input type="checkbox">':""}<span class="p">${esc(nomAff)}</span><span class="fil"></span><span class="q">${esc(qAff)}</span></div>`;
+}
+function dessinerTicket(){
+  const lignes = agreger();
+  const restes = lignes.filter(resteVisible);
+  const d = new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  let parRayon = "";
+  let rayonCourant = null;
+  lignes.forEach(l=>{
+    if(l.rayon!==rayonCourant){ rayonCourant=l.rayon; parRayon += `<div class="rayon">${esc(l.rayon)}</div>`; }
+    parRayon += ligneTicket(l.nom, fmtAchat(l), true);
+  });
+
+  ecran.innerHTML = `
+    <div class="ecran-tete">
+      <button class="fermer" data-act="fermer-ecran" aria-label="Revenir aux plats">←</button>
+      <h2>Ma liste</h2>
+      <div class="outils">
+        <button data-act="copier">Copier</button>
+        <button data-act="imprimer">Imprimer</button>
+      </div>
+    </div>
+    <div class="papier-wrap"><div class="papier">
+      <div class="t-tete">
+        <h1>LA BORNE : rue du charmois 💕</h1>
+        <p>${esc(d)}</p>
+        <p>${etat.pers} personne${etat.pers>1?"s":""} · ${totalPlats()} plat${totalPlats()>1?"s":""}</p>
+      </div>
+      <div class="sep-forte"></div>
+      <p class="t-titre">Au menu</p>
+      ${etat.panier.map(i=>{
+        const r = recette(i.rid);
+        const ings = r.ing.map(([nom],k)=>({nom,q:i.qtes[k]})).filter(x=>x.q>0);
+        return `<div class="t-plat">
+          <div class="t-plat-nom"><span>${esc(r.nom)}</span><span class="pf">${libPortion(i)}</span></div>
+          ${ings.map(x=>ligneTicket(x.nom, fmtIngredient(x.nom,x.q), false)).join("")}
+        </div>`;
+      }).join("")}
+      <div class="sep-forte"></div>
+      <p class="t-titre">Liste de courses — ${lignes.length} article${lignes.length>1?"s":""}</p>
+      ${parRayon}
+      ${restes.length?`
+        <div class="sep"></div>
+        <p class="t-titre">Restes après ces repas</p>
+        ${restes.map(l=>`<div class="reste"><span>${esc(l.nom)}</span><span class="q">${fmtQte(l.reste,l.unite)}</span></div>`).join("")}
+        <p class="t-pied" style="margin-top:10px;font-size:11.5px">De quoi caler le prochain menu.</p>`:""}
+      <div class="sep-forte"></div>
+      <div class="t-pied">
+        <div>MERCI ET BON APPÉTIT</div>
+        <div class="codebarres"></div>
+        <div>*** ${lignes.length} ARTICLES ***</div>
+      </div>
+    </div></div>`;
+  ecran.hidden = false;
+  document.body.style.overflow = "hidden";
+  ecran.scrollTop = 0;
+}
+
+function ticketTexte(){
+  const lignes = agreger(), restes = lignes.filter(resteVisible);
+  const L = [];
+  L.push("LISTE DE COURSES — "+new Date().toLocaleDateString("fr-FR"));
+  L.push(etat.pers+" personnes · "+totalPlats()+" plats","");
+  L.push("== AU MENU ==");
+  etat.panier.forEach(i=>{
+    const r = recette(i.rid);
+    L.push("");
+    L.push(r.nom.toUpperCase()+"  ("+libPortion(i)+")");
+    r.ing.forEach(([nom],k)=>{ if(i.qtes[k]>0) L.push("   - "+nom+" : "+fmtQte(i.qtes[k],prod(nom).unite)); });
+  });
+  L.push("","== LISTE DE COURSES ==");
+  let ray = null;
+  lignes.forEach(l=>{
+    if(l.rayon!==ray){ ray=l.rayon; L.push("","["+ray+"]"); }
+    const det = (l.lots && (l.lots>1||l.reste>0.001)) ? "  ("+l.lots+"x"+fmtQte(l.lot,l.unite)+")" : "";
+    L.push("[ ] "+l.nom+" : "+fmtQte(l.acheter,l.unite)+det);
+  });
+  if(restes.length){
+    L.push("","== RESTES ==");
+    restes.forEach(l=>L.push("   "+l.nom+" : "+fmtQte(l.reste,l.unite)));
+  }
+  return L.join("\n");
+}
+async function copierTicket(btn){
+  const txt = ticketTexte();
+  try{ await navigator.clipboard.writeText(txt); }
+  catch(e){
+    const t=document.createElement("textarea"); t.value=txt; t.style.position="fixed"; t.style.opacity="0";
+    document.body.appendChild(t); t.select();
+    try{ document.execCommand("copy"); }catch(_){}
+    t.remove();
+  }
+  const anc = btn.textContent; btn.textContent = "Copié ✓";
+  setTimeout(()=>btn.textContent = anc, 1600);
+}
+
+/* ============================ ÉVÉNEMENTS ============================ */
+$("#onglets").addEventListener("click", e=>{
+  const b = e.target.closest(".onglet"); if(!b) return;
+  catActive = b.dataset.cat; requete=""; $("#recherche").value=""; $("#effacer").hidden=true;
+  rendreOnglets(); rendreGrille();
+});
+$("#grille").addEventListener("click", e=>{
+  const b = e.target.closest(".plat"); if(!b) return;
+  ouvrirPlat(b.dataset.id, null);
+});
+$("#recherche").addEventListener("input", e=>{
+  requete = e.target.value; $("#effacer").hidden = !requete; rendreGrille();
+});
+$("#effacer").addEventListener("click", ()=>{
+  requete=""; $("#recherche").value=""; $("#effacer").hidden=true; $("#recherche").focus(); rendreGrille();
+});
+$("#pers-moins").addEventListener("click", ()=>changerPers(-1));
+$("#pers-plus").addEventListener("click", ()=>changerPers(1));
+function changerPers(d){
+  const anc = etat.pers;
+  etat.pers = Math.min(30, Math.max(1, etat.pers+d));
+  if(etat.pers===anc) return;
+  etat.panier.forEach(i=>{ if(i.suivi && i.mult===anc) majMult(i, etat.pers); });
+  rafraichir();
+}
+$("#ouvrir-panier").addEventListener("click", dessinerPanier);
+$("#ouvrir-ticket").addEventListener("click", dessinerTicket);
+
+voile.addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  const act = b.dataset.act;
+
+  if(b.dataset.sugg){ 
+    const r = recette(b.dataset.sugg);
+    etat.panier.push(nouvelItem(r, multParDefaut(r)));
+    rafraichir(); fermerFeuille(); return;
+  }
+  if(b.dataset.edit){ ouvrirPlat(etat.panier.find(i=>i.uid==b.dataset.edit).rid, +b.dataset.edit); return; }
+  if(b.dataset.sup){
+    etat.panier = etat.panier.filter(i=>i.uid!=b.dataset.sup);
+    rafraichir();
+    if(totalPlats()) dessinerPanier(); else fermerFeuille();
+    return;
+  }
+  if(act==="fermer"){ fermerFeuille(); return; }
+  if(act==="vider"){ etat.panier=[]; rafraichir(); fermerFeuille(); return; }
+  if(act==="ticket"){ fermerFeuille(); dessinerTicket(); return; }
+
+  if(!brouillon) return;
+  const r = recette(brouillon.rid);
+  if(act==="mult-"||act==="mult+"){
+    const v = Math.min(40, Math.max(1, brouillon.mult + (act==="mult+"?1:-1)));
+    if(v!==brouillon.mult){ majMult(brouillon,v); brouillon.suivi = !r.fixe && v===etat.pers; majPortions(); }
+    return;
+  }
+  if(act==="q-"||act==="q+"){
+    const i = +b.dataset.i, u = prod(r.ing[i][0]).unite;
+    let q = brouillon.qtes[i];
+    const p = pas(q>0?q:r.ing[i][1]*brouillon.mult, u);
+    q = act==="q+" ? q+p : q-p;
+    brouillon.qtes[i] = Math.max(0, Math.round(q*100)/100);
+    majLigneIngredient(i);
+    return;
+  }
+  if(act==="jeter"){
+    const i = +b.dataset.i;
+    brouillon.avant = brouillon.avant || {};
+    if(brouillon.qtes[i] > 0){
+      brouillon.avant[i] = brouillon.qtes[i];      // on garde la quantité de côté
+      brouillon.qtes[i] = 0;
+    } else {
+      brouillon.qtes[i] = brouillon.avant[i] ?? r.ing[i][1]*brouillon.mult;
+    }
+    majLigneIngredient(i);
+    return;
+  }
+  if(act==="retirer"){
+    etat.panier = etat.panier.filter(i=>i.uid!==brouillon.uid);
+    brouillon=null; rafraichir(); fermerFeuille(); return;
+  }
+  if(act==="valider"){
+    if(brouillonEdition){
+      const k = etat.panier.findIndex(i=>i.uid===brouillon.uid);
+      etat.panier[k] = brouillon; rafraichir(); fermerFeuille();
+    } else {
+      etat.panier.push(brouillon); rafraichir();
+      const rr = recette(brouillon.rid); brouillon=null;
+      if(rr.sugg && rr.sugg.length) dessinerSuggestions(rr); else fermerFeuille();
+    }
+    return;
+  }
+});
+
+ecran.addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  const act = b.dataset.act;
+  if(act==="fermer-ecran") fermerEcran();
+  if(act==="imprimer") window.print();
+  if(act==="copier") copierTicket(b);
+});
+
+/* --------------------------- Démarrage --------------------------- */
+try{ decoderMenu(decodeURIComponent(location.hash.slice(1))); }catch(e){}
+rendreOnglets(); rafraichir();
+</script>
+</body>
+</html>
