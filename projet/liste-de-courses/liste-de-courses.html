@@ -101,7 +101,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 .b-liste:disabled,.b-panier:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
 
 /* ---------- Feuille modale ---------- */
-.voile{position:fixed;inset:0;background:rgba(22,24,15,.5);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.voile{position:fixed;inset:0;background:rgba(22,24,15,.5);z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:0}
 .voile[hidden]{display:none}
 .feuille{
   background:var(--papier);width:100%;max-width:620px;max-height:92vh;
@@ -223,6 +223,51 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 .t-pied{text-align:center;margin-top:22px;font-size:12px;letter-spacing:.05em}
 .codebarres{height:38px;margin:14px auto 8px;max-width:220px;background:repeating-linear-gradient(90deg,#22241a 0 2px,transparent 2px 4px,#22241a 4px 5px,transparent 5px 9px,#22241a 9px 12px,transparent 12px 14px)}
 
+/* ---------- Ajouts hors recette ---------- */
+.b-ajout{background:transparent;border:2px dashed var(--trait);color:var(--gris);font-weight:600}
+.b-ajout:hover{border-color:var(--vert);color:var(--vert);background:var(--carte)}
+.barre .b-ajout{flex:0 0 auto;padding:15px 16px;gap:5px;font-size:14px}
+.barre .court{display:none}
+.ajout-ligne{width:100%;margin-top:10px;padding:13px;border:2px dashed var(--trait);border-radius:12px;color:var(--gris);font-weight:600;font-size:14px;text-align:center;background:transparent}
+.ajout-ligne:hover{border-color:var(--vert);color:var(--vert);background:var(--carte)}
+.ingr.ajouts{margin-top:8px}
+.ingr.ajouts li{border-style:dashed}
+.titre-mini{font-family:var(--display);font-weight:800;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--gris);margin:0 0 8px}
+
+.rech-prod input{width:100%;font:500 16px/1 var(--body);padding:13px 14px;border:2px solid var(--trait);border-radius:12px;background:var(--carte);color:var(--encre);margin-bottom:14px}
+.rech-prod input:focus{border-color:var(--vert);outline:none}
+.rech-prod input::-webkit-search-decoration,
+.rech-prod input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.res{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:44vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.res button{width:100%;text-align:left;background:var(--carte);border:2px solid var(--trait);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500}
+.res button:hover{border-color:var(--vert)}
+.res .ray{margin-left:auto;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--gris);flex:none}
+.res .neuf{border-style:dashed;color:var(--vert);font-weight:700}
+.unites{display:flex;gap:6px;margin:0 0 10px}
+.unites button{border:2px solid var(--trait);background:var(--carte);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--gris)}
+.unites button[aria-pressed="true"]{border-color:var(--vert);background:var(--vert);color:#fff}
+.choisis{margin-bottom:18px}
+
+/* ---------- Partage ---------- */
+.b-second{background:var(--carte);border:2px solid var(--vert);color:var(--vert);flex:0 0 auto!important;padding:15px 20px!important}
+.lien{width:100%;font-family:var(--mono);font-size:12.5px;line-height:1.5;padding:12px;border:2px solid var(--trait);border-radius:12px;background:var(--carte);color:var(--encre);resize:vertical;word-break:break-all}
+.lien:focus{border-color:var(--vert);outline:none}
+
+@media (max-width:560px){
+  /* La place manque : le bouton du milieu se réduit à son +, les libellés raccourcissent. */
+  .barre .long{display:none}
+  .barre .court{display:inline}
+  .barre .b-ajout .court{display:none}
+  .barre .b-ajout{padding:15px 15px;font-size:17px;line-height:1}
+  .barre button{flex:1 1 auto;white-space:nowrap;padding:15px 12px;font-size:14px;gap:7px}
+  .barre{padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+  .barre-in{gap:8px}
+  /* Sur téléphone les trois actions passent avant le titre : le ticket parle de lui-même. */
+  .ecran-tete{gap:8px;padding:14px 12px}
+  .ecran-tete h2{display:none}
+  .outils{gap:6px}
+  .outils button{padding:9px 11px;font-size:12.5px}
+}
 @media (min-width:700px){
   .voile{align-items:center;padding:24px}
   .feuille{border-radius:20px;max-height:86vh}
@@ -267,7 +312,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 <div class="barre">
   <div class="barre-in">
     <button class="b-panier" id="ouvrir-panier" disabled>Mes plats <span class="pastille" id="nb-plats">0</span></button>
-    <button class="b-liste" id="ouvrir-ticket" disabled>🧾 Voir ma liste</button>
+    <button class="b-ajout" id="ouvrir-ajout" aria-label="Ajouter un article hors recette">＋<span class="long">Ajouter un article</span><span class="court">Article</span></button>
+    <button class="b-liste" id="ouvrir-ticket" disabled>🧾 <span class="long">Voir ma liste</span><span class="court">Ma liste</span></button>
   </div>
 </div>
 
@@ -305,7 +351,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
    alOeil    : condiment affiché « au goût » au lieu d'un poids
    stock     : produit d'armoire, son reliquat n'est pas listé dans les restes
    ──────────────────────────────────────────────────────────────────────── */
-const RAYONS = ["Fruits & légumes","Boucherie","Charcuterie","Poissonnerie","Crèmerie","Boulangerie","Épicerie salée","Épicerie sucrée","Surgelés","Traiteur","Boissons","Divers"];
+const RAYONS = ["Fruits & légumes","Boucherie","Charcuterie","Poissonnerie","Crèmerie","Boulangerie","Épicerie salée","Épicerie sucrée","Surgelés","Traiteur","Boissons","Divers","Autres"];
 
 const PRODUITS = {
   /* Fruits & légumes */
@@ -2711,12 +2757,19 @@ const PLURIELS = {"tranche":"tranches","pain":"pains","pot":"pots","rouleau":"ro
 const CATS = [...new Set(RECETTES.map(r=>r.cat))];
 const CAT_EMO = {"Plats":"🍽️","Accompagnements":"🥗","Entrées & apéro":"🥂","Petit-déjeuner":"☕","Desserts":"🍰","Petits gâteaux":"🍪"};
 
-const etat = { pers:2, panier:[], uid:1 };
+const etat = { pers:2, panier:[], uid:1, extras:[] };
 const $ = s => document.querySelector(s);
 // Les ligatures ne sont pas décomposées par NFD : sans ça, taper "oeufs" ne trouve pas "Œufs".
 const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
                   .replace(/œ/gi,"oe").replace(/æ/gi,"ae").toLowerCase();
-const prod = n => PRODUITS[n] || {rayon:"Divers",unite:"pièce",lot:null};
+/* Articles tapés à la main : absents de PRODUITS, ils vivent ici le temps de la
+   session et voyagent dans l'adresse. Toujours rangés dans le rayon "Autres". */
+const PERSO = {};
+function ajouterPerso(nom,unite){
+  if(!PRODUITS[nom] && !PERSO[nom]) PERSO[nom] = {rayon:"Autres",unite:unite||"pièce",lot:null,perso:true};
+  return nom;
+}
+const prod = n => PRODUITS[n] || PERSO[n] || {rayon:"Divers",unite:"pièce",lot:null};
 const denombrable = u => DENOMBRABLES.includes(u);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -2798,12 +2851,13 @@ function achatArrondi(q,u,lot){
 const recette = id => RECETTES.find(r=>r.id===id);
 function multParDefaut(r){ return r.fixe ? 1 : etat.pers; }
 function nouvelItem(r,mult){
-  return { uid:etat.uid++, rid:r.id, mult, qtes:r.ing.map(([,q])=>q*mult), suivi:!r.fixe };
+  return { uid:etat.uid++, rid:r.id, mult, qtes:r.ing.map(([,q])=>q*mult), extras:[], suivi:!r.fixe };
 }
 function majMult(item,nouveau){
   const r = recette(item.rid), anc = item.mult||1;
   item.qtes = item.qtes.map((q,i)=> q<=0 ? 0 : (anc? q*nouveau/anc : r.ing[i][1]*nouveau));
   if(item.avant) Object.keys(item.avant).forEach(k=>{ item.avant[k] = item.avant[k]*nouveau/anc; });
+  (item.extras||[]).forEach(e=>{ e.q = Math.round(e.q*nouveau/anc*100)/100; });
   item.mult = nouveau;
 }
 function libPortion(item){
@@ -2816,14 +2870,13 @@ function totalPlats(){ return etat.panier.length; }
 /* ------------------------ Liste de courses ------------------------ */
 function agreger(){
   const m = new Map();
+  const ajoute = (nom,q)=>{ if(q>0) m.set(nom,(m.get(nom)||0)+q); };
   etat.panier.forEach(item=>{
     const r = recette(item.rid);
-    r.ing.forEach(([nom],i)=>{
-      const q = item.qtes[i];
-      if(q<=0) return;
-      m.set(nom,(m.get(nom)||0)+q);
-    });
+    r.ing.forEach(([nom],i)=>ajoute(nom, item.qtes[i]));
+    (item.extras||[]).forEach(e=>ajoute(e.nom, e.q));
   });
+  etat.extras.forEach(e=>ajoute(e.nom, e.q));
   const lignes=[];
   m.forEach((besoin,nom)=>{
     const p = prod(nom);
@@ -2916,39 +2969,93 @@ function rendreGrille(){
   g.innerHTML = html;
 }
 function rendreBarre(){
-  const n = totalPlats();
+  const n = totalPlats(), vide = n===0 && !etat.extras.length;
   $("#nb-plats").textContent = n;
-  $("#ouvrir-panier").disabled = n===0;
-  $("#ouvrir-ticket").disabled = n===0;
+  $("#ouvrir-panier").disabled = vide;
+  $("#ouvrir-ticket").disabled = vide;
   $("#pers-nb").innerHTML = etat.pers+"<i>pers.</i>";
 }
 /* ---------- Mémoire du menu dans l'URL ----------
    Pas de stockage navigateur : le menu vit dans le # de l'adresse. Il survit à un
    rafraîchissement, et l'adresse peut se transmettre telle quelle à quelqu'un d'autre. */
 let ecritureHash = false;
-function encoderMenu(){
-  if(!etat.panier.length) return "";
-  return etat.pers+"~"+etat.panier.map(i=>
-    i.rid+"*"+i.mult+"*"+i.qtes.map(q=>Math.round(q*100)/100).join("-")).join("!");
+let ouvrirTicketAuChargement = false;
+
+/* Un nom d'article libre peut contenir espaces, accents, apostrophes : on ne
+   garde que lettres et chiffres, tout le reste devient _hh (octets UTF-8).
+   L'adresse reste entièrement en ASCII, donc collable telle quelle. */
+function codeNom(s){
+  let out = "";
+  new TextEncoder().encode(s).forEach(b=>{
+    const c = String.fromCharCode(b);
+    out += /[A-Za-z0-9]/.test(c) ? c : "_"+b.toString(16).padStart(2,"0");
+  });
+  return out;
+}
+function decodeNom(s){
+  const o = [];
+  for(let i=0;i<s.length;i++){
+    if(s[i]==="_"){ o.push(parseInt(s.substr(i+1,2),16)); i+=2; }
+    else o.push(s.charCodeAt(i));
+  }
+  return new TextDecoder().decode(new Uint8Array(o));
+}
+/* Un ajout : nom:quantité, plus le code d'unité quand l'article est hors catalogue
+   (c'est ce troisième champ qui dit au lecteur de recréer le produit). */
+const CODE_UNITE = {"pièce":"p","g":"g","ml":"m"};
+const UNITE_CODE = {p:"pièce",g:"g",m:"ml"};
+function codeExtras(liste){
+  return (liste||[]).map(e=>{
+    const p = prod(e.nom);
+    return codeNom(e.nom)+":"+(Math.round(e.q*100)/100)+(p.perso?":"+(CODE_UNITE[p.unite]||"p"):"");
+  }).join(",");
+}
+function decodeExtras(txt){
+  return (txt||"").split(",").filter(Boolean).map(bloc=>{
+    const [n,q,u] = bloc.split(":");
+    const nom = decodeNom(n||""), val = Number(q);
+    if(!nom || !(val>0)) return null;
+    if(u) ajouterPerso(nom, UNITE_CODE[u]||"pièce");
+    return {nom, q:val};
+  }).filter(Boolean);
+}
+/* Format : personnes ~ plats ~ ajouts ~ options
+   un plat : id * portions * quantités * ajouts du plat
+   Les deux derniers champs sont facultatifs : les anciennes adresses marchent encore. */
+function encoderMenu(options){
+  if(!etat.panier.length && !etat.extras.length) return "";
+  const plats = etat.panier.map(i=>{
+    const bloc = i.rid+"*"+i.mult+"*"+i.qtes.map(q=>Math.round(q*100)/100).join("-");
+    const ex = codeExtras(i.extras);
+    return ex ? bloc+"*"+ex : bloc;
+  }).join("!");
+  const champs = [etat.pers, plats, codeExtras(etat.extras), options||""];
+  while(champs.length>2 && !champs[champs.length-1]) champs.pop();
+  return champs.join("~");
 }
 function decoderMenu(txt){
   if(!txt) return false;
   try{
-    const [pers,plats] = txt.split("~");
+    const [pers,plats,extras,options] = txt.split("~");
     const n = parseInt(pers,10);
     if(!(n>=1 && n<=30)) return false;
     const panier = [];
     (plats||"").split("!").filter(Boolean).forEach(bloc=>{
-      const [rid,mult,qtes] = bloc.split("*");
+      const [rid,mult,qtes,ex] = bloc.split("*");
       const r = recette(rid);
       if(!r) return;                                  // recette supprimée du fichier : on l'ignore
       const q = (qtes||"").split("-").map(Number);   // "-" et non "." : les quantités sont décimales
       if(q.length!==r.ing.length || q.some(isNaN)) return;
-      panier.push({uid:etat.uid++, rid, mult:Number(mult)||1, qtes:q, suivi:!r.fixe});
+      panier.push({uid:etat.uid++, rid, mult:Number(mult)||1, qtes:q, extras:decodeExtras(ex), suivi:!r.fixe});
     });
-    etat.pers = n; etat.panier = panier;
+    etat.pers = n; etat.panier = panier; etat.extras = decodeExtras(extras);
+    ouvrirTicketAuChargement = (options||"").includes("t");
     return true;
   }catch(e){ return false; }
+}
+function lienPartage(){
+  const code = encoderMenu("t");
+  return location.href.split("#")[0] + (code ? "#"+code : "");
 }
 function memoriser(){
   try{
@@ -2960,25 +3067,44 @@ function memoriser(){
 }
 window.addEventListener("hashchange", ()=>{
   if(ecritureHash) return;
-  if(decoderMenu(decodeURIComponent(location.hash.slice(1)))) rafraichir();
+  if(!decoderMenu(decodeURIComponent(location.hash.slice(1)))) return;
+  fermerFeuille(); rafraichir();
+  if(ouvrirTicketAuChargement) dessinerTicket();
 });
 
 function rafraichir(){ rendreGrille(); rendreBarre(); memoriser(); }
 
 /* ---------------------------- Feuille ---------------------------- */
 const voile = $("#voile");
+let feuilleCourante = null;   // sert à redessiner la bonne feuille après un changement
 function ouvrirFeuille(html){
   voile.innerHTML = `<div class="feuille" role="dialog" aria-modal="true">${html}</div>`;
   voile.hidden = false;
   document.body.style.overflow = "hidden";
   const f = voile.querySelector(".fermer"); if(f) f.focus();
 }
-function fermerFeuille(){ voile.hidden = true; voile.innerHTML=""; document.body.style.overflow=""; }
-voile.addEventListener("click", e=>{ if(e.target===voile) fermerFeuille(); });
+function fermerFeuille(){
+  voile.hidden = true; voile.innerHTML=""; feuilleCourante = null;
+  document.body.style.overflow = $("#ecran").hidden ? "" : "hidden";   // le ticket peut être dessous
+}
+/* Depuis la feuille d'ajout, on revient à la feuille d'où l'on vient plutôt que
+   de tout fermer : on ne perd pas le plat en cours de personnalisation. */
+function sortirFeuille(){
+  if(feuilleCourante===dessinerAjout){
+    rafraichir();
+    if(ajoutRetour){ ajoutRetour(); return; }
+  }
+  fermerFeuille();
+}
+function redessinerFeuille(){
+  if(feuilleCourante===dessinerAjout) majAjout();
+  else if(feuilleCourante) feuilleCourante();
+}
+voile.addEventListener("click", e=>{ if(e.target===voile) sortirFeuille(); });
 document.addEventListener("keydown", e=>{
   if(e.key!=="Escape") return;
-  if(!$("#ecran").hidden) fermerEcran();
-  else if(!voile.hidden) fermerFeuille();
+  if(!voile.hidden) sortirFeuille();
+  else if(!$("#ecran").hidden) fermerEcran();
 });
 
 /* --- personnaliser un plat --- */
@@ -3006,6 +3132,7 @@ function liensRecette(r){
   return liens.length ? `<div class="liens">${liens.join("")}</div>` : "";
 }
 function dessinerPlat(){
+  feuilleCourante = dessinerPlat;
   const r = recette(brouillon.rid);
   const unitePortion = r.fixe ? (r.unite||"lot") : "personne";
   ouvrirFeuille(`
@@ -3037,6 +3164,8 @@ function dessinerPlat(){
             </span></li>`;
         }).join("")}
       </ul>
+      ${lignesExtras(brouillon.extras,"plat")}
+      <button class="ajout-ligne" data-act="ajout-plat">＋ Ajouter un ingrédient</button>
     </div>
     <div class="feuille-pied">
       ${brouillonEdition?`<button class="b-retirer" data-act="retirer">Retirer</button>`:""}
@@ -3073,6 +3202,117 @@ function majPortions(){
   recette(brouillon.rid).ing.forEach((_,i)=>majLigneIngredient(i));
 }
 
+/* ================== Articles hors recette ==================
+   Deux points d'entrée, même feuille : depuis un plat (l'article compte dans ce
+   plat et suit les portions) ou depuis la barre (l'article part directement sur
+   la liste de courses). Ce qui n'existe pas dans PRODUITS atterrit dans "Autres". */
+let ajoutCible = "global", ajoutRetour = null, ajoutRequete = "", ajoutUnite = "pièce";
+
+function extrasDe(cible){
+  if(cible==="plat"){ if(!brouillon.extras) brouillon.extras = []; return brouillon.extras; }
+  return etat.extras;
+}
+/* Même présentation que les ingrédients, mais la corbeille supprime pour de bon :
+   l'article ne fait pas partie de la recette, il n'y a rien à "remettre". */
+function lignesExtras(liste, cible){
+  if(!liste || !liste.length) return "";
+  return `<ul class="ingr ajouts">${liste.map((e,i)=>{
+    const p = prod(e.nom);
+    return `<li>
+      <span class="nm">${esc(e.nom)}<i>${esc(p.rayon)}${p.perso?" · hors catalogue":""}</i></span>
+      <span class="cmd">
+        <button data-act="xq-" data-c="${cible}" data-x="${i}" aria-label="Moins de ${esc(e.nom)}">−</button>
+        <b>${esc(fmtQte(e.q,p.unite))}</b>
+        <button data-act="xq+" data-c="${cible}" data-x="${i}" aria-label="Plus de ${esc(e.nom)}">+</button>
+        <button class="jeter" data-act="xsup" data-c="${cible}" data-x="${i}" title="Supprimer" aria-label="Supprimer ${esc(e.nom)}">${iconeJeter(false)}</button>
+      </span></li>`;
+  }).join("")}</ul>`;
+}
+function ouvrirAjout(cible, retour){
+  ajoutCible = cible; ajoutRetour = retour||null; ajoutRequete = ""; ajoutUnite = "pièce";
+  dessinerAjout();
+}
+function dessinerAjout(){
+  feuilleCourante = dessinerAjout;
+  ouvrirFeuille(`
+    <div class="feuille-tete">
+      <span class="emo">➕</span>
+      <div><h2>Ajouter un article</h2><p>${ajoutCible==="plat"?"Il sera compté dans ce plat":"Il ira directement sur la liste de courses"}</p></div>
+      <button class="fermer" data-act="ajout-fin" aria-label="Fermer">✕</button>
+    </div>
+    <div class="feuille-corps">
+      <div class="rech-prod">
+        <input id="rech-prod" type="search" placeholder="Coriandre, papier toilette, bière…" autocomplete="off" aria-label="Chercher un article">
+      </div>
+      <div id="ajout-choisis"></div>
+      <div id="ajout-resultats"></div>
+    </div>
+    <div class="feuille-pied">
+      <button class="b-valider" data-act="ajout-fin">Terminé</button>
+    </div>`);
+  const champ = voile.querySelector("#rech-prod");
+  if(champ){
+    champ.value = ajoutRequete;
+    champ.addEventListener("input", e=>{ ajoutRequete = e.target.value; majAjout(); });
+    champ.focus();
+  }
+  majAjout();
+}
+/* On ne redessine que les deux blocs qui changent : le champ de recherche garde
+   son focus et le clavier ne se referme pas sur téléphone. */
+function majAjout(){
+  const liste = extrasDe(ajoutCible);
+  const ch = voile.querySelector("#ajout-choisis");
+  if(ch) ch.innerHTML = liste.length
+    ? `<p class="titre-mini">Déjà ajoutés</p><div class="choisis">${lignesExtras(liste, ajoutCible)}</div>`
+    : "";
+  const res = voile.querySelector("#ajout-resultats");
+  if(!res) return;
+
+  const brut = (ajoutRequete||"").trim().replace(/\s+/g," ");
+  const termes = norm(brut).split(/[\s,]+/).filter(Boolean);
+  const catalogue = Object.keys(PRODUITS).concat(Object.keys(PERSO));
+  const dejaLa = new Set(liste.map(e=>e.nom));
+  let noms = catalogue.filter(n=>!dejaLa.has(n));
+  if(termes.length) noms = noms.filter(n=>{ const x = norm(n); return termes.every(t=>x.includes(t)); });
+  noms.sort((a,b)=>{
+    if(termes.length){                                  // ce qui commence par le mot tapé passe devant
+      const da = norm(a).startsWith(termes[0])?0:1, db = norm(b).startsWith(termes[0])?0:1;
+      if(da!==db) return da-db;
+    }
+    const d = RAYONS.indexOf(prod(a).rayon)-RAYONS.indexOf(prod(b).rayon);
+    return d!==0 ? d : a.localeCompare(b,"fr");
+  });
+  // Proposer la création seulement si rien dans le catalogue ne porte déjà ce nom.
+  const existe = brut && catalogue.some(n=>norm(n)===norm(brut));
+  let html = "";
+  if(brut && !existe){
+    html += `<div class="unites" role="group" aria-label="Unité de l'article">
+      ${[["pièce","à l'unité"],["g","en grammes"],["ml","en ml"]].map(([u,lab])=>
+        `<button data-act="unite" data-u="${u}" aria-pressed="${u===ajoutUnite}">${lab}</button>`).join("")}
+    </div>`;
+  }
+  const lignes = [];
+  if(brut && !existe) lignes.push(`<li><button class="neuf" data-act="creer">＋ Ajouter « ${esc(brut)} »<span class="ray">Autres</span></button></li>`);
+  noms.slice(0,300).forEach(n=>lignes.push(
+    `<li><button data-act="prendre" data-n="${esc(n)}">${esc(n)}<span class="ray">${esc(prod(n).rayon)}</span></button></li>`));
+  html += lignes.length ? `<ul class="res">${lignes.join("")}</ul>`
+                        : `<p class="legende">Rien sous ce nom. Efface une lettre ou deux.</p>`;
+  res.innerHTML = html;
+}
+/* Quantité de départ : le conditionnement du rayon quand on le connaît. */
+function ajouterExtra(nom){
+  const liste = extrasDe(ajoutCible);
+  if(liste.some(e=>e.nom===nom)) return;
+  const p = prod(nom);
+  liste.push({nom, q: p.lot || (p.unite==="g"||p.unite==="ml" ? 100 : 1)});
+  ajoutRequete = "";
+  const champ = voile.querySelector("#rech-prod");
+  if(champ){ champ.value = ""; champ.focus(); }
+  if(ajoutCible==="global"){ rendreBarre(); memoriser(); }
+  majAjout();
+}
+
 /* Un plat qui contient déjà l'un de ces produits est considéré "a déjà son féculent" :
    inutile de lui proposer un deuxième féculent en accompagnement, mieux vaut un légume. */
 const PRODUITS_FECULENTS = new Set([
@@ -3088,6 +3328,7 @@ const PRODUITS_FECULENTS = new Set([
 function aDejaUnFeculent(r){ return r.ing.some(([nom])=>PRODUITS_FECULENTS.has(nom)); }
 
 function dessinerSuggestions(r){
+  feuilleCourante = null;
   const cats = r.sugg||[];
   const tous = RECETTES.filter(x=>cats.includes(x.cat) && x.id!==r.id);
   if(!tous.length){ fermerFeuille(); return; }
@@ -3137,6 +3378,7 @@ function dessinerSuggestions(r){
 
 /* --- panier --- */
 function dessinerPanier(){
+  feuilleCourante = dessinerPanier;
   ouvrirFeuille(`
     <div class="feuille-tete">
       <span class="emo">🍽️</span>
@@ -3156,6 +3398,8 @@ function dessinerPanier(){
           </li>`;
         }).join("")}
       </ul>
+      ${etat.extras.length?`<p class="titre-mini" style="margin-top:18px">En plus des plats</p>${lignesExtras(etat.extras,"global")}`:""}
+      <button class="ajout-ligne" data-act="ajout-panier">＋ Ajouter un article hors recette</button>
     </div>
     <div class="feuille-pied">
       <button class="b-retirer" data-act="vider">Tout vider</button>
@@ -3186,6 +3430,7 @@ function dessinerTicket(){
       <button class="fermer" data-act="fermer-ecran" aria-label="Revenir aux plats">←</button>
       <h2>Ma liste</h2>
       <div class="outils">
+        <button data-act="partager">Partager</button>
         <button data-act="copier">Copier</button>
         <button data-act="imprimer">Imprimer</button>
       </div>
@@ -3204,8 +3449,13 @@ function dessinerTicket(){
         return `<div class="t-plat">
           <div class="t-plat-nom"><span>${esc(r.nom)}</span><span class="pf">${libPortion(i)}</span></div>
           ${ings.map(x=>ligneTicket(x.nom, fmtIngredient(x.nom,x.q), false)).join("")}
+          ${(i.extras||[]).map(e=>ligneTicket("+ "+e.nom, fmtQte(e.q,prod(e.nom).unite), false)).join("")}
         </div>`;
       }).join("")}
+      ${etat.extras.length?`<div class="t-plat">
+        <div class="t-plat-nom"><span>En plus</span><span class="pf">hors recette</span></div>
+        ${etat.extras.map(e=>ligneTicket(e.nom, fmtQte(e.q,prod(e.nom).unite), false)).join("")}
+      </div>`:""}
       <div class="sep-forte"></div>
       <p class="t-titre">Liste de courses — ${lignes.length} article${lignes.length>1?"s":""}</p>
       ${parRayon}
@@ -3237,7 +3487,13 @@ function ticketTexte(){
     L.push("");
     L.push(r.nom.toUpperCase()+"  ("+libPortion(i)+")");
     r.ing.forEach(([nom],k)=>{ if(i.qtes[k]>0) L.push("   - "+nom+" : "+fmtQte(i.qtes[k],prod(nom).unite)); });
+    (i.extras||[]).forEach(e=>L.push("   + "+e.nom+" : "+fmtQte(e.q,prod(e.nom).unite)));
   });
+  if(etat.extras.length){
+    L.push("");
+    L.push("EN PLUS  (hors recette)");
+    etat.extras.forEach(e=>L.push("   - "+e.nom+" : "+fmtQte(e.q,prod(e.nom).unite)));
+  }
   L.push("","== LISTE DE COURSES ==");
   let ray = null;
   lignes.forEach(l=>{
@@ -3251,8 +3507,7 @@ function ticketTexte(){
   }
   return L.join("\n");
 }
-async function copierTicket(btn){
-  const txt = ticketTexte();
+async function copierTexte(txt, btn, confirmation){
   try{ await navigator.clipboard.writeText(txt); }
   catch(e){
     const t=document.createElement("textarea"); t.value=txt; t.style.position="fixed"; t.style.opacity="0";
@@ -3260,8 +3515,31 @@ async function copierTicket(btn){
     try{ document.execCommand("copy"); }catch(_){}
     t.remove();
   }
-  const anc = btn.textContent; btn.textContent = "Copié ✓";
+  const anc = btn.textContent; btn.textContent = confirmation;
   setTimeout(()=>btn.textContent = anc, 1600);
+}
+const copierTicket = btn => copierTexte(ticketTexte(), btn, "Copié ✓");
+
+/* --------------------------- Partage --------------------------- */
+function dessinerPartage(){
+  feuilleCourante = dessinerPartage;
+  const url = lienPartage();
+  ouvrirFeuille(`
+    <div class="feuille-tete">
+      <span class="emo">🔗</span>
+      <div><h2>Partager la liste</h2><p>Tout le menu tient dans l'adresse : celui qui l'ouvre retrouve ce ticket, tel quel.</p></div>
+      <button class="fermer" data-act="fermer" aria-label="Fermer">✕</button>
+    </div>
+    <div class="feuille-corps">
+      <textarea class="lien" id="lien-partage" rows="5" readonly aria-label="Lien de la liste">${esc(url)}</textarea>
+      ${location.protocol==="file:" ? `<p class="legende" style="margin-top:12px">Cette page est ouverte depuis un fichier de l'appareil : le lien ne fonctionnera que chez quelqu'un qui a le même fichier au même endroit.</p>` : ""}
+    </div>
+    <div class="feuille-pied">
+      ${navigator.share?`<button class="b-second" data-act="partage-natif">Envoyer…</button>`:""}
+      <button class="b-valider" data-act="copier-lien">Copier le lien</button>
+    </div>`);
+  const t = voile.querySelector("#lien-partage");
+  if(t){ t.focus(); t.select(); }
 }
 
 /* ============================ ÉVÉNEMENTS ============================ */
@@ -3289,6 +3567,7 @@ function changerPers(d){
   etat.panier.forEach(i=>{ if(i.suivi && i.mult===anc) majMult(i, etat.pers); });
   rafraichir();
 }
+$("#ouvrir-ajout").addEventListener("click", ()=>ouvrirAjout("global", null));
 $("#ouvrir-panier").addEventListener("click", dessinerPanier);
 $("#ouvrir-ticket").addEventListener("click", dessinerTicket);
 
@@ -3309,8 +3588,40 @@ voile.addEventListener("click", e=>{
     return;
   }
   if(act==="fermer"){ fermerFeuille(); return; }
-  if(act==="vider"){ etat.panier=[]; rafraichir(); fermerFeuille(); return; }
+  if(act==="vider"){ etat.panier=[]; etat.extras=[]; rafraichir(); fermerFeuille(); return; }
   if(act==="ticket"){ fermerFeuille(); dessinerTicket(); return; }
+  if(act==="copier-lien"){ copierTexte(lienPartage(), b, "Lien copié ✓"); return; }
+  if(act==="partage-natif"){
+    navigator.share({title:"Ma liste de courses", url:lienPartage()}).catch(()=>{});
+    return;
+  }
+
+  /* --- articles hors recette --- */
+  if(act==="ajout-global"||act==="ajout-panier"){ ouvrirAjout("global", dessinerPanier); return; }
+  if(act==="ajout-plat"){ ouvrirAjout("plat", dessinerPlat); return; }
+  if(act==="ajout-fin"){ sortirFeuille(); return; }
+  if(act==="unite"){ ajoutUnite = b.dataset.u; majAjout(); return; }
+  if(act==="creer"){
+    const nom = (ajoutRequete||"").trim().replace(/\s+/g," ");
+    if(!nom) return;
+    ajouterPerso(nom, ajoutUnite);
+    ajouterExtra(nom);
+    return;
+  }
+  if(act==="prendre"){ ajouterExtra(b.dataset.n); return; }
+  if(act==="xq-"||act==="xq+"||act==="xsup"){
+    const liste = extrasDe(b.dataset.c), i = +b.dataset.x, e = liste[i];
+    if(!e) return;
+    if(act==="xsup") liste.splice(i,1);
+    else {
+      const d = pas(e.q, prod(e.nom).unite);
+      e.q = Math.max(0, Math.round((e.q + (act==="xq+"?d:-d))*100)/100);
+      if(e.q<=0) liste.splice(i,1);
+    }
+    if(b.dataset.c==="global"){ rendreBarre(); memoriser(); }
+    redessinerFeuille();
+    return;
+  }
 
   if(!brouillon) return;
   const r = recette(brouillon.rid);
@@ -3361,6 +3672,7 @@ ecran.addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   const act = b.dataset.act;
   if(act==="fermer-ecran") fermerEcran();
+  if(act==="partager") dessinerPartage();
   if(act==="imprimer") window.print();
   if(act==="copier") copierTicket(b);
 });
@@ -3368,6 +3680,8 @@ ecran.addEventListener("click", e=>{
 /* --------------------------- Démarrage --------------------------- */
 try{ decoderMenu(decodeURIComponent(location.hash.slice(1))); }catch(e){}
 rendreOnglets(); rafraichir();
+/* Adresse de partage : on arrive directement sur le ticket. */
+if(ouvrirTicketAuChargement && (etat.panier.length || etat.extras.length)) dessinerTicket();
 </script>
 </body>
 </html>
