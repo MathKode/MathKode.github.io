@@ -25,6 +25,10 @@
     { id:17, videoSrc:"video/17.mp4", caption:'Notre vie est un film romantique 🍿' },
     { id:18, videoSrc:"video/18.mp4", caption:'Just us <3' },
     { id:19, videoSrc:"video/19.mp4", caption:'Bisous à la place Stan 💋' },
+    { id:20, videoSrc:"video/20.mp4", caption:'Te amo Elinou 💕' },
+    { id:21, videoSrc:"video/21.mp4", caption:'On est trop chou tous les deux 🫶' },
+    { id:22, videoSrc:"video/22.mp4", caption:'Pellicule souvenir 💌' },
+    { id:23, videoSrc:"video/23.mp4", caption:'Je t\'adore ma mimi 💗' },
   ];
 
   const HANDLE = '@elinou.et.mathou';
