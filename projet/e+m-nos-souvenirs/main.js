@@ -38,7 +38,7 @@
     { user:'@gougou', text:'Vous êtes le couple le plus chou que je connaisse' },
     { user:'@marmottes-aussois', text:'Ça donne envie de vivre la même histoire ❤️' },
     { user:'@gros-pinpin', text:'On voit clairement l\u2019amour à travers l\u2019écran' },
-    { user:'@gougou', text:'Ptdrrr le regard à la fin 😂' },
+    { user:'@gougou', text:'Trop mims le regard à la fin 😂' },
     { user:'@amanite', text:'Je suis venu ici juste pour pleurer de joie' },
     { user:'@chatmanite', text:'Encore une pépite, merci de partager ça' },
     { user:'@pharma_noiseville', text:'Ce couple mérite tout le bonheur du monde 🥹' },
