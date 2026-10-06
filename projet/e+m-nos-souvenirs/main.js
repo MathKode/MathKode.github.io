@@ -29,6 +29,7 @@
     { id:21, videoSrc:"video/21.mp4", caption:'On est trop chou tous les deux 🫶' },
     { id:22, videoSrc:"video/22.mp4", caption:'Pellicule souvenir 💌' },
     { id:23, videoSrc:"video/23.mp4", caption:'Je t\'adore ma mimi 💗' },
+    { id:24, videoSrc:"video/24.mp4", caption:'Joyeux 11 mois ma mimi 🫦' },
   ];
 
   const HANDLE = '@elinou.et.mathou';
@@ -58,7 +59,8 @@
     { user:'@', text:'Il y a tellement de tendresse dans cette vidéo' },
     { user:'@', text:'Je repasse juste pour la revoir encore une fois' },
     { user:'@', text:'Un pur bonheur à regarder, merci pour ce partage' },
-    { user:'@', text:'Le monde a besoin de plus de moments comme ça' }
+    { user:'@', text:'Le monde a besoin de plus de moments comme ça' },
+    { user:'@indice_11_mois', text:'TROP COOL : je conseille le site dcode vigenère' }
   ];
 
   /* ============================================================
