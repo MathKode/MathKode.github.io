@@ -4,22 +4,32 @@
      1. État et formats
      2. Chargement et synchronisation
      3. Actions (ajouter, retirer, tout effacer)
-     4. Calculs
+     4. Calculs (dont regroupement par mois)
      5. Rendu de l'interface
      6. Remise à zéro
      7. Feuille de saisie
      8. Message temporaire et démarrage
+
+   Fonctionnement mensuel :
+   rien n'est écrit dans le classeur à la fin du mois. Chaque dépense
+   porte déjà sa date ; le site la range dans son mois au moment de
+   l'affichage. Le compteur ne montre que le mois en cours, les mois
+   passés apparaissent dans la liste sous forme de bilans dépliables.
+   Avantage : aucun script à déclencher, aucun risque que les deux
+   téléphones écrivent chacun leur propre « ligne de clôture ».
    ============================================================ */
 
 
 /* ---------- 1. État et formats ---------- */
 
-let items = [];              // dépenses affichées, la plus récente en premier
+let items = [];              // toutes les dépenses, la plus récente en premier
 let payer = 'mathis';        // personne sélectionnée dans la feuille de saisie
+const moisOuverts = new Set(); // bilans dépliés, conservés entre deux rafraîchissements
 
 // Formats français créés une seule fois (leur construction est coûteuse)
-const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
-const day  = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+const euro    = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+const day     = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+const moisNom = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
 
 const $ = id => document.getElementById(id);
 
@@ -50,6 +60,7 @@ async function refresh() {
 
 // Le classeur peut être modifié par l'autre personne, ou à la main dans
 // Google Sheets : on se resynchronise dès que l'onglet redevient actif.
+// Cela suffit aussi à basculer sur le nouveau mois le 1er au matin.
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') refresh();
 });
@@ -74,7 +85,7 @@ async function addExpense(who, amount, label) {
   } catch (e) {
     items.shift();                       // on retire la ligne provisoire
     render();
-    console.log(e)
+    console.log(e);
     sync('Hors ligne');
     toast("Ajout impossible. Vérifiez la connexion.");
   }
@@ -99,7 +110,7 @@ async function removeExpense(item) {
   }
 }
 
-/** Efface toutes les dépenses. */
+/** Efface toutes les dépenses (tous les mois). */
 async function removeAll() {
   const sauvegarde = items.slice();
   items = [];
@@ -121,13 +132,72 @@ async function removeAll() {
 
 /* ---------- 4. Calculs ---------- */
 
-/** Somme dépensée par chacun. */
-function totals() {
+/** Somme dépensée par chacun, sur la liste donnée. */
+function totals(liste) {
   let m = 0, e = 0;
-  for (const it of items) {
+  for (const it of liste) {
     it.who === 'mathis' ? m += it.amount : e += it.amount;
   }
   return { m, e };
+}
+
+/**
+ * Qui doit combien à qui.
+ * On divise l'écart par deux : pour égaliser deux comptes qui diffèrent
+ * de 20 €, il suffit d'un remboursement de 10 €.
+ * Renvoie null si l'écart est inférieur à un demi-centime.
+ */
+function dette(m, e) {
+  const diff = Math.abs(m - e) / 2;
+  if (diff < 0.005) return null;
+  return {
+    debtor:   m > e ? 'Eline'  : 'Mathis',
+    creditor: m > e ? 'Mathis' : 'Eline',
+    diff
+  };
+}
+
+/**
+ * Clé du mois au format « 2026-11 ».
+ * Calculée en heure LOCALE : une dépense saisie le 1er novembre à 0 h 30
+ * (heure de Paris) est stockée « 2026-10-31T23:30Z » en UTC, mais doit
+ * bien compter pour novembre.
+ * Renvoie null si la date n'est pas lisible.
+ */
+function moisCle(v) {
+  const d = new Date(v);
+  if (isNaN(d)) return null;
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function moisCourant() {
+  return moisCle(new Date());
+}
+
+/** « 2026-10 » → « Octobre 2026 » */
+function libelleMois(cle) {
+  if (!cle) return 'Date non reconnue';
+  const [a, m] = cle.split('-').map(Number);
+  const s = moisNom.format(new Date(a, m - 1, 1));
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
+ * Regroupe les dépenses par mois, du plus récent au plus ancien.
+ * Les dates illisibles forment un dernier groupe à part.
+ */
+function parMois() {
+  const groupes = new Map();
+  for (const it of items) {
+    const k = moisCle(it.date);
+    if (!groupes.has(k)) groupes.set(k, []);
+    groupes.get(k).push(it);
+  }
+  return [...groupes.entries()].sort((a, b) => {
+    if (a[0] === null) return 1;
+    if (b[0] === null) return -1;
+    return b[0].localeCompare(a[0]);
+  });
 }
 
 /**
@@ -143,7 +213,11 @@ function parseAmount(s) {
 /* ---------- 5. Rendu de l'interface ---------- */
 
 function render() {
-  const { m, e } = totals();
+  // Le compteur ne prend en compte que le mois en cours
+  const cur = moisCourant();
+  const duMois = items.filter(it => moisCle(it.date) === cur);
+
+  const { m, e } = totals(duMois);
   $('sumM').textContent = euro.format(m);
   $('sumE').textContent = euro.format(e);
 
@@ -153,78 +227,125 @@ function render() {
   $('segE').style.width = (tot ? e / tot * 100 : 50) + '%';
 
   renderVerdict(m, e, tot);
-  renderCount();
-  renderList();
+  renderCount(duMois.length, cur);
+  renderList(duMois, cur);
   renderReset();
 }
 
-/**
- * Phrase de conclusion.
- * On divise l'écart par deux : pour égaliser deux comptes qui diffèrent
- * de 20 €, il suffit d'un remboursement de 10 €.
- */
 function renderVerdict(m, e, tot) {
   const v = $('verdict');
-  const diff = Math.abs(m - e) / 2;
+  const d = dette(m, e);
 
   if (!tot) {
     v.className = 'verdict balanced';
-    v.textContent = 'Aucune dépense enregistrée.';
-  } else if (diff < 0.005) {              // écart inférieur à un demi-centime
+    v.textContent = 'Aucune dépense ce mois-ci.';
+  } else if (!d) {
     v.className = 'verdict balanced';
     v.textContent = 'Tout est équilibré.';
   } else {
-    const debtor   = m > e ? 'Eline'  : 'Mathis';
-    const creditor = m > e ? 'Mathis' : 'Eline';
     v.className = 'verdict';
-    v.innerHTML = debtor + ' doit <strong>' + euro.format(diff) +
-                  '</strong> <span class="arrow">→</span> ' + creditor;
+    v.innerHTML = d.debtor + ' doit <strong>' + euro.format(d.diff) +
+                  '</strong> <span class="arrow">→</span> ' + d.creditor;
   }
 }
 
-function renderCount() {
-  $('count').textContent = items.length
-    ? items.length + (items.length > 1 ? ' dépenses' : ' dépense')
-    : 'Dépenses';
+/** En-tête de liste : « Novembre 2026 · 3 dépenses » */
+function renderCount(n, cur) {
+  $('count').textContent = libelleMois(cur) +
+    (n ? ' · ' + n + (n > 1 ? ' dépenses' : ' dépense') : '');
 }
 
-function renderList() {
+function renderList(duMois, cur) {
   const list = $('list');
   list.innerHTML = '';
 
-  if (!items.length) {
+  // 1. Le mois en cours, ligne par ligne
+  if (!duMois.length) {
     const d = document.createElement('div');
     d.className = 'empty';
-    d.innerHTML = '<b>Rien pour le moment</b>Ajoutez votre première dépense avec le bouton +.';
+    d.innerHTML = items.length
+      ? '<b>Nouveau mois</b>Les compteurs repartent de zéro. Le bilan des mois précédents est juste en dessous.'
+      : '<b>Rien pour le moment</b>Ajoutez votre première dépense avec le bouton +.';
     list.appendChild(d);
-    return;
   }
+  for (const it of duMois) list.appendChild(ligneDepense(it));
 
-  for (const it of items) {
-    const li = document.createElement('li');
-    li.className = 'row ' + (it.who === 'mathis' ? 'm' : 'e') + (it.pending ? ' pending' : '');
-    const name = it.who === 'mathis' ? 'Mathis' : 'Eline';
-
-    li.innerHTML =
-      '<div class="meta">' +
-        '<div class="label"></div>' +
-        '<div class="sub">' + name + ' · ' + dateCourte(it.date) + '</div>' +
-      '</div>' +
-      '<div class="amt">' + euro.format(it.amount) + '</div>' +
-      '<button class="kill" title="Retirer cette dépense" aria-label="Retirer la dépense de ' + name + '">−</button>';
-
-    // Le motif est saisi par l'utilisateur : textContent évite qu'un
-    // caractère comme « < » ne casse la page
-    li.querySelector('.label').textContent = it.label;
-
-    const kill = li.querySelector('.kill');
-    // Tant que le classeur n'a pas répondu, la ligne n'a pas de numéro :
-    // on ne peut pas encore la supprimer
-    if (it.pending) kill.disabled = true;
-    else kill.onclick = () => removeExpense(it);
-
-    list.appendChild(li);
+  // 2. Les mois passés, chacun résumé par un bilan dépliable
+  for (const [cle, liste] of parMois()) {
+    if (cle === cur) continue;
+    list.appendChild(blocMois(cle, liste));
   }
+}
+
+/** Une ligne de dépense. */
+function ligneDepense(it) {
+  const li = document.createElement('li');
+  li.className = 'row ' + (it.who === 'mathis' ? 'm' : 'e') + (it.pending ? ' pending' : '');
+  const name = it.who === 'mathis' ? 'Mathis' : 'Eline';
+
+  li.innerHTML =
+    '<div class="meta">' +
+      '<div class="label"></div>' +
+      '<div class="sub">' + name + ' · ' + dateCourte(it.date) + '</div>' +
+    '</div>' +
+    '<div class="amt">' + euro.format(it.amount) + '</div>' +
+    '<button class="kill" title="Retirer cette dépense" aria-label="Retirer la dépense de ' + name + '">−</button>';
+
+  // Le motif est saisi par l'utilisateur : textContent évite qu'un
+  // caractère comme « < » ne casse la page
+  li.querySelector('.label').textContent = it.label;
+
+  const kill = li.querySelector('.kill');
+  // Tant que le classeur n'a pas répondu, la ligne n'a pas de numéro :
+  // on ne peut pas encore la supprimer
+  if (it.pending) kill.disabled = true;
+  else kill.onclick = () => removeExpense(it);
+
+  return li;
+}
+
+/**
+ * Bilan d'un mois passé : total, part de chacun, qui doit quoi.
+ * Un clic déplie les dépenses du mois.
+ */
+function blocMois(cle, liste) {
+  const { m, e } = totals(liste);
+  const d = dette(m, e);
+  const n = liste.length;
+
+  const li = document.createElement('li');
+  li.className = 'month';
+
+  const det = document.createElement('details');
+  det.open = moisOuverts.has(cle);
+  det.addEventListener('toggle', () => {
+    det.open ? moisOuverts.add(cle) : moisOuverts.delete(cle);
+  });
+
+  const sum = document.createElement('summary');
+  sum.innerHTML =
+    '<div class="mhead">' +
+      '<span class="mname">' + libelleMois(cle) + '</span>' +
+      '<span class="mtotal">' + euro.format(m + e) + '</span>' +
+    '</div>' +
+    '<div class="msub">' +
+      '<span class="m">Mathis ' + euro.format(m) + '</span> · ' +
+      '<span class="e">Eline ' + euro.format(e) + '</span> · ' +
+      n + (n > 1 ? ' dépenses' : ' dépense') +
+    '</div>' +
+    '<div class="mverdict">' +
+      (d ? d.debtor + ' doit <strong>' + euro.format(d.diff) +
+           '</strong> <span class="arrow">→</span> ' + d.creditor
+         : 'Mois équilibré') +
+    '</div>';
+
+  const ul = document.createElement('ul');
+  ul.className = 'list';
+  for (const it of liste) ul.appendChild(ligneDepense(it));
+
+  det.append(sum, ul);
+  li.appendChild(det);
+  return li;
 }
 
 /** Le classeur peut renvoyer une date ISO ou du texte saisi à la main. */
@@ -238,7 +359,8 @@ function dateCourte(v) {
 
 /**
  * Le bouton corbeille n'existe que s'il y a quelque chose à effacer.
- * La confirmation s'affiche sur place, à la place du bouton.
+ * Il efface TOUS les mois : la remise à zéro mensuelle, elle, est
+ * automatique et ne supprime rien.
  * @param {boolean} confirming - true pour afficher « Non / Oui, effacer »
  */
 function renderReset(confirming) {
@@ -257,7 +379,7 @@ function renderReset(confirming) {
 
   const box = document.createElement('div');
   box.className = 'confirm';
-  box.innerHTML = 'Effacer&nbsp;?';
+  box.innerHTML = 'Tout l’historique&nbsp;?';
 
   const no = document.createElement('button');
   no.className = 'ghost';
