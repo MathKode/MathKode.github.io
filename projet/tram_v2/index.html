@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#E30613">
+  <title>Quand partir ?</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="app">
+
+    <header class="entete">
+      <h1>Quand partir ?</h1>
+      <p id="horloge" class="horloge">--:--</p>
+    </header>
+
+    <!-- Une carte par trajet (remplie par js/affichage.js) -->
+    <section id="cartes" class="cartes">
+      <p class="message">Chargement…</p>
+    </section>
+
+    <!-- Le plan de la ligne avec tous les trams (rempli par js/plan.js) -->
+    <section id="ligne" class="ligne">
+      <h2 class="ligne-titre">La ligne T1 en direct</h2>
+
+      <div class="plan-grille plan-entetes">
+        <div class="plan-entA">↓ vers Essey<span id="plan-nbA" class="plan-nb">–</span></div>
+        <div class="plan-entN">Arrêt</div>
+        <div class="plan-entB">↑ vers Brabois<span id="plan-nbB" class="plan-nb">–</span></div>
+      </div>
+
+      <div class="plan plan-grille">
+        <div id="plan-etaA" class="plan-col plan-eta plan-sensA"></div>
+        <div id="plan-railA" class="plan-rail plan-sensA"></div>
+        <div id="plan-noms" class="plan-col plan-noms"></div>
+        <div id="plan-railB" class="plan-rail plan-sensB"></div>
+        <div id="plan-etaB" class="plan-col plan-eta plan-sensB"></div>
+      </div>
+
+      <details class="plan-details">
+        <summary>Liste des trams</summary>
+        <div class="plan-listes">
+          <div><h3 class="plan-sensA">↓ Vers Essey Mouzimpré</h3><ul id="plan-listeA"></ul></div>
+          <div><h3 class="plan-sensB">↑ Vers Brabois Hôpitaux</h3><ul id="plan-listeB"></ul></div>
+        </div>
+      </details>
+
+      <p class="plan-note">
+        Chiffres : prochain passage à chaque arrêt (et le suivant en petit).
+        Cercle plein : tram en route ou à quai. Cercle pointillé : tram au terminus, sur le point de partir.
+        ★ : mes arrêts. Chaque tram n'est compté qu'une fois, même s'il est annoncé à plusieurs arrêts.
+      </p>
+    </section>
+
+    <footer class="pied">
+      <span id="etat">—</span>
+    </footer>
+
+  </main>
+
+  <!-- L'ordre compte : config d'abord, app en dernier -->
+  <script src="js/config.js"></script>
+  <script src="js/stan.js"></script>
+  <script src="js/suivi.js"></script>
+  <script src="js/affichage.js"></script>
+  <script src="js/plan.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
