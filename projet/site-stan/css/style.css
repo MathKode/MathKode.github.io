@@ -1,0 +1,186 @@
+/* ===== Couleurs et tailles faciles à changer ===== */
+:root {
+  --fond: #f4f4f6;
+  --carte: #ffffff;
+  --texte: #1c1c1e;
+  --texte-doux: #6b6b70;
+  --rouge: #e30613;
+  --vert: #1a8f3c;
+  --orange: #d97706;
+  --rayon: 18px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fond);
+  color: var(--texte);
+  min-height: 100vh;
+}
+
+/* Colonne centrale */
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== En-tête de la page ===== */
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+.horloge {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte-doux);
+}
+
+/* ===== Les cartes : côte à côte sur PC, l'une sous l'autre sur téléphone ===== */
+.cartes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.carte {
+  background: var(--carte);
+  border-radius: var(--rayon);
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* En-tête de la carte : badge T1 + nom de l'arrêt */
+.carte-entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+.sous-titre {
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+}
+
+/* Le prochain départ, en grand */
+.prochain {
+  border-left: 6px solid var(--vert);
+  padding-left: 14px;
+}
+
+.prochain .label {
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.prochain .heure {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.prochain .compte {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--vert);
+}
+
+.prochain .detail {
+  color: var(--texte-doux);
+  margin-top: 4px;
+}
+
+/* Quand il faut partir tout de suite */
+.prochain.urgent {
+  border-left-color: var(--orange);
+}
+
+.prochain.urgent .compte {
+  color: var(--orange);
+}
+
+/* Départ estimé (tram pas encore annoncé par Stan) : bordure en pointillés */
+.prochain.estime {
+  border-left-style: dashed;
+}
+
+/* Le départ suivant, en petit */
+.suivant {
+  color: var(--texte-doux);
+  font-size: 0.95rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  padding-top: 12px;
+}
+
+.suivant strong {
+  color: var(--texte);
+}
+
+/* Messages (chargement, erreur, aucun tram) */
+.message {
+  color: var(--texte-doux);
+  padding: 20px 0;
+  text-align: center;
+}
+
+.message.erreur {
+  color: var(--rouge);
+}
+
+/* ===== Bas de page ===== */
+.pied {
+  margin-top: auto;
+  text-align: center;
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+}
+
+/* ===== Petits écrans : on réduit un peu ===== */
+@media (max-width: 400px) {
+  .prochain .heure {
+    font-size: 3.2rem;
+  }
+}
+
+/* ===== Mode sombre automatique ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #121214;
+    --carte: #1e1e22;
+    --texte: #f2f2f5;
+    --texte-doux: #9a9aa2;
+  }
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#E30613">
+  <title>Quand partir ?</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="app">
+
+    <header class="entete">
+      <h1>Quand partir ?</h1>
+      <p id="horloge" class="horloge">--:--</p>
+    </header>
+
+    <!-- Une carte par arrêt (remplie par js/affichage.js) -->
+    <section id="cartes" class="cartes">
+      <p class="message">Chargement…</p>
+    </section>
+
+    <footer class="pied">
+      <span id="etat">—</span>
+    </footer>
+
+  </main>
+
+  <!-- L'ordre compte : config d'abord, app en dernier -->
+  <script src="js/config.js"></script>
+  <script src="js/stan.js"></script>
+  <script src="js/affichage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
