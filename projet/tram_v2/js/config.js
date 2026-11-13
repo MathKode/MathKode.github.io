@@ -10,7 +10,7 @@ const CONFIG = {
   // 25 arrêts toutes les 30 s ≈ 72 000 requêtes par jour si la page reste
   // ouverte en permanence (limite gratuite Cloudflare : 100 000).
   // La page s'arrête d'interroger quand l'onglet est caché.
-  rafraichissement: 30,
+  rafraichissement: 25,
 
   // Nombre de demandes envoyées en même temps au relais
   requetesSimultanees: 6,
